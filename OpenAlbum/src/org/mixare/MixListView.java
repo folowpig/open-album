@@ -443,7 +443,6 @@ class ListItemAdapter extends BaseAdapter {
 		myInflater = LayoutInflater.from(mixListView);
 	}
 
-	@Override
 	public View getView(final int position, View convertView, ViewGroup parent) {
 		itemPosition = position;
 		if (convertView==null) {
@@ -466,7 +465,6 @@ class ListItemAdapter extends BaseAdapter {
 
 		holder.checkbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 
-			@Override
 			public void onCheckedChanged(CompoundButton buttonView,
 					boolean isChecked) {
 					mixListView.clickOnDataSource(position);
@@ -515,17 +513,14 @@ class ListItemAdapter extends BaseAdapter {
 			changeColor(4, Color.WHITE, Color.DKGRAY);
 	}
 
-	@Override
 	public int getCount() {
 		return mixListView.getDataSourceMenu().size();
 	}
 
-	@Override
 	public Object getItem(int position) {
 		return this;
 	}
 
-	@Override
 	public long getItemId(int position) {
 		return position;
 	}

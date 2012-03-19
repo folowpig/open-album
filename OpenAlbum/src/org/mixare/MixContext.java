@@ -500,7 +500,6 @@ public class MixContext extends ContextWrapper {
 	
 	private LocationListener lbounce = new LocationListener() {
 
-		@Override
 		public void onLocationChanged(Location location) {
 			Log.d(TAG, "bounce Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy());
 			//Toast.makeText(ctx, "BOUNCE: Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy(), Toast.LENGTH_LONG).show();
@@ -513,25 +512,21 @@ public class MixContext extends ContextWrapper {
 			}
 		}
 
-		@Override
 		public void onProviderDisabled(String arg0) {
 			Log.d(TAG, "bounce disabled");
 		}
 
-		@Override
 		public void onProviderEnabled(String arg0) {
 			Log.d(TAG, "bounce enabled");
 
 		}
 
-		@Override
 		public void onStatusChanged(String arg0, int arg1, Bundle arg2) {}
 		
 	};
 	
 	private LocationListener lcoarse = new LocationListener() {
 
-		@Override
 		public void onLocationChanged(Location location) {
 			try {
 				Log.d(TAG, "coarse Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy());
@@ -543,13 +538,10 @@ public class MixContext extends ContextWrapper {
 			}
 		}
 
-		@Override
 		public void onProviderDisabled(String arg0) {}
 
-		@Override
 		public void onProviderEnabled(String arg0) {}
 
-		@Override
 		public void onStatusChanged(String arg0, int arg1, Bundle arg2) {}
 		
 	};

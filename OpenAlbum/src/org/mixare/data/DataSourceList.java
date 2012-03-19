@@ -157,18 +157,15 @@ public class DataSourceList extends ListActivity {
 			notifyDataSetChanged();
 		}
 
-		@Override
 		public int getCount() {
 			return mDataSource.size();
 		}
 
-		@Override
 		public long getItemId(int position) {
 			return position;
 		}
 
 
-		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
 			ViewHolder holder = null;
 
@@ -197,7 +194,6 @@ public class DataSourceList extends ListActivity {
 			return convertView;
 		}
 
-		@Override
 		public void onCheckedChanged(CompoundButton buttonView,
 				boolean isChecked) {
 			int position = (Integer) buttonView.getTag();
@@ -209,7 +205,6 @@ public class DataSourceList extends ListActivity {
 			mDataSource.get(position).setEnabled(isChecked);
 		}
 
-		@Override
 		public Object getItem(int arg0) {
 			return null;
 		}

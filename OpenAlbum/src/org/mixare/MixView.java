@@ -220,7 +220,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 			this.mWakeLock = pm.newWakeLock(
 					PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "My Tag");
 
-			killOnError();
+			//killOnError();
 			requestWindowFeature(Window.FEATURE_NO_TITLE);
 
 			/*Get the preference file PREFS_NAME stored in the internal memory of the phone*/
@@ -776,7 +776,6 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 		}
 	}
 
-	@Override
 	public boolean onTouch(View v, MotionEvent event) {
 		dataView.setFrozen(false);
 		if (searchNotificationTxt != null) {

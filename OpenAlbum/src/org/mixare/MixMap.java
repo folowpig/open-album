@@ -289,7 +289,6 @@ public class MixMap extends MapActivity implements OnTouchListener{
 		}
 	}
 
-	@Override
 	public boolean onTouch(View v, MotionEvent event) {
 		dataView.setFrozen(false);
 		dataView.getDataHandler().setMarkerList(originalMarkerList);
