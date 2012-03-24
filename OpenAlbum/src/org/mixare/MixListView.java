@@ -105,7 +105,7 @@ public class MixListView extends ListActivity {
 		//		mixCtx = MixView.ctx;
 		dataView = MixView.dataView;	
 		ctx = this;
-		mixContext = dataView.getContext();
+		setMixContext(dataView.getContext());
 
 		switch(list){
 		case 1:
@@ -354,7 +354,7 @@ public class MixListView extends ListActivity {
 		/*define menu items*/
 		MenuItem item1 = menu.add(base, base, base, getString(DataView.MENU_ITEM_3)); 
 		MenuItem item2 = menu.add(base, base+1, base+1, getString(DataView.MENU_CAM_MODE));
-		MenuItem item3 = menu.add(base, base+2, base+2, "Add data source");
+		//MenuItem item3 = menu.add(base, base+2, base+2, "Add data source");
 		/*assign icons to the menu items*/
 		item1.setIcon(android.R.drawable.ic_menu_mapmode);
 		item2.setIcon(android.R.drawable.ic_menu_camera);
@@ -419,6 +419,20 @@ public class MixListView extends ListActivity {
 
 	public static void setSearchQuery(String query){
 		searchQuery = query;
+	}
+
+	/**
+	 * @return the mixContext
+	 */
+	public MixContext getMixContext() {
+		return mixContext;
+	}
+
+	/**
+	 * @param mixContext the mixContext to set
+	 */
+	public void setMixContext(MixContext mixContext) {
+		this.mixContext = mixContext;
 	}
 }
 

@@ -61,7 +61,7 @@ import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.provider.Settings;
 import android.util.Log;
-import android.view.Display;
+//import android.view.Display;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -71,7 +71,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.Window;
-import android.view.WindowManager;
+//import android.view.WindowManager;//!
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.FrameLayout;
@@ -369,7 +369,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 			this.mWakeLock.acquire();
 
 			killOnError();
-			SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+			//SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 			mixContext.mixView = this;
 			dataView.doStart();
 			dataView.clearEvents();

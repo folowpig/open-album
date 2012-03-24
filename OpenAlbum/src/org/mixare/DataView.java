@@ -27,7 +27,7 @@ import static android.view.KeyEvent.KEYCODE_DPAD_UP;
 
 import java.util.ArrayList;
 import java.util.Locale;
-import java.util.Map.Entry;
+//import java.util.Map.Entry;
 
 import org.mixare.data.DataHandler;
 import org.mixare.data.DataSource;
