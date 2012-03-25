@@ -39,6 +39,9 @@ import android.util.Log;
 /**
  * This class establishes a connection and downloads the data for
  * each entry in its todo list one after another.
+ * 
+ * @TODO Customize Class + decouple it, fix performance issues.
+ * @TODO http://grepcode.com/file/repository.grepcode.com/java/ext/com.google.android/android/2.3.1_r1/android/app/DownloadManager.java#DownloadManager  
  */
 public class DownloadManager implements Runnable {
 
@@ -76,7 +79,7 @@ public class DownloadManager implements Runnable {
 
 			// Wait for proceed
 			while (!stop && !pause) {
-				synchronized (this) {
+				synchronized (this) { //@FIXME Important - Thread deadLock
 					if (todoList.size() > 0) {
 						jobId = getNextReqId();
 						request = todoList.get(jobId);
@@ -146,7 +149,7 @@ public class DownloadManager implements Runnable {
 
 					Log.v(MixView.TAG, "try to load JSON data");
 
-					JSONObject root = new JSONObject(tmp);
+					JSONObject root = new JSONObject(tmp);//@FIXME OpenStreetMap Recieved data is XML
 
 					Log.d(MixView.TAG, "loading JSON data");
 

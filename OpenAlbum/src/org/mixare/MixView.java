@@ -61,7 +61,7 @@ import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.provider.Settings;
 import android.util.Log;
-//import android.view.Display;
+//import android.view.Display; //@del
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -71,7 +71,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.Window;
-//import android.view.WindowManager;//!
+//import android.view.WindowManager;//@del
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.FrameLayout;
@@ -285,7 +285,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 				//add the default datasources to the preferences file
 				SharedPreferences.Editor dataSourceEditor = DataSourceSettings.edit();
 				dataSourceEditor.putString("DataSource0", "Wikipedia|http://ws.geonames.org/findNearbyWikipediaJSON|0|0|true");
-				dataSourceEditor.putString("DataSource1", "Twitter|http://search.twitter.com/search.json|2|0|true");
+				//dataSourceEditor.putString("DataSource1", "Twitter|http://search.twitter.com/search.json|2|0|true");
 				dataSourceEditor.putString("DataSource2", "OpenStreetmap|http://open.mapquestapi.com/xapi/api/0.6/node[railway=station]|3|1|true");
 				//dataSourceEditor.putString("DataSource3", "Own URL|http://mixare.org/geotest.php|4|0|false");
 				dataSourceEditor.commit();

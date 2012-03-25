@@ -30,7 +30,7 @@ import org.mixare.reality.PhysicalPlace;
 import org.mixare.render.Camera;
 import org.mixare.render.MixVector;
 
-import android.graphics.Color;
+//import android.graphics.Color; //@del
 import android.location.Location;
 
 /**
@@ -40,7 +40,7 @@ import android.location.Location;
  * NavigationMarkers, since this class is abstract
  */
 
-abstract public class Marker implements Comparable<Marker> {
+ public abstract class Marker implements Comparable<Marker> {
 
 	private String ID;
 	protected String title;
@@ -86,30 +86,6 @@ abstract public class Marker implements Comparable<Marker> {
 		
 	}
 	
-	
-	public String getTitle(){
-		return title;
-	}
-
-	public String getURL(){
-		return URL;
-	}
-
-	public double getLatitude() {
-		return mGeoLoc.getLatitude();
-	}
-	
-	public double getLongitude() {
-		return mGeoLoc.getLongitude();
-	}
-	
-	public double getAltitude() {
-		return mGeoLoc.getAltitude();
-	}
-	
-	public MixVector getLocationVector() {
-		return locationVector;
-	}
 	private void cCMarker(MixVector originalPoint, Camera viewCam, float addX, float addY) {
 
 		// Temp properties
@@ -271,25 +247,9 @@ abstract public class Marker implements Comparable<Marker> {
 		return evtHandled;
 	}
 
-	public double getDistance() {
-		return distance;
-	}
-
-	public void setDistance(double distance) {
-		this.distance = distance;
-	}
-	
-
-	public String getID() {
-		return ID;
-	}
-
-	public void setID(String iD) {
-		ID = iD;
-	}
 
 	public int compareTo(Marker another) {
-
+		
 		Marker leftPm = this;
 		Marker rightPm = another;
 
@@ -302,6 +262,52 @@ abstract public class Marker implements Comparable<Marker> {
 		return this.ID.equals(((Marker) marker).getID());
 	}
 
+	//?!! 
+	abstract public int getMaxObjects();
+
+	/************ Getters and Setters ****************/
+	public String getTitle(){
+		return title;
+	}
+	//get Colour for OpenStreetMap based on the URL number
+	public int getColour() {
+		return this.datasource.getColor();
+	}
+	public String getURL(){
+		return URL;
+	}
+
+	public double getLatitude() {
+		return mGeoLoc.getLatitude();
+	}
+	
+	public double getLongitude() {
+		return mGeoLoc.getLongitude();
+	}
+	
+	public double getAltitude() {
+		return mGeoLoc.getAltitude();
+	}
+	
+	public MixVector getLocationVector() {
+		return locationVector;
+	}
+	
+	public double getDistance() {
+		return distance;
+	}
+
+	public void setDistance(double distance) {
+		this.distance = distance;
+	}
+
+	public String getID() {
+		return ID;
+	}
+
+	public void setID(String iD) {
+		ID = iD;
+	}
 	public boolean isActive() {
 		return active;
 	}
@@ -310,15 +316,6 @@ abstract public class Marker implements Comparable<Marker> {
 		this.active = active;
 	}
 
-	abstract public int getMaxObjects();
-	
-
-	//get Colour for OpenStreetMap based on the URL number
-	public int getColour() {
-		return this.datasource.getColor();
-	}
-
-	
 }
 
 

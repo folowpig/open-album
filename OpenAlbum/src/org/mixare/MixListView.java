@@ -59,6 +59,8 @@ import android.widget.Toast;
 /**
  * This class holds vectors with informaction about sources, their description
  * and whether they have been selected.
+ * 
+ * @TODO Performance improvement
  */
 public class MixListView extends ListActivity {
 
@@ -84,21 +86,7 @@ public class MixListView extends ListActivity {
 	private static SpannableString underlinedTitle;
 	public static List<Marker> searchResultMarkers;
 	public static List<Marker> originalMarkerList;
-
-	public Vector<String> getDataSourceMenu() {
-		return dataSourceMenu;
-	}
 	
-	public Vector<String> getDataSourceDescription() {
-		return dataSourceDescription;
-	}
-
-	public Vector<Boolean> getDataSourceChecked() {
-		return dataSourceChecked;
-	}
-	public Vector<Integer> getDataSourceIcon() {
-		return dataSourceIcon;
-	}
 	@Override
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -354,7 +342,7 @@ public class MixListView extends ListActivity {
 		/*define menu items*/
 		MenuItem item1 = menu.add(base, base, base, getString(DataView.MENU_ITEM_3)); 
 		MenuItem item2 = menu.add(base, base+1, base+1, getString(DataView.MENU_CAM_MODE));
-		//MenuItem item3 = menu.add(base, base+2, base+2, "Add data source");
+		MenuItem item3 = menu.add(base, base+2, base+2, "Add data source");
 		/*assign icons to the menu items*/
 		item1.setIcon(android.R.drawable.ic_menu_mapmode);
 		item2.setIcon(android.R.drawable.ic_menu_camera);
@@ -401,6 +389,14 @@ public class MixListView extends ListActivity {
 		startActivityForResult(intent2, 20);
 	}
 
+
+
+/***************** Getters and Setters *****************/
+
+	public static void setSearchQuery(String query){
+		searchQuery = query;
+	}
+
 	/*public void setDataSource(String source){
 		selectedDataSource = source;
 	}
@@ -417,10 +413,6 @@ public class MixListView extends ListActivity {
 		return searchQuery;
 	}
 
-	public static void setSearchQuery(String query){
-		searchQuery = query;
-	}
-
 	/**
 	 * @return the mixContext
 	 */
@@ -434,6 +426,22 @@ public class MixListView extends ListActivity {
 	public void setMixContext(MixContext mixContext) {
 		this.mixContext = mixContext;
 	}
+
+	public Vector<String> getDataSourceMenu() {
+		return dataSourceMenu;
+	}
+	
+	public Vector<String> getDataSourceDescription() {
+		return dataSourceDescription;
+	}
+
+	public Vector<Boolean> getDataSourceChecked() {
+		return dataSourceChecked;
+	}
+	public Vector<Integer> getDataSourceIcon() {
+		return dataSourceIcon;
+	}
+
 }
 
 /**

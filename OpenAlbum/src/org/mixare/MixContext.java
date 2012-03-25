@@ -107,17 +107,18 @@ public class MixContext extends ContextWrapper {
 		this.allDataSources.add(datasource);
 	}
 	
+	//@TODO reorganize + centralize datasource input 
 	public void refreshDataSources() {
 		this.allDataSources.clear();
 		SharedPreferences settings = getSharedPreferences(
 				DataSourceList.SHARED_PREFS, 0);
-		int size = settings.getAll().size();
+		int size = settings.getAll().size();  
 		if (size == 0){
 			SharedPreferences.Editor dataSourceEditor = settings.edit();
 			dataSourceEditor.putString("DataSource0", "Wikipedia|http://ws.geonames.org/findNearbyWikipediaJSON|0|0|true");
-			dataSourceEditor.putString("DataSource1", "Twitter|http://search.twitter.com/search.json|2|0|true");
+//			dataSourceEditor.putString("DataSource1", "Twitter|http://search.twitter.com/search.json|2|0|true");
 			dataSourceEditor.putString("DataSource2", "OpenStreetmap|http://open.mapquestapi.com/xapi/api/0.6/node[railway=station]|3|1|true");
-			dataSourceEditor.putString("DataSource3", "Own URL|http://mixare.org/geotest.php|4|0|false");
+//			dataSourceEditor.putString("DataSource3", "Own URL|http://mixare.org/geotest.php|4|0|false");
 			dataSourceEditor.commit();
 			size = settings.getAll().size();
 		}
@@ -301,7 +302,7 @@ public class MixContext extends ContextWrapper {
 			conn.setReadTimeout(10000);
 			conn.setConnectTimeout(10000);
 
-			is = conn.getInputStream();
+			is = conn.getInputStream(); //@TODO fix openMap error (URL Params)
 			
 			return is;
 		} catch (Exception ex) {
@@ -431,7 +432,6 @@ public class MixContext extends ContextWrapper {
 	}
 
 	public void loadMixViewWebPage(String url) throws Exception {
-		// TODO
 		WebView webview = new WebView(mixView);
 		webview.getSettings().setJavaScriptEnabled(true);
 
@@ -461,7 +461,6 @@ public class MixContext extends ContextWrapper {
 		webview.loadUrl(url);
 	}
 	public void loadWebPage(String url, Context context) throws Exception {
-		// TODO
 		WebView webview = new WebView(context);
 		
 		webview.setWebViewClient(new WebViewClient() {
@@ -504,6 +503,7 @@ public class MixContext extends ContextWrapper {
 			Log.d(TAG, "bounce Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy());
 			//Toast.makeText(ctx, "BOUNCE: Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy(), Toast.LENGTH_LONG).show();
 
+			//@FIXME Check location changes before purging, make use of cache - leak
 			downloadManager.purgeLists();
 			
 			if (location.getAccuracy() < 40) {
@@ -534,7 +534,8 @@ public class MixContext extends ContextWrapper {
 //				if (lm != null)
 //					lm. =  location;
 //				lm.removeUpdates(lcoarse); //?
-//				downloadManager.purgeLists();
+				//@FIXME Check location changes before purging, make use of cache - leak
+				downloadManager.purgeLists();
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}

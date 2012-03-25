@@ -143,50 +143,6 @@ public class DataView {
 		this.mixContext = ctx;
 	}
 	
-	public MixContext getContext() {
-		return mixContext;
-	}
-
-	public boolean isLauncherStarted() {
-		return isLauncherStarted;
-	}
-	
-	public boolean isFrozen() {
-		return frozen;
-	}
-
-	public void setFrozen(boolean frozen) {
-		this.frozen = frozen;
-	}
-	
-	public float getRadius() {
-		return radius;
-	}
-
-	public void setRadius(float radius) {
-		this.radius = radius;
-	}
-	
-	public DataHandler getDataHandler() {
-		return dataHandler;
-	}
-	
-	public boolean isDetailsView() {
-		return state.isDetailsView();
-	}
-	
-	public void setDetailsView(boolean detailsView) {
-		state.setDetailsView(detailsView);
-	}
-
-	public void doStart() {
-		state.nextLStatus = MixState.NOT_STARTED;
-		mixContext.setLocationAtLastDownload(curFix);
-	}
-
-	public boolean isInited() {
-		return isInit;
-	}
 
 	public void init(int widthInit, int heightInit) {
 		try {
@@ -398,7 +354,51 @@ public class DataView {
 		dw.paintText(padw + x - w / 2, padh + dw.getTextAsc() + y - h / 2, txt, false);
 	}
 
+/**************** Getters And Setters ******************/
+	public MixContext getContext() {
+		return mixContext;
+	}
 
+	public boolean isLauncherStarted() {
+		return isLauncherStarted;
+	}
+	
+	public boolean isFrozen() {
+		return frozen;
+	}
+
+	public void setFrozen(boolean frozen) {
+		this.frozen = frozen;
+	}
+	
+	public float getRadius() {
+		return radius;
+	}
+
+	public void setRadius(float radius) {
+		this.radius = radius;
+	}
+	
+	public DataHandler getDataHandler() {
+		return dataHandler;
+	}
+	
+	public boolean isDetailsView() {
+		return state.isDetailsView();
+	}
+	
+	public void setDetailsView(boolean detailsView) {
+		state.setDetailsView(detailsView);
+	}
+
+	public void doStart() {
+		state.nextLStatus = MixState.NOT_STARTED;
+		mixContext.setLocationAtLastDownload(curFix);
+	}
+
+	public boolean isInited() {
+		return isInit;
+	}
 	public void clickEvent(float x, float y) {
 		synchronized (uiEvents) {
 			uiEvents.add(new ClickEvent(x, y));

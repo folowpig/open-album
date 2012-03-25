@@ -22,7 +22,7 @@ package org.mixare.data;
 import org.mixare.R;
 
 import android.app.Activity;
-import android.content.Intent;
+//import android.content.Intent; //@del
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -46,7 +46,7 @@ public class DataSource extends Activity {
 	
 	private String name;
 	private String url;
-	public enum TYPE { WIKIPEDIA, BUZZ, TWITTER, OSM, MIXARE };
+	public enum TYPE { WIKIPEDIA, BUZZ, TWITTER, OSM, MIXARE }; //@TODO add panoramio
 	public enum DISPLAY { CIRCLE_MARKER, NAVIGATION_MARKER };
 	private boolean enabled;
 	private TYPE type;
