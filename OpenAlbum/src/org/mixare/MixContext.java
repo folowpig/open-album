@@ -531,8 +531,10 @@ public class MixContext extends ContextWrapper {
 			try {
 				Log.d(TAG, "coarse Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy());
 				//Toast.makeText(ctx, "COARSE: Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy(), Toast.LENGTH_LONG).show();
-				lm.removeUpdates(lcoarse);
-				downloadManager.purgeLists();
+//				if (lm != null)
+//					lm. =  location;
+//				lm.removeUpdates(lcoarse); //?
+//				downloadManager.purgeLists();
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
