@@ -123,22 +123,10 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 	private TextView searchNotificationTxt;
 
 	//TAG for logging
-	public static final String TAG = "Mixare";
+	public static final String TAG = "Mixare-OA";
 
 	/*string to name & access the preference file in the internal storage*/
 	public static final String PREFS_NAME = "MyPrefsFileForMenuItems";
-
-	public boolean isZoombarVisible() {
-		return myZoomBar != null && myZoomBar.getVisibility() == View.VISIBLE;
-	}
-
-	public String getZoomLevel() {
-		return zoomLevel;
-	}
-
-	public int getZoomProgress() {
-		return zoomProgress;
-	}
 
 	public void doError(Exception ex1) {
 		if (!fError) {
@@ -283,11 +271,13 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 				editor.commit();
 
 				//add the default datasources to the preferences file
+				// ex of panoramio 
+				// http://www.panoramio.com/map/get_panoramas.php?set=public&from=0&to=20&minx=-180&miny=-90&maxx=180&maxy=90&size=medium&mapfilter=true
 				SharedPreferences.Editor dataSourceEditor = DataSourceSettings.edit();
-				dataSourceEditor.putString("DataSource0", "Wikipedia|http://ws.geonames.org/findNearbyWikipediaJSON|0|0|true");
-				//dataSourceEditor.putString("DataSource1", "Twitter|http://search.twitter.com/search.json|2|0|true");
+				dataSourceEditor.putString("DataSource0", "Wikipedia|http://api.geonames.org/findNearbyWikipediaJSON|0|0|true");
+				dataSourceEditor.putString("DataSource1", "Twitter|http://search.twitter.com/search.json|2|0|false");
 				dataSourceEditor.putString("DataSource2", "OpenStreetmap|http://open.mapquestapi.com/xapi/api/0.6/node[railway=station]|3|1|true");
-				//dataSourceEditor.putString("DataSource3", "Own URL|http://mixare.org/geotest.php|4|0|false");
+				//dataSourceEditor.putString("DataSource3", "http://www.panoramio.com/map/get_panoramas.php|4|0|true");
 				dataSourceEditor.commit();
 
 			} 
@@ -613,21 +603,6 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 		return myout;
 	}
 
-	private void setZoomLevel() {
-		float myout = calcZoomLevel();
-
-		dataView.setRadius(myout);
-
-		myZoomBar.setVisibility(View.INVISIBLE);
-		zoomLevel = String.valueOf(myout);
-
-		dataView.doStart();
-		dataView.clearEvents();
-		downloadThread = new Thread(mixContext.downloadManager);
-		downloadThread.start();
-
-	};
-
 	private SeekBar.OnSeekBarChangeListener myZoomBarOnSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
 		Toast t;
 
@@ -663,7 +638,6 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 		}
 
 	};
-
 
 	public void onSensorChanged(SensorEvent evt) {
 		try {
@@ -785,7 +759,31 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 		return false;
 	}
 
+/*********** Getters and Setters ************/
+	public boolean isZoombarVisible() {
+		return myZoomBar != null && myZoomBar.getVisibility() == View.VISIBLE;
+	}
+	
+	private void setZoomLevel() {
+		float myout = calcZoomLevel();
 
+		dataView.setRadius(myout);
+
+		myZoomBar.setVisibility(View.INVISIBLE);
+		zoomLevel = String.valueOf(myout);
+
+		dataView.doStart();
+		dataView.clearEvents();
+		downloadThread = new Thread(mixContext.downloadManager);
+		downloadThread.start();
+
+	};
+	public int getZoomProgress() {
+		return zoomProgress;
+	}
+	public String getZoomLevel() {
+		return zoomLevel;
+	}
 }
 
 /**
@@ -793,7 +791,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
  *
  */
 class CameraSurface extends SurfaceView implements SurfaceHolder.Callback {
-	MixView app;
+	MixView app; //? 
 	SurfaceHolder holder;
 	Camera camera;
 
@@ -807,20 +805,23 @@ class CameraSurface extends SurfaceView implements SurfaceHolder.Callback {
 			holder.addCallback(this);
 			holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 		} catch (Exception ex) {
-
+			Log.e(VIEW_LOG_TAG, ex.getMessage());
 		}
 	}
 
 	public void surfaceCreated(SurfaceHolder holder) {
 		try {
+			//release camera if it's in use
 			if (camera != null) {
 				try {
 					camera.stopPreview();
 				} catch (Exception ignore) {
+					Log.i(VIEW_LOG_TAG, ignore.getMessage());
 				}
 				try {
 					camera.release();
 				} catch (Exception ignore) {
+					Log.i(VIEW_LOG_TAG, ignore.getMessage());
 				}
 				camera = null;
 			}
@@ -828,20 +829,23 @@ class CameraSurface extends SurfaceView implements SurfaceHolder.Callback {
 			camera = Camera.open();
 			camera.setPreviewDisplay(holder);
 		} catch (Exception ex) {
+			Log.w(VIEW_LOG_TAG, ex.getMessage());
 			try {
 				if (camera != null) {
 					try {
 						camera.stopPreview();
 					} catch (Exception ignore) {
+						Log.e(VIEW_LOG_TAG, ignore.getMessage());
 					}
 					try {
 						camera.release();
 					} catch (Exception ignore) {
+						Log.e(VIEW_LOG_TAG, ignore.getMessage());
 					}
 					camera = null;
 				}
 			} catch (Exception ignore) {
-
+				Log.i(VIEW_LOG_TAG, ignore.getMessage());
 			}
 		}
 	}
@@ -852,10 +856,12 @@ class CameraSurface extends SurfaceView implements SurfaceHolder.Callback {
 				try {
 					camera.stopPreview();
 				} catch (Exception ignore) {
+					Log.i(VIEW_LOG_TAG, ignore.getMessage());
 				}
 				try {
 					camera.release();
 				} catch (Exception ignore) {
+					Log.i(VIEW_LOG_TAG, ignore.getMessage());
 				}
 				camera = null;
 			}
@@ -928,7 +934,7 @@ class CameraSurface extends SurfaceView implements SurfaceHolder.Callback {
 }
 
 class AugmentedView extends View {
-	MixView app;
+	MixView app; //?
 	int xSearch=200;
 	int ySearch = 10;
 	int searchObjWidth = 0;

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Mixare</string>
+    <string name="app_name">OpenAlbum - Mixare</string>
     <string name="search_hint">Search Location</string>
     
     <string name="N">N</string>
@@ -96,4 +96,9 @@
 	<string name="osm_max_object_menu">Set max POI per URL</string>
 	<string name="set_osm_max_object">Maximum POIs per URL</string>
 	
+	<!--  Internal google api key -->
+	<string name="GoogleMapAPIKey">0bynx7meN9jlSdHQ4-lK_Vzsw-T82UVibnI0nCA</string>
+	
+	<!-- gonames dev username -->
+	<string name="GeonamesUsername">Devopenalbum</string>
 </resources>

@@ -41,7 +41,6 @@ import android.view.View.OnTouchListener;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.ItemizedOverlay;
 import com.google.android.maps.MapActivity;
@@ -64,9 +63,9 @@ public class MixMap extends MapActivity implements OnTouchListener{
 	private static GeoPoint startPoint;
 
 	private MixContext mixContext;
-	private MapView mapView;
+	private MapView mapView; 
 
-	static MixMap map;
+	static MixMap map; //???!! this !!
 	private static Context thisContext;
 	private static TextView searchNotificationTxt;
 	public static List<Marker> originalMarkerList;
@@ -86,7 +85,7 @@ public class MixMap extends MapActivity implements OnTouchListener{
 		map = this;
 
 		setMapContext(this);
-		mapView= new MapView(this, "0bynx7meN9jlSdHQ4-lK_Vzsw-T82UVibnI0nCA"); //@devKey
+		mapView= new MapView(this, this.getString(R.string.GoogleMapAPIKey)); //@devKey
 		mapView.setBuiltInZoomControls(true);
 		mapView.setClickable(true);
 		mapView.setSatellite(true);

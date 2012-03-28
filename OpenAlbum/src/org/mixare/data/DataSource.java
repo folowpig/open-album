@@ -23,6 +23,7 @@ import org.mixare.R;
 
 import android.app.Activity;
 //import android.content.Intent; //@del
+//import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -46,8 +47,8 @@ public class DataSource extends Activity {
 	
 	private String name;
 	private String url;
-	public enum TYPE { WIKIPEDIA, BUZZ, TWITTER, OSM, MIXARE }; //@TODO add panoramio
-	public enum DISPLAY { CIRCLE_MARKER, NAVIGATION_MARKER };
+	public enum TYPE { WIKIPEDIA, BUZZ, TWITTER, OSM, MIXARE, PANORAMIO}; //@TODO add panoramio
+	public enum DISPLAY { CIRCLE_MARKER, NAVIGATION_MARKER, THUMBNAILS };
 	private boolean enabled;
 	private TYPE type;
 	private DISPLAY display;
@@ -176,7 +177,7 @@ public class DataSource extends Activity {
 				"&radius="+ geoNamesRadius +
 				"&maxRows=50" +
 				"&lang=" + locale+
-				"&username=mixare"; 
+				"&username=devopenalbum"; //this.getString(R.string.GeonamesUsername);
 			break;
 			
 			case BUZZ: 
