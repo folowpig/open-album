@@ -47,9 +47,9 @@ public class DataSource extends Activity {
 	
 	private String name;
 	private String url;
-	public enum TYPE { WIKIPEDIA, BUZZ, TWITTER, OSM, MIXARE, PANORAMIO}; //@TODO add panoramio
+	public enum TYPE { WIKIPEDIA, BUZZ, TWITTER, OSM, MIXARE,OPENSTREETMAP, PANORAMIO}; //@TODO add panoramio
 	public enum DISPLAY { CIRCLE_MARKER, NAVIGATION_MARKER, THUMBNAILS };
-	private boolean enabled;
+	private boolean isenabled;
 	private TYPE type;
 	private DISPLAY display;
 	
@@ -140,28 +140,28 @@ public class DataSource extends Activity {
 		this.url = url;
 		this.type = type;
 		this.display = display;
-		this.enabled = enabled;
+		this.isenabled = enabled;
 		Log.d("mixare", "New Datasource!" + name +" "+url+" "+type+" "+display+" "+ enabled);
 	}
 	
 	public DataSource(String name, String url, int typeInt, int displayInt, boolean enabled) {
-		TYPE typeEnum = TYPE.values()[typeInt];
+		TYPE typeEnum = TYPE.valueOf(name.toUpperCase());
 		DISPLAY displayEnum = DISPLAY.values()[displayInt];
 		this.name = name;
 		this.url = url;
 		this.type = typeEnum;
 		this.display = displayEnum;
-		this.enabled = enabled;
+		this.isenabled = enabled;
 	}
 	public DataSource(String name, String url, String typeString, String displayString, String enabledString) {
-		TYPE typeEnum = TYPE.values()[Integer.parseInt(typeString)];
+		TYPE typeEnum = TYPE.valueOf(name.toUpperCase());  
 		DISPLAY displayEnum = DISPLAY.values()[Integer.parseInt(displayString)];
 		Boolean enabledBool = Boolean.parseBoolean(enabledString);
 		this.name = name;
 		this.url = url;
 		this.type = typeEnum;
 		this.display = displayEnum;
-		this.enabled = enabledBool;
+		this.isenabled = enabledBool;
 	}
 
 	public String createRequestParams(double lat, double lon, double alt, float radius,String locale) {
@@ -201,9 +201,11 @@ public class DataSource extends Activity {
 				"&radius=" + Double.toString(radius);
 			break;
 			
-			case OSM: 
+			case OSM: case OPENSTREETMAP: 
 				ret+= XMLHandler.getOSMBoundingBox(lat, lon, radius);
 			break;
+			case PANORAMIO: //Hardcoded for now
+				ret+= "?set=public&from=0&to=20&minx=-180&miny=-90&maxx=180&maxy=90&size=medium&mapfilter=true";
 			}
 			
 		}
@@ -231,7 +233,7 @@ public class DataSource extends Activity {
 			case TWITTER:	
 				ret=R.drawable.twitter; 
 				break;
-			case OSM:		
+			case OSM: case OPENSTREETMAP:		
 				ret=R.drawable.osm;
 				break;
 			case WIKIPEDIA:	
@@ -261,7 +263,7 @@ public class DataSource extends Activity {
 	}
 	
 	public boolean getEnabled() {
-		return this.enabled;
+		return this.isenabled;
 	}
 
 	public String getName() {
@@ -280,7 +282,7 @@ public class DataSource extends Activity {
 		+ this.getEnabled();
 	}
 	public void setEnabled(boolean isChecked) {
-		this.enabled = isChecked;
+		this.isenabled = isChecked;
 	}
 	
 }

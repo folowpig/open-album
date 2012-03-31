@@ -142,14 +142,14 @@ public class DownloadManager implements Runnable {
 				is = ctx.getHttpGETInputStream(request.source.getUrl() + request.params);
 				String tmp = ctx.getHttpInputString(is);
 
-				Json layer = new Json();
+				Json layer = new Json(); ////@FIXME OpenStreetMap Recieved data is XML
 
 				// try loading JSON DATA
 				try {
 
 					Log.v(MixView.TAG, "try to load JSON data");
 
-					JSONObject root = new JSONObject(tmp);//@FIXME OpenStreetMap Recieved data is XML
+					JSONObject root = new JSONObject(tmp);
 
 					Log.d(MixView.TAG, "loading JSON data");
 

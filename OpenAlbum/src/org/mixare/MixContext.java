@@ -78,7 +78,7 @@ import android.widget.Toast;
 public class MixContext extends ContextWrapper {
 
 	//TAG for logging
-	public static final String TAG = "Mixare";
+	public static final String TAG = "Mixare-OA";
 	
 	public MixView mixView;
 	Context ctx;
@@ -118,7 +118,7 @@ public class MixContext extends ContextWrapper {
 			dataSourceEditor.putString("DataSource0", "Wikipedia|http://api.geonames.org/findNearbyWikipediaJSON|0|0|true");
 			dataSourceEditor.putString("DataSource1", "Twitter|http://search.twitter.com/search.json|2|0|false");
 			dataSourceEditor.putString("DataSource2", "OpenStreetmap|http://open.mapquestapi.com/xapi/api/0.6/node[railway=station]|3|1|true");
-//			dataSourceEditor.putString("DataSource3", "Own URL|http://mixare.org/geotest.php|4|0|false");
+			dataSourceEditor.putString("DataSource3", "Panoramio|http://www.panoramio.com/map/get_panoramas.php|4|0|true");
 			dataSourceEditor.commit();
 			size = settings.getAll().size();
 		}
@@ -140,12 +140,12 @@ public class MixContext extends ContextWrapper {
 		
 		for(DataSource ds: this.allDataSources) {
 			if(ds.getEnabled())
-				atLeastOneDatasourceSelected=true;
+				atLeastOneDatasourceSelected=true; //? Why do we need that, why here
 		}
 		// select Wikipedia if nothing was previously selected  
-		if(!atLeastOneDatasourceSelected)
+		if(!atLeastOneDatasourceSelected){
 			//TODO>: start intent data source select
-		
+		}
 		
 		rotationM.toIdentity();
 		
@@ -181,28 +181,28 @@ public class MixContext extends ContextWrapper {
 		hardFix.setLongitude(11.296005);
 		hardFix.setAltitude(300);
 
-		/*New York*/
-//		hardFix.setLatitude(40.731510);
-//		hardFix.setLongitude(-73.991547);
-		
-		// TU Wien
-//		hardFix.setLatitude(48.196349);
-//		hardFix.setLongitude(16.368653);
-//		hardFix.setAltitude(180);
-
-		//frequency and minimum distance for update
-		//this values will only be used after there's a good GPS fix
-		//see back-off pattern discussion 
-		//http://stackoverflow.com/questions/3433875/how-to-force-gps-provider-to-get-speed-in-android
-		//thanks Reto Meier for his presentation at gddde 2010
-		long lFreq = 60000;	//60 seconds
-		float lDist = 50;		//20 meters
-		try {
-			lm.requestLocationUpdates(fineProvider, lFreq , lDist, lnormal);
-		} catch (Exception e) {
-			Log.d(TAG, "Could not initialize the normal provider");
-			Toast.makeText( this, getString(DataView.CONNECTION_GPS_DIALOG_TEXT), Toast.LENGTH_LONG ).show();
-		}
+//		/*New York*/
+////		hardFix.setLatitude(40.731510);
+////		hardFix.setLongitude(-73.991547);
+//		
+//		// TU Wien
+////		hardFix.setLatitude(48.196349);
+////		hardFix.setLongitude(16.368653);
+////		hardFix.setAltitude(180);
+//
+//		//frequency and minimum distance for update
+//		//this values will only be used after there's a good GPS fix
+//		//see back-off pattern discussion 
+//		//http://stackoverflow.com/questions/3433875/how-to-force-gps-provider-to-get-speed-in-android
+//		//thanks Reto Meier for his presentation at gddde 2010
+//		long lFreq = 60000;	//60 seconds
+//		float lDist = 50;		//20 meters
+//		try {
+//			lm.requestLocationUpdates(fineProvider, lFreq , lDist, lnormal);
+//		} catch (Exception e) {
+//			Log.d(TAG, "Could not initialize the normal provider");
+//			Toast.makeText( this, getString(DataView.CONNECTION_GPS_DIALOG_TEXT), Toast.LENGTH_LONG ).show();
+//		}
 		
 		try {
 			Location lastFinePos=lm.getLastKnownLocation(fineProvider);
