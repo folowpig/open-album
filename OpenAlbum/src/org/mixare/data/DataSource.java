@@ -109,7 +109,6 @@ public class DataSource extends Activity {
 
 	@Override
 	protected void onPause() {
-
 		super.onPause();
 	}
 	
@@ -205,7 +204,7 @@ public class DataSource extends Activity {
 				ret+= XMLHandler.getOSMBoundingBox(lat, lon, radius);
 			break;
 			case PANORAMIO: //Hardcoded for now
-				ret+= "?set=public&from=0&to=20&minx=-180&miny=-90&maxx=180&maxy=90&size=medium&mapfilter=true";
+				ret+= "?set=public&from=0&to=2&minx=-180&miny=-90&maxx=180&maxy=90&size=medium&mapfilter=true";
 			}
 			
 		}
@@ -219,6 +218,7 @@ public class DataSource extends Activity {
 			case BUZZ:		ret=Color.rgb(4, 228, 20); break;
 			case TWITTER:	ret=Color.rgb(50, 204, 255); break;
 			case WIKIPEDIA:	ret=Color.RED; break;
+			case PANORAMIO: ret=Color.GRAY; break;
 			default:		ret=Color.WHITE; break;
 		}
 		return ret;
@@ -233,9 +233,12 @@ public class DataSource extends Activity {
 			case TWITTER:	
 				ret=R.drawable.twitter; 
 				break;
-			case OSM: case OPENSTREETMAP:		
+			case OSM:		
 				ret=R.drawable.osm;
 				break;
+			 case OPENSTREETMAP:
+					ret=R.drawable.osm;
+					break;
 			case WIKIPEDIA:	
 				ret=R.drawable.wikipedia; 
 				break;
