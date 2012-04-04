@@ -204,7 +204,7 @@ public class DataSource extends Activity {
 				ret+= XMLHandler.getOSMBoundingBox(lat, lon, radius);
 			break;
 			case PANORAMIO: //Hardcoded for now
-				ret+= "?set=public&from=0&to=2&minx=-180&miny=-90&maxx=180&maxy=90&size=medium&mapfilter=true";
+				ret+= "?set=public&from=0&to=2&minx=-180&miny=-90&maxx=180&maxy=90&size=thumbnail&mapfilter=true";
 			}
 			
 		}
@@ -212,6 +212,7 @@ public class DataSource extends Activity {
 		return ret;
 	}
 	
+	/******** Getters and Setters *******/
 	public int getColor() {
 		int ret;
 		switch(this.type) {

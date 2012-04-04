@@ -24,6 +24,8 @@ package org.mixare;
  * It sets up the camera screen and the augmented screen which is in front of the
  * camera screen.
  * It also handles the main sensor events, touch events and location events.
+ * 
+ * @TODO decouple class, ...
  */
 
 import static android.hardware.SensorManager.SENSOR_DELAY_GAME;
@@ -273,7 +275,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 				SharedPreferences.Editor dataSourceEditor = DataSourceSettings.edit();
 				dataSourceEditor.putString("DataSource0", "Wikipedia|http://api.geonames.org/findNearbyWikipediaJSON|0|0|true");
 				dataSourceEditor.putString("DataSource1", "Twitter|http://search.twitter.com/search.json|2|0|false");
-				dataSourceEditor.putString("DataSource2", "OpenStreetmap|http://open.mapquestapi.com/xapi/api/0.6/node[railway=station]|3|1|true");
+				dataSourceEditor.putString("DataSource2", "OpenStreetmap|http://open.mapquestapi.com/xapi/api/0.6/node[railway=station]|3|1|false");
 				dataSourceEditor.putString("DataSource3", "Panoramio|http://www.panoramio.com/map/get_panoramas.php|4|0|true");
 				dataSourceEditor.commit();
 
@@ -355,7 +357,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 		try {
 			this.mWakeLock.acquire();
 
-			killOnError();
+			//killOnError();
 			//SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 			mixContext.mixView = this;
 			dataView.doStart();
@@ -366,7 +368,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 			
 			double angleX, angleY;
 
-			int marker_orientation = -90;
+			int marker_orientation = -90; //why -90
 
 			int rotation = Compatibility.getRotation(this);
 			
@@ -396,7 +398,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 			}
 			
 			m4.toIdentity();
-
+			//@FIXME large Memory consumtion, 60 Matrix's will be created within a matrix
 			for (int i = 0; i < histR.length; i++) {
 				histR[i] = new Matrix();
 			}
@@ -771,7 +773,7 @@ public class MixView extends Activity implements SensorEventListener, OnTouchLis
 
 		dataView.doStart();
 		dataView.clearEvents();
-		downloadThread = new Thread(mixContext.downloadManager);
+		downloadThread = new Thread(mixContext.downloadManager); //Does this set's zoom level?
 		downloadThread.start();
 
 	};

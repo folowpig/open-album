@@ -137,7 +137,7 @@ public class DownloadManager implements Runnable {
 		//assume an error until everything is fine
 		result.error = true;
 		try {
-			if(ctx!=null && request!=null && ctx.getHttpGETInputStream(request.source.getUrl())!=null){
+			if(ctx!=null && request!=null && request.source.getUrl() !=null){
 
 				is = ctx.getHttpGETInputStream(request.source.getUrl() + request.params);
 				String tmp = ctx.getHttpInputString(is);

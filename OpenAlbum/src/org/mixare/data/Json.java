@@ -29,6 +29,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.mixare.Marker;
 //import org.mixare.MixContext;
+import org.mixare.ImageMarker;
 import org.mixare.MixView;
 import org.mixare.NavigationMarker;
 import org.mixare.POIMarker;
@@ -56,7 +57,9 @@ public class Json extends DataHandler {
 			// Wikipedia
 			else if (root.has("geonames"))
 				dataArray = root.getJSONArray("geonames");
-
+			else if (root.has("photos"))
+				dataArray = root.getJSONArray("photos");
+			
 			if (dataArray != null) {
 
 				Log.i(MixView.TAG, "processing " + datasource.getType()
@@ -74,6 +77,9 @@ public class Json extends DataHandler {
 					case WIKIPEDIA:
 						ma = processWikipediaJSONObject(jo, datasource);
 						break;
+					case PANORAMIO:
+						ma = processPanoramioJSONObject(jo,datasource);
+						break;
 					case MIXARE:
 						default:
 						ma = processMixareJSONObject(jo, datasource);
@@ -87,6 +93,32 @@ public class Json extends DataHandler {
 			e.printStackTrace();
 		}
 		return markers;
+	}
+
+	/**
+	 * Creates Markers for Panoramio JSON objects
+	 * 
+	 *  @return Marker
+	 */
+	private Marker processPanoramioJSONObject(JSONObject jo,
+			DataSource datasource) throws JSONException {
+		Marker ma = null;
+		if (jo.has("photo_id") && jo.has("latitude") && jo.has("longitude")
+				&& jo.has("photo_file_url")) {
+
+			Log.v(MixView.TAG, "processing Panoramio JSON object");
+			String link= jo.getString("photo_file_url");
+
+			ma = new ImageMarker(
+					unescapeHTML(jo.getString("photo_title"), 0), 
+					jo.getDouble("latitude"), 
+					jo.getDouble("longitude"), 
+//					jo.getDouble("elevation"), 
+					(double) 1000, //@TODO elevation level for Panoramio
+					link, 
+					datasource);
+		}
+		return ma;
 	}
 
 	public Marker processTwitterJSONObject(JSONObject jo, DataSource datasource)
