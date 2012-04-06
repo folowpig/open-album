@@ -114,7 +114,7 @@ public class Json extends DataHandler {
 					jo.getDouble("latitude"), 
 					jo.getDouble("longitude"), 
 //					jo.getDouble("elevation"), 
-					(double) 1000, //@TODO elevation level for Panoramio
+					(double) 50, //@TODO elevation level for Panoramio
 					link, 
 					datasource);
 		}

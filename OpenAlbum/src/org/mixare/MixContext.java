@@ -99,6 +99,7 @@ public class MixContext extends ContextWrapper {
 	
 	private ArrayList<DataSource> allDataSources=new ArrayList<DataSource>();
 
+	//@TODO move to download manager
 	public InputStream getHttpGETInputStream(String urlStr)
 	throws Exception {
 		InputStream is = null;
@@ -347,7 +348,7 @@ public class MixContext extends ContextWrapper {
 		
 		setLocationAtLastDownload(curLoc);
 
-//TODO fix logic
+//@TODO fix logic
 
 	
 	}
