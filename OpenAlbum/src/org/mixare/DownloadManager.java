@@ -69,12 +69,10 @@ import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.mixare.MixView;
 import android.content.ContentResolver;
-import android.content.IntentFilter;
 import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Bundle;
 import android.util.Log;
 
 /**
