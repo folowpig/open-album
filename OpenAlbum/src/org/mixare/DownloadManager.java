@@ -229,7 +229,7 @@ public class DownloadManager implements Runnable {
 						e1.printStackTrace();
 					}				
 				}
-				returnHttpInputStream(is);
+				closeHttpInputStream(is);
 				is = null;
 			}
 		}
@@ -238,7 +238,7 @@ public class DownloadManager implements Runnable {
 			result.errorRequest = request;
 
 			try {
-				returnHttpInputStream(is);
+				closeHttpInputStream(is);
 			} catch (Exception ignore) {
 			}
 
@@ -474,7 +474,7 @@ public class DownloadManager implements Runnable {
 		return sb.toString();
 	}
 
-	public void returnHttpInputStream(InputStream is) throws Exception {
+	public void closeHttpInputStream(InputStream is) throws Exception {
 		if (is != null) {
 			is.close();
 		}
@@ -485,7 +485,7 @@ public class DownloadManager implements Runnable {
 		return mgr.open(name);
 	}
 
-	public void returnResourceInputStream(InputStream is) throws Exception {
+	public void closeResourceInputStream(InputStream is) throws Exception {
 		if (is != null)
 			is.close();
 	}
