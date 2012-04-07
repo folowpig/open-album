@@ -26,6 +26,7 @@ package org.mixare;
  * It also handles the main sensor events, touch events and location events.
  * 
  * @TODO decouple class, ...
+ * @FIXME displaying wikipedia, if user returns from list view.
  */
 
 import static android.hardware.SensorManager.SENSOR_DELAY_GAME;
