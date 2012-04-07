@@ -36,6 +36,22 @@ import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.NameValuePair;
+import org.apache.http.ParseException;
+import org.apache.http.auth.AuthenticationException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.params.ConnManagerParams;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
+import org.apache.http.util.EntityUtils;
+
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -51,12 +67,14 @@ import org.mixare.data.Json;
 import org.mixare.data.XMLHandler;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
-
+import org.mixare.MixView;
 import android.content.ContentResolver;
+import android.content.IntentFilter;
 import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.util.Log;
 
 /**
@@ -159,11 +177,12 @@ public class DownloadManager implements Runnable {
 		DownloadResult result = new DownloadResult();
 		//assume an error until everything is fine
 		result.error = true;
+		
 		try {
-			if(ctx!=null && request!=null && request.source.getUrl() !=null){
+			if( request!=null && request.source.getUrl() !=null){
 
-				is = ctx.getHttpGETInputStream(request.source.getUrl() + request.params);
-				String tmp = ctx.getHttpInputString(is);
+				is = getHttpGETInputStream(request.source.getUrl() + request.params);
+				String tmp = getHttpInputString(is);
 
 				Json layer = new Json(); ////@FIXME OpenStreetMap Recieved data is XML
 
@@ -212,7 +231,7 @@ public class DownloadManager implements Runnable {
 						e1.printStackTrace();
 					}				
 				}
-				ctx.returnHttpInputStream(is);
+				returnHttpInputStream(is);
 				is = null;
 			}
 		}
@@ -221,7 +240,7 @@ public class DownloadManager implements Runnable {
 			result.errorRequest = request;
 
 			try {
-				ctx.returnHttpInputStream(is);
+				returnHttpInputStream(is);
 			} catch (Exception ignore) {
 			}
 
@@ -305,136 +324,136 @@ public class DownloadManager implements Runnable {
 	}
 
 	//Moved from mixContext
-//	public InputStream getHttpPOSTInputStream(String urlStr,
-//			String params) throws Exception {
-//		InputStream is = null;
-//		OutputStream os = null;
-//		HttpURLConnection conn = null;
-//
-//		if (urlStr.startsWith("content://"))
-//			return getContentInputStream(urlStr, params);
-//
-//		try {
-//			URL url = new URL(urlStr);
-//			conn = (HttpURLConnection) url.openConnection();
-//			conn.setReadTimeout(10000);
-//			conn.setConnectTimeout(10000);
-//
-//			if (params != null) {
-//				conn.setDoOutput(true);
-//				os = conn.getOutputStream();
-//				OutputStreamWriter wr = new OutputStreamWriter(os);
-//				wr.write(params);
-//				wr.close();
-//			}
-//
-//			is = conn.getInputStream();
-//			
-//			return is;
-//		} catch (Exception ex) {
-//
-//			try {
-//				is.close();
-//			} catch (Exception ignore) {			
-//
-//			}
-//			try {
-//				os.close();
-//			} catch (Exception ignore) {			
-//
-//			}
-//			try {
-//				conn.disconnect();
-//			} catch (Exception ignore) {
-//			}
-//
-//			if (conn != null && conn.getResponseCode() == 405) {
-//				return getHttpGETInputStream(urlStr);
-//			} else {		
-//
-//				throw ex;
-//			}
-//		}
-//	}
-//	public InputStream getHttpGETInputStream(String urlStr)
-//			throws Exception {
-//				InputStream is = null;
-//				URLConnection conn = null;
-//
-//			    // HTTP connection reuse which was buggy pre-froyo
-//			    if (Integer.parseInt(Build.VERSION.SDK) < Build.VERSION_CODES.FROYO) {
-//			        System.setProperty("http.keepAlive", "false");
-//			    }
-//			    
-//				if (urlStr.startsWith("file://"))			
-//					return new FileInputStream(urlStr.replace("file://", ""));
-//
-//				if (urlStr.startsWith("content://"))
-//					return getContentInputStream(urlStr, null);
-//
-//				if (urlStr.startsWith("https://")) {
-//					HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier(){
-//		    			public boolean verify(String hostname, SSLSession session) {
-//		    				return true;
-//		    			}});
-//				SSLContext context = SSLContext.getInstance("TLS");
-//				context.init(null, new X509TrustManager[]{new X509TrustManager(){
-//					public void checkClientTrusted(X509Certificate[] chain,
-//							String authType) throws CertificateException {}
-//					public void checkServerTrusted(X509Certificate[] chain,
-//							String authType) throws CertificateException {}
-//					public X509Certificate[] getAcceptedIssuers() {
-//						return new X509Certificate[0];
-//					}}}, new SecureRandom());
-//				HttpsURLConnection.setDefaultSSLSocketFactory(
-//						context.getSocketFactory());
-//				}
-//				
-//				try {
-//					URL url = new URL(urlStr);
-//					conn =  url.openConnection();
-//					conn.setReadTimeout(10000);
-//					conn.setConnectTimeout(10000);
-//
-//					is = conn.getInputStream(); //@TODO fix openMap error (URL Params)
-//					
-//					return is;
-//				} catch (Exception ex) {
-//					try {
-//						is.close();
-//					} catch (Exception ignore) {			
-//					}
-//					try {
-//						if(conn instanceof HttpURLConnection)
-//							((HttpURLConnection)conn).disconnect();
-//					} catch (Exception ignore) {			
-//					}
-//					
-//					throw ex;				
-//
-//				}
-//			}
+	public InputStream getHttpPOSTInputStream(String urlStr,
+			String params) throws Exception {
+		InputStream is = null;
+		OutputStream os = null;
+		HttpURLConnection conn = null;
 
-//	public InputStream getContentInputStream(String urlStr, String params)
-//	throws Exception {
-//		ContentResolver cr = mixView.getContentResolver();
-//		Cursor cur = cr.query(Uri.parse(urlStr), null, params, null, null);
-//
-//		cur.moveToFirst();
-//		int mode = cur.getInt(cur.getColumnIndex("MODE"));
-//
-//		if (mode == 1) {
-//			String result = cur.getString(cur.getColumnIndex("RESULT"));
-//			cur.deactivate();
-//
-//			return new ByteArrayInputStream(result
-//					.getBytes());
-//		} else {
-//			cur.deactivate();
-//
-//			throw new Exception("Invalid content:// mode " + mode);
-//		}
-//	}
+		if (urlStr.startsWith("content://"))
+			return getContentInputStream(urlStr, params);
+
+		try {
+			URL url = new URL(urlStr);
+			conn = (HttpURLConnection) url.openConnection();
+			conn.setReadTimeout(10000);
+			conn.setConnectTimeout(10000);
+
+			if (params != null) {
+				conn.setDoOutput(true);
+				os = conn.getOutputStream();
+				OutputStreamWriter wr = new OutputStreamWriter(os);
+				wr.write(params);
+				wr.close();
+			}
+
+			is = conn.getInputStream();
+			
+			return is;
+		} catch (Exception ex) {
+
+			try {
+				is.close();
+			} catch (Exception ignore) {			
+
+			}
+			try {
+				os.close();
+			} catch (Exception ignore) {			
+
+			}
+			try {
+				conn.disconnect();
+			} catch (Exception ignore) {
+			}
+
+			if (conn != null && conn.getResponseCode() == 405) {
+				return getHttpGETInputStream(urlStr);
+			} else {		
+
+				throw ex;
+			}
+		}
+	}
+	public InputStream getHttpGETInputStream(String urlStr)
+			throws Exception {
+				InputStream is = null;
+				URLConnection conn = null;
+
+			    // HTTP connection reuse which was buggy pre-froyo
+			    if (Integer.parseInt(Build.VERSION.SDK) < Build.VERSION_CODES.FROYO) {
+			        System.setProperty("http.keepAlive", "false");
+			    }
+			    
+				if (urlStr.startsWith("file://"))			
+					return new FileInputStream(urlStr.replace("file://", ""));
+
+				if (urlStr.startsWith("content://"))
+					return getContentInputStream(urlStr, null);
+
+				if (urlStr.startsWith("https://")) {
+					HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier(){
+		    			public boolean verify(String hostname, SSLSession session) {
+		    				return true;
+		    			}});
+				SSLContext context = SSLContext.getInstance("TLS");
+				context.init(null, new X509TrustManager[]{new X509TrustManager(){
+					public void checkClientTrusted(X509Certificate[] chain,
+							String authType) throws CertificateException {}
+					public void checkServerTrusted(X509Certificate[] chain,
+							String authType) throws CertificateException {}
+					public X509Certificate[] getAcceptedIssuers() {
+						return new X509Certificate[0];
+					}}}, new SecureRandom());
+				HttpsURLConnection.setDefaultSSLSocketFactory(
+						context.getSocketFactory());
+				}
+				
+				try {
+					URL url = new URL(urlStr);
+					conn =  url.openConnection();
+					conn.setReadTimeout(10000);
+					conn.setConnectTimeout(10000);
+
+					is = conn.getInputStream(); //@TODO fix openMap error (URL Params)
+					
+					return is;
+				} catch (Exception ex) {
+					try {
+						is.close();
+					} catch (Exception ignore) {			
+					}
+					try {
+						if(conn instanceof HttpURLConnection)
+							((HttpURLConnection)conn).disconnect();
+					} catch (Exception ignore) {			
+					}
+					
+					throw ex;				
+
+				}
+			}
+
+	public InputStream getContentInputStream(String urlStr, String params)
+	throws Exception {
+		ContentResolver cr = MixView.class.newInstance().getContentResolver();
+		Cursor cur = cr.query(Uri.parse(urlStr), null, params, null, null);
+
+		cur.moveToFirst();
+		int mode = cur.getInt(cur.getColumnIndex("MODE"));
+
+		if (mode == 1) {
+			String result = cur.getString(cur.getColumnIndex("RESULT"));
+			cur.deactivate();
+
+			return new ByteArrayInputStream(result
+					.getBytes());
+		} else {
+			cur.deactivate();
+
+			throw new Exception("Invalid content:// mode " + mode);
+		}
+	}
 
 	public String getHttpInputString(InputStream is) {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(is), 8 * 1024);
@@ -463,10 +482,10 @@ public class DownloadManager implements Runnable {
 		}
 	}
 
-//	public InputStream getResourceInputStream(String name) throws Exception {
-//		AssetManager mgr = mixView.getAssets();
-//		return mgr.open(name);
-//	}
+	public InputStream getResourceInputStream(String name) throws Exception {
+		AssetManager mgr = MixView.class.newInstance().getAssets();
+		return mgr.open(name);
+	}
 
 	public void returnResourceInputStream(InputStream is) throws Exception {
 		if (is != null)
