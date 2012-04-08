@@ -18,28 +18,9 @@
  */
 package org.mixare;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLConnection;
-import java.security.SecureRandom;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
+
 import java.util.ArrayList;
 import java.util.Random;
-
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.X509TrustManager;
 
 import org.mixare.data.DataSource;
 import org.mixare.data.DataSourceList;
@@ -47,19 +28,14 @@ import org.mixare.render.Matrix;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.AssetManager;
-import android.database.Cursor;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -75,12 +51,12 @@ import android.widget.Toast;
  * Cares about location management and about
  * the data (source, inputstream)
  * 
- * @TODO decouple class, ...
+ * @TODO decouple class; consider refactoring ...
  */
 public class MixContext extends ContextWrapper {
 
 	//TAG for logging
-	public static final String TAG = "Mixare-OA";
+	public static final String TAG = "OpenAlbum - Mixare";
 	
 	public MixView mixView;
 	Context ctx;
@@ -93,7 +69,7 @@ public class MixContext extends ContextWrapper {
 	float declination = 0f;
 	
 	//Location related
-	private LocationManager lm;
+	private LocationManager locMangr;
 	Location curLoc;
 	Location locationAtLastDownload;
 	
@@ -103,11 +79,11 @@ public class MixContext extends ContextWrapper {
 	//@TODO reorganize + centralize datasource input 
 	public void refreshDataSources() {
 		this.allDataSources.clear();
-		SharedPreferences settings = getSharedPreferences(
+		final SharedPreferences settings = getSharedPreferences(
 				DataSourceList.SHARED_PREFS, 0);
 		int size = settings.getAll().size();  
 		if (size == 0){
-			SharedPreferences.Editor dataSourceEditor = settings.edit();
+			final SharedPreferences.Editor dataSourceEditor = settings.edit();
 			dataSourceEditor.putString("DataSource0", "Wikipedia|http://api.geonames.org/findNearbyWikipediaJSON|0|0|true");
 			dataSourceEditor.putString("DataSource1", "Twitter|http://search.twitter.com/search.json|2|0|false");
 			dataSourceEditor.putString("DataSource2", "OpenStreetmap|http://open.mapquestapi.com/xapi/api/0.6/node[railway=station]|3|1|true");
@@ -117,13 +93,12 @@ public class MixContext extends ContextWrapper {
 		}
 		// copy the value from shared preference to adapter
 		for (int i = 0; i < size; i++) {
-			String fields[] = settings.getString("DataSource" + i, "").split("\\|", -1);
+			final String fields[] = settings.getString("DataSource" + i, "").split("\\|", -1);
 			this.allDataSources.add(new DataSource(fields[0], fields[1], fields[2], fields[3], fields[4]));
 		}
 	}
 	
 	public MixContext(Context appCtx) {
-	
 		super(appCtx);
 		this.mixView = (MixView) appCtx;
 		this.ctx = appCtx.getApplicationContext();
@@ -133,8 +108,10 @@ public class MixContext extends ContextWrapper {
 		boolean atLeastOneDatasourceSelected=false;
 		
 		for(DataSource ds: this.allDataSources) {
-			if(ds.getEnabled())
-				atLeastOneDatasourceSelected=true; //? Why do we need that, why here
+			if(ds.getEnabled()){
+				atLeastOneDatasourceSelected=true; //? Why do we need to run through them all, why here
+			break;
+			}
 		}
 		// select Wikipedia if nothing was previously selected  
 		if(!atLeastOneDatasourceSelected){
@@ -143,26 +120,26 @@ public class MixContext extends ContextWrapper {
 		
 		rotationM.toIdentity();
 		
-		lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+		locMangr = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		
-		Criteria c = new Criteria();
+		final Criteria deviceCriteria = new Criteria();
 		//try to use the coarse provider first to get a rough position
-		c.setAccuracy(Criteria.ACCURACY_COARSE);
-		String coarseProvider = lm.getBestProvider(c, true);
+		deviceCriteria.setAccuracy(Criteria.ACCURACY_COARSE);
+		final String coarseProvider = locMangr.getBestProvider(deviceCriteria, true);
 		try {
-			lm.requestLocationUpdates(coarseProvider, 0 , 0, lcoarse);
+			locMangr.requestLocationUpdates(coarseProvider, 0 , 0, lcoarse);
 		} catch (Exception e) {
 			Log.d(TAG, "Could not initialize the coarse provider");
 		}
 		
 		//need to be precise
-		c.setAccuracy(Criteria.ACCURACY_FINE);				
+		deviceCriteria.setAccuracy(Criteria.ACCURACY_FINE);				
 		//fineProvider will be used for the initial phase (requesting fast updates)
 		//as well as during normal program usage
 		//NB: using "true" as second parameters means we get the provider only if it's enabled
-		String fineProvider = lm.getBestProvider(c, true);
+		String fineProvider = locMangr.getBestProvider(deviceCriteria, true);
 		try {
-			lm.requestLocationUpdates(fineProvider, 0 , 0, lbounce);
+			locMangr.requestLocationUpdates(fineProvider, 0 , 0, lbounce);
 		} catch (Exception e) {
 			Log.d(TAG, "Could not initialize the bounce provider");
 		}
@@ -199,8 +176,8 @@ public class MixContext extends ContextWrapper {
 //		}
 		
 		try {
-			Location lastFinePos=lm.getLastKnownLocation(fineProvider);
-			Location lastCoarsePos=lm.getLastKnownLocation(coarseProvider);
+			Location lastFinePos=locMangr.getLastKnownLocation(fineProvider);
+			Location lastCoarsePos=locMangr.getLastKnownLocation(coarseProvider);
 			if(lastFinePos!=null)
 				curLoc = lastFinePos;
 			else if (lastCoarsePos!=null)
@@ -217,8 +194,6 @@ public class MixContext extends ContextWrapper {
 		setLocationAtLastDownload(curLoc);
 
 //@TODO fix logic
-
-	
 	}
 	
 	
@@ -233,11 +208,11 @@ public class MixContext extends ContextWrapper {
 	}
 
 	public void unregisterLocationManager() {
-		if (lm != null) {
-			lm.removeUpdates(lnormal);
-			lm.removeUpdates(lcoarse);
-			lm.removeUpdates(lbounce);
-			lm = null;
+		if (locMangr != null) {
+			locMangr.removeUpdates(lnormal);
+			locMangr.removeUpdates(lcoarse);
+			locMangr.removeUpdates(lbounce);
+			//locMangr = null;
 		}
 	}
 
@@ -255,6 +230,7 @@ public class MixContext extends ContextWrapper {
 		}
 	}
 
+	//set or get !! DevOpenAlbum.
 	public void getRM(Matrix dest) {
 		synchronized (rotationM) {
 			dest.set(rotationM);
@@ -279,20 +255,20 @@ public class MixContext extends ContextWrapper {
 
 		});
 				
-		Dialog d = new Dialog(mixView) {
+		Dialog userDialog = new Dialog(mixView) {
 			public boolean onKeyDown(int keyCode, KeyEvent event) {
 				if (keyCode == KeyEvent.KEYCODE_BACK)
 					this.dismiss();
 				return true;
 			}
 		};
-		d.requestWindowFeature(Window.FEATURE_NO_TITLE);
-		d.getWindow().setGravity(Gravity.BOTTOM);
-		d.addContentView(webview, new FrameLayout.LayoutParams(
+		userDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		userDialog.getWindow().setGravity(Gravity.BOTTOM);
+		userDialog.addContentView(webview, new FrameLayout.LayoutParams(
 				LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT,
 				Gravity.BOTTOM));
 
-		d.show();
+		userDialog.show();
 		
 		webview.loadUrl(url);
 	}
@@ -308,20 +284,20 @@ public class MixContext extends ContextWrapper {
 
 		});
 				
-		Dialog d = new Dialog(context) {
+		 Dialog loadDialog = new Dialog(context) {
 			public boolean onKeyDown(int keyCode, KeyEvent event) {
 				if (keyCode == KeyEvent.KEYCODE_BACK)
 					this.dismiss();
 				return true;
 			}
 		};
-		d.requestWindowFeature(Window.FEATURE_NO_TITLE);
-		d.getWindow().setGravity(Gravity.BOTTOM);
-		d.addContentView(webview, new FrameLayout.LayoutParams(
+		loadDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		loadDialog.getWindow().setGravity(Gravity.BOTTOM);
+		loadDialog.addContentView(webview, new FrameLayout.LayoutParams(
 				LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT,
 				Gravity.BOTTOM));
 
-		d.show();
+		loadDialog.show();
 		
 		webview.loadUrl(url);
 	}
@@ -344,8 +320,8 @@ public class MixContext extends ContextWrapper {
 			downloadManager.purgeLists();
 			
 			if (location.getAccuracy() < 40) {
-				lm.removeUpdates(lcoarse);
-				lm.removeUpdates(lbounce);			
+				locMangr.removeUpdates(lcoarse);
+				locMangr.removeUpdates(lbounce);			
 			}
 		}
 
@@ -358,7 +334,9 @@ public class MixContext extends ContextWrapper {
 
 		}
 
-		public void onStatusChanged(String arg0, int arg1, Bundle arg2) {}
+		public void onStatusChanged(String arg0, int arg1, Bundle arg2) {
+			
+		}
 		
 	};
 	
@@ -374,7 +352,7 @@ public class MixContext extends ContextWrapper {
 				//@FIXME Check location changes before purging, make use of cache - leak
 				downloadManager.purgeLists();
 			} catch (Exception ex) {
-				ex.printStackTrace();
+				Log.e(TAG, ex.getMessage(), ex);
 			}
 		}
 
@@ -386,7 +364,7 @@ public class MixContext extends ContextWrapper {
 		
 	};
 
-	private LocationListener lnormal = new LocationListener() {
+	private final LocationListener lnormal = new LocationListener() {
 		public void onProviderDisabled(String provider) {}
 
 		public void onProviderEnabled(String provider) {}
@@ -408,7 +386,7 @@ public class MixContext extends ContextWrapper {
 					if(lastLoc==null)
 						setLocationAtLastDownload(location);
 			} catch (Exception ex) {
-				ex.printStackTrace();
+				Log.e(TAG, ex.getMessage(), ex);
 			}
 		}
 

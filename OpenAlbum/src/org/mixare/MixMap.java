@@ -110,11 +110,11 @@ public class MixMap extends MapActivity implements OnTouchListener{
 	}
 
 	public void setStartPoint() {
-		Location location = mixContext.getCurrentLocation();
+		final Location location = mixContext.getCurrentLocation();
 		MapController controller;
 
-		double latitude = location.getLatitude()*1E6;
-		double longitude = location.getLongitude()*1E6;
+		final double latitude = location.getLatitude()*1E6;
+		final double longitude = location.getLongitude()*1E6;
 
 		controller = mapView.getController();
 		startPoint = new GeoPoint((int)latitude, (int)longitude);
@@ -126,7 +126,7 @@ public class MixMap extends MapActivity implements OnTouchListener{
 		mapOverlays=mapView.getOverlays();
 		OverlayItem item; 
 		drawable = this.getResources().getDrawable(R.drawable.icon_map);
-		MixOverlay mixOverlay = new MixOverlay(this, drawable);
+		final MixOverlay mixOverlay = new MixOverlay(this, drawable);
 
 		for(Marker marker:markerList) {
 			if(marker.isActive()) {
@@ -207,10 +207,6 @@ public class MixMap extends MapActivity implements OnTouchListener{
 		}
 	}
 
-//	public static ArrayList<Marker> getMarkerList(){
-//		return markerList;
-//	}
-
 	public void setMarkerList(List<Marker> maList){
 		markerList = maList;
 	}
@@ -218,18 +214,6 @@ public class MixMap extends MapActivity implements OnTouchListener{
 	public DataView getDataView(){
 		return dataView;
 	}
-
-//	public static void setDataView(DataView view){
-//		dataView= view;
-//	}
-
-//	public static void setMixContext(MixContext context){
-//		ctx= context;
-//	}
-//
-//	public static MixContext getMixContext(){
-//		return ctx;
-//	}
 
 	public List<Overlay> getMapOverlayList(){
 		return mapOverlays;
@@ -269,13 +253,13 @@ public class MixMap extends MapActivity implements OnTouchListener{
 		markerList = new ArrayList<Marker>();
 
 		for(int i = 0; i < jLayer.getMarkerCount(); i++) {
-			Marker ma = jLayer.getMarker(i);
+			Marker searchMarker = jLayer.getMarker(i);
 
-			if (ma.getTitle().toLowerCase().indexOf(query.toLowerCase())!=-1){
-				markerList.add(ma);
+			if (searchMarker.getTitle().toLowerCase().indexOf(query.toLowerCase())!=-1){
+				markerList.add(searchMarker);
 			}
 		}
-		if(markerList.size()==0){
+		if(markerList.isEmpty()){
 			Toast.makeText( this, getString(DataView.SEARCH_FAILED_NOTIFICATION), Toast.LENGTH_LONG ).show();
 		}
 		else{
@@ -293,7 +277,8 @@ public class MixMap extends MapActivity implements OnTouchListener{
 		dataView.getDataHandler().setMarkerList(originalMarkerList);
 
 		searchNotificationTxt.setVisibility(View.INVISIBLE);
-		searchNotificationTxt = null;
+		//searchNotificationTxt = null;
+		searchNotificationTxt.clearComposingText();
 		finish();
 		Intent intent1 = new Intent(this, MixMap.class); 
 		startActivityForResult(intent1, 42);
@@ -318,8 +303,8 @@ class MixOverlay extends ItemizedOverlay<OverlayItem> {
 	}
 
 	@Override
-	protected OverlayItem createItem(int i) {
-		return overlayItems.get(i);
+	protected OverlayItem createItem(int index) {
+		return overlayItems.get(index);
 	}
 
 	@Override
@@ -340,7 +325,7 @@ class MixOverlay extends ItemizedOverlay<OverlayItem> {
 					mixMap.getDataView().getContext().loadWebPage(newUrl, mixMap.getMapContext());
 				}
 			} catch (Exception e) {
-				e.printStackTrace();
+				Log.e("OpenAlbum - Mixare", e.getMessage(), e);
 			}
 		}
 
