@@ -47,7 +47,7 @@ public class DataSource extends Activity {
 	
 	private String name;
 	private String url;
-	public enum TYPE { WIKIPEDIA, BUZZ, TWITTER, OSM, MIXARE,OPENSTREETMAP, PANORAMIO}; //@TODO add panoramio
+	public enum TYPE { WIKIPEDIA,  PANORAMIO, TWITTER, OSM, MIXARE,OPENSTREETMAP,BUZZ }; //@TODO add panoramio
 	public enum DISPLAY { CIRCLE_MARKER, NAVIGATION_MARKER, THUMBNAILS };
 	private boolean isenabled;
 	private TYPE type;

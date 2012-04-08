@@ -29,7 +29,7 @@ import java.net.URL;
 public class ImageMarker extends Marker {
 
 	public static final int MAX_OBJECTS = 20;
-	private static Bitmap image;
+	private  Bitmap image; //@TODO Should not be static
 	public static final int OSM_URL_MAX_OBJECTS = 5;
 	private static final boolean FLAG_DECODE_PHOTO_STREAM_WITH_SKIA = false;
 	private static final int IO_BUFFER_SIZE = 4 * 1024;
@@ -38,36 +38,36 @@ public class ImageMarker extends Marker {
 	public ImageMarker(String title, double latitude, double longitude,
 			double altitude, String URL, DataSource datasource, Bitmap image) {
 		super(title, latitude, longitude, altitude, URL, datasource);
-		image = image;
+		this.image = image;
 	}
 
 	public ImageMarker(String title, double latitude, double longitude,
 			double altitude, String URL, DataSource datasource) {
 		super(title, latitude, longitude, altitude, URL, datasource);
 
-		image = getBitmapFromURL(URL);
+		this.image = getBitmapFromURL(URL);
 	}
 
-	public static Bitmap getBitmapFromURL(String src) {
+	public  Bitmap getBitmapFromURL(String src) {
 		
 		InputStream input = null;
 		BufferedOutputStream out = null;
 		Bitmap myBitmap = null;
 		try {
-			// workaround DNS lookup, resolves unknown host issue
-			try {
-				InetAddress.getByName(src);
-				// InetAddress i = InetAddress.getByName(URLName);
-			} catch (UnknownHostException e1) {
-				e1.printStackTrace();
-			}
+//			// workaround DNS lookup, resolves unknown host issue
+//			try {
+//				InetAddress.getByName(src);
+//				// InetAddress i = InetAddress.getByName(URLName);
+//			} catch (UnknownHostException e1) {
+//				e1.printStackTrace();
+//			}
 			URL url = new URL(src);
 			HttpURLConnection connection = (HttpURLConnection) url
 					.openConnection();
 			connection.setDoInput(true);
 			connection.connect();
 			input = new BufferedInputStream(connection.getInputStream(),
-					IO_BUFFER_SIZE); // size
+					IO_BUFFER_SIZE);
 			if (FLAG_DECODE_PHOTO_STREAM_WITH_SKIA) {
 				myBitmap = BitmapFactory.decodeStream(input);
 			} else {
@@ -137,6 +137,7 @@ public class ImageMarker extends Marker {
 			dw.setColor(rectangleBackgroundColor);
 			dw.paintBitmap(image, signMarker.x - (image.getWidth() / 2),
 					signMarker.y - (image.getHeight() / 2));
+			
 		}
 	}
 }

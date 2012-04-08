@@ -7,5 +7,6 @@
 	<string-array name="displaytypelist">
 		<item>@string/CIRCLE_MARKER</item>
 		<item>@string/NAVIGATION_MARKER</item>
+		<item >@string/THUMBNAILS</item>
 	</string-array>
 </resources>

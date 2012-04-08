@@ -180,7 +180,7 @@ public class DataView {
 		request.params = datasource.createRequestParams(lat, lon, alt, radius, locale);
 		request.source = datasource;
 		
-		mixContext.getDownloader().submitJob(request);
+		mixContext.getDownloader().submitJob(request); //@FIXME logic and pano don't go through
 		state.nextLStatus = MixState.PROCESSING;
 		
 	}
