@@ -96,10 +96,7 @@ public class DownloadManager implements Runnable {
 
 	private String currJobId = null;
 
-	MixContext ctx;
-
 	public DownloadManager(MixContext ctx) {
-		this.ctx = ctx;
 	}
 
 	public void run() {
@@ -173,7 +170,7 @@ public class DownloadManager implements Runnable {
 	}
 
 	private DownloadResult processRequest(DownloadRequest request) {
-		DownloadResult result = new DownloadResult();
+		final DownloadResult result = new DownloadResult();
 		//assume an error until everything is fine
 		result.error = true;
 		
