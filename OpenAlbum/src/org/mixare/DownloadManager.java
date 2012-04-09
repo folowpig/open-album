@@ -71,7 +71,7 @@ import org.mixare.data.Json;
 import org.mixare.data.XMLHandler;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
-//import org.mixare.MixView;
+import org.mixare.MixView;
 import android.content.ContentResolver;
 import android.content.res.AssetManager;
 import android.database.Cursor;
@@ -80,22 +80,25 @@ import android.os.Build;
 import android.util.Log;
 
 /**
- * This class establishes a connection and downloads the data for
- * each entry in its todo list one after another.
+ * This class establishes a connection and downloads the data for each entry in
+ * its todo list one after another.
  * 
  * @TODO Customize Class + decouple it, fix performance issues.
- * @TODO http://grepcode.com/file/repository.grepcode.com/java/ext/com.google.android/android/2.3.1_r1/android/app/DownloadManager.java#DownloadManager  
+ * @TODO 
+ *       http://grepcode.com/file/repository.grepcode.com/java/ext/com.google.android
+ *       /android/2.3.1_r1/android/app/DownloadManager.java#DownloadManager
  */
 public class DownloadManager implements Runnable {
 
 	private boolean stop = false, pause = false, proceed = false;
-	public static int NOT_STARTED = 0, CONNECTING = 1, CONNECTED = 2, PAUSED = 3, STOPPED = 4;
+	public static int NOT_STARTED = 0, CONNECTING = 1, CONNECTED = 2,
+			PAUSED = 3, STOPPED = 4;
 	private int state = NOT_STARTED;
 
 	private int id = 0;
 	private HashMap<String, DownloadRequest> todoList = new HashMap<String, DownloadRequest>();
 	private HashMap<String, DownloadResult> doneList = new HashMap<String, DownloadResult>();
-	InputStream is;
+	private InputStream inStream;
 
 	private String currJobId = null;
 
@@ -119,7 +122,7 @@ public class DownloadManager implements Runnable {
 
 			// Wait for proceed
 			while (!stop && !pause) {
-				synchronized (this) { //@FIXME Important - Thread deadLock
+				synchronized (this) { // @FIXME Important - Thread deadLock
 					if (todoList.size() > 0) {
 						jobId = getNextReqId();
 						request = todoList.get(jobId);
@@ -156,15 +159,16 @@ public class DownloadManager implements Runnable {
 		state = STOPPED;
 	}
 
-	public int checkForConnection(){
+	public int checkForConnection() {
 		return state;
 	}
 
-	private void sleep(long ms){
+	private void sleep(long ms) {
 		try {
 			Thread.sleep(ms);
 		} catch (java.lang.InterruptedException ex) {
-			Log.w("OpenAlbum - Mixare", "Thread interrupted, sleep() -> DownloadMang");
+			Log.w("OpenAlbum - Mixare",
+					"Thread interrupted, sleep() -> DownloadMang");
 		}
 	}
 
@@ -174,16 +178,18 @@ public class DownloadManager implements Runnable {
 
 	private DownloadResult processRequest(DownloadRequest request) {
 		final DownloadResult result = new DownloadResult();
-		//assume an error until everything is fine
+		// assume an error until everything is fine
 		result.error = true;
-		
+
 		try {
-			if( request!=null && request.source.getUrl() !=null){
+			if (request != null && request.source.getUrl() != null) {
 
-				is = getHttpGETInputStream(request.source.getUrl() + request.params);
-				final String tmp = getHttpInputString(is);
+				inStream = getHttpGETInputStream(request.source.getUrl()
+						+ request.params);
+				final String tmp = getHttpInputString(inStream);
 
-				final Json layer = new Json(); ////@FIXME OpenStreetMap Recieved data is XML
+				final Json layer = new Json(); // //@FIXME OpenStreetMap
+												// Recieved data is XML
 
 				// try loading JSON DATA
 				try {
@@ -194,33 +200,33 @@ public class DownloadManager implements Runnable {
 
 					Log.d(MixView.TAG, "loading JSON data");
 
-					List<Marker> markers = layer.load(root,request.source);
+					List<Marker> markers = layer.load(root, request.source);
 					result.setMarkers(markers);
 
 					result.source = request.source;
 					result.error = false;
-					result.errorMsg = ""; 
+					result.errorMsg = "";
 
-				}
-				catch (JSONException e) {
+				} catch (JSONException e) {
 
 					Log.v(MixView.TAG, "no JSON data");
 					Log.v(MixView.TAG, "try to load XML data");
 
 					try {
-						DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-						//Document doc = builder.parse(is);d
-						Document doc = builder.parse(new InputSource(new StringReader(tmp)));
+						DocumentBuilder builder = DocumentBuilderFactory
+								.newInstance().newDocumentBuilder();
+						// Document doc = builder.parse(is);d
+						Document doc = builder.parse(new InputSource(
+								new StringReader(tmp)));
 
-						//Document doc = builder.parse(is);
+						// Document doc = builder.parse(is);
 
 						XMLHandler xml = new XMLHandler();
 
-						Log.i(MixView.TAG, "loading XML data");	
-						
+						Log.i(MixView.TAG, "loading XML data");
 
 						List<Marker> markers = xml.load(doc, request.source);
-						
+
 						result.setMarkers(markers);
 
 						result.source = request.source;
@@ -228,18 +234,17 @@ public class DownloadManager implements Runnable {
 						result.errorMsg = "";
 					} catch (Exception e1) {
 						Log.d("OpenAlbum - Mixare", e1.getMessage(), e1);
-					}				
+					}
 				}
-				closeHttpInputStream(is);
-				is = null;
+				closeHttpInputStream(inStream);
+				inStream = null;
 			}
-		}
-		catch (Exception ex) {
+		} catch (Exception ex) {
 			result.errorMsg = ex.getMessage();
 			result.errorRequest = request;
 
 			try {
-				closeHttpInputStream(is);
+				closeHttpInputStream(inStream);
 			} catch (Exception ignore) {
 				Log.e("OpenAlbum - Mixare", ignore.getMessage());
 			}
@@ -258,31 +263,30 @@ public class DownloadManager implements Runnable {
 	}
 
 	public synchronized String submitJob(DownloadRequest job) {
-		if(job!=null) {
+		if (job != null) {
 			String jobId = "";
-			//ensure that we only have one download per each datasource
+			// ensure that we only have one download per each datasource
 			String currDSname = job.source.getName();
 			boolean found = false;
-			if (!todoList.isEmpty()){
-			for (String k: todoList.keySet()) {
-				if (currDSname.equals(todoList.get(k).source.getName())) {
-					found = true;
-					jobId = k;
+			if (!todoList.isEmpty()) {
+				for (String k : todoList.keySet()) {
+					if (currDSname.equals(todoList.get(k).source.getName())) {
+						found = true;
+						jobId = k;
+					}
 				}
 			}
-			}
 			if (!found) {
-			jobId = "ID_" + (id++);
-			todoList.put(jobId, job);
-			Log.i(MixView.TAG, "Submitted Job with " + jobId + ", type: "
-					+ job.source.getType() + ", params: " + job.params + ", url: "
-					+ job.source.getUrl());
+				jobId = "ID_" + (id++);
+				todoList.put(jobId, job);
+				Log.i(MixView.TAG, "Submitted Job with " + jobId + ", type: "
+						+ job.source.getType() + ", params: " + job.params
+						+ ", url: " + job.source.getUrl());
 			}
 			return jobId;
 		}
 		return null;
 	}
-	
 
 	public synchronized boolean isReqComplete(String jobId) {
 		return doneList.containsKey(jobId);
@@ -298,6 +302,7 @@ public class DownloadManager implements Runnable {
 	public String getActiveReqId() {
 		return currJobId;
 	}
+
 	public void pause() {
 		pause = true;
 	}
@@ -309,35 +314,30 @@ public class DownloadManager implements Runnable {
 	public void stop() {
 		stop = true;
 	}
-	
+
 	public synchronized DownloadResult getNextResult() {
-		if(!doneList.isEmpty()) {
-			String nextId=doneList.keySet().iterator().next();
+		if (!doneList.isEmpty()) {
+			String nextId = doneList.keySet().iterator().next();
 			DownloadResult result = doneList.get(nextId);
 			doneList.remove(nextId);
 			return result;
 		}
 		return null;
 	}
+
 	public Boolean isDone() {
 		return todoList.isEmpty();
 	}
 
-	//Moved from mixContext
+	// Moved from mixContext
 	public InputStream getHttpPOSTInputStream(String urlStr,
-			String params)  {
+			String params) throws Exception {
 		InputStream is = null;
 		OutputStream os = null;
 		HttpURLConnection conn = null;
 
-		if (urlStr.startsWith("content://")){
-			try {
-				return getContentInputStream(urlStr, params);
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				Log.d("OpenAlbum - Mixare", e.getMessage(), e);
-			}
-		}
+		if (urlStr.startsWith("content://"))
+			return getContentInputStream(urlStr, params);
 
 		try {
 			URL url = new URL(urlStr);
@@ -358,19 +358,6 @@ public class DownloadManager implements Runnable {
 			return is;
 		} catch (Exception ex) {
 
-			
-			try {
-				if (conn != null && conn.getResponseCode() == 405) {
-					return getHttpGETInputStream(urlStr);
-				} 
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				Log.d("OpenAlbum - Mixare", e.getMessage(), e);
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				Log.d("OpenAlbum - Mixare", e.getMessage(), e);
-			}
-		} finally {
 			try {
 				is.close();
 			} catch (Exception ignore) {			
@@ -385,94 +372,115 @@ public class DownloadManager implements Runnable {
 				conn.disconnect();
 			} catch (Exception ignore) {
 			}
+
+			if (conn != null && conn.getResponseCode() == 405) {
+				return getHttpGETInputStream(urlStr);
+			} else {		
+
+				throw ex;
+			}
 		}
 	}
-	public InputStream getHttpGETInputStream(String urlStr)
-	 {
-				InputStream is = null;
-				URLConnection conn = null;
 
-			    // HTTP connection reuse which was buggy pre-froyo
-			    if (Integer.parseInt(Build.VERSION.SDK) < Build.VERSION_CODES.FROYO) {
-			        System.setProperty("http.keepAlive", "false");
-			    }
-			    
-				if (urlStr.startsWith("file://"))
-					try {
-						return new FileInputStream(urlStr.replace("file://", ""));
-					} catch (FileNotFoundException e) {
-						Log.d("OpenAlbum - Mixare", e.getMessage(), e);
-					}
+	public InputStream getHttpGETInputStream(String urlStr) {
+		InputStream is = null;
+		URLConnection conn = null;
 
-				if (urlStr.startsWith("content://"))
-					try {
-						return getContentInputStream(urlStr, null);
-					} catch (Exception e) {
-						Log.d("OpenAlbum - Mixare", e.getMessage(), e);
-					}
+		// HTTP connection reuse which was buggy pre-froyo
+		if (Integer.parseInt(Build.VERSION.SDK) < Build.VERSION_CODES.FROYO) {
+			System.setProperty("http.keepAlive", "false");
+		}
 
-				if (urlStr.startsWith("https://")) {
-					HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier(){
-		    			public boolean verify(String hostname, SSLSession session) {
-		    				return true;
-		    			}});
-				SSLContext context;
-				try {
-					context = SSLContext.getInstance("TLS");
-				
-				context.init(null, new X509TrustManager[]{new X509TrustManager(){
-					public void checkClientTrusted(X509Certificate[] chain,
-							String authType) {}
-					public void checkServerTrusted(X509Certificate[] chain,
-							String authType) {}
-					public X509Certificate[] getAcceptedIssuers() {
-						return new X509Certificate[0];
-					}}}, new SecureRandom());
-				HttpsURLConnection.setDefaultSSLSocketFactory(
-						context.getSocketFactory());
-				} catch (NoSuchAlgorithmException e) {
-					// TODO Auto-generated catch block
-					Log.d("OpenAlbum - Mixare", e.getMessage(), e);
-				} catch (KeyManagementException e) {
-					Log.d("OpenAlbum - Mixare", e.getMessage(), e);
-				}
-				}
-				
-				
-				try {
-					URL url = new URL(urlStr);
-					conn =  url.openConnection();
-					conn.setReadTimeout(10000);
-					conn.setConnectTimeout(10000);
-
-					is = conn.getInputStream(); //@TODO fix openMap error (URL Params)
-					
-					return is;
-				} catch (Exception ex) {
-					
-					try {
-						if(conn instanceof HttpURLConnection)
-							((HttpURLConnection)conn).disconnect();
-					} catch (Exception ignore) {			
-					}				
-
-				} finally{
-					try {
-						is.close();
-					} catch (Exception ignore) {			
-					}
-				}
+		if (urlStr.startsWith("file://"))
+			try {
+				return new FileInputStream(urlStr.replace("file://", ""));
+			} catch (FileNotFoundException e) {
+				Log.d("OpenAlbum - Mixare", e.getMessage(), e);
+				// return null;
 			}
 
-	public InputStream getContentInputStream(String urlStr, String params)
-	 {
+		if (urlStr.startsWith("content://"))
+			try {
+				return getContentInputStream(urlStr, null);
+			} catch (Exception e) {
+				Log.d("OpenAlbum - Mixare", e.getMessage(), e);
+				// return null;
+			}
+
+		if (urlStr.startsWith("https://")) {
+			HttpsURLConnection
+					.setDefaultHostnameVerifier(new HostnameVerifier() {
+						public boolean verify(String hostname,
+								SSLSession session) {
+							return true;
+						}
+					});
+			SSLContext context;
+			try {
+				context = SSLContext.getInstance("TLS");
+
+				context.init(null,
+						new X509TrustManager[] { new X509TrustManager() {
+							public void checkClientTrusted(
+									X509Certificate[] chain, String authType) {
+							}
+
+							public void checkServerTrusted(
+									X509Certificate[] chain, String authType) {
+							}
+
+							public X509Certificate[] getAcceptedIssuers() {
+								return new X509Certificate[0];
+							}
+						} }, new SecureRandom());
+				HttpsURLConnection.setDefaultSSLSocketFactory(context
+						.getSocketFactory());
+			} catch (NoSuchAlgorithmException e) {
+				// TODO Auto-generated catch block
+				Log.d("OpenAlbum - Mixare", e.getMessage(), e);
+				// return null;
+			} catch (KeyManagementException e) {
+				Log.d("OpenAlbum - Mixare", e.getMessage(), e);
+				// return null;
+			}
+		}
+
+		try {
+			URL url = new URL(urlStr);
+			conn = url.openConnection();
+			conn.setReadTimeout(10000);
+			conn.setConnectTimeout(10000);
+
+			is = conn.getInputStream(); // @TODO fix openMap error (URL Params)
+
+			// return is;
+		} catch (Exception ex) {
+
+			try {
+				if (conn instanceof HttpURLConnection)
+					((HttpURLConnection) conn).disconnect();
+			} catch (Exception ignore) {
+			}
+
+		} finally {
+//			try {
+//				is.close();
+//			} catch (Exception ignore) {
+//			}
+		}
+		return is;
+	}
+
+	public InputStream getContentInputStream(String urlStr, String params) throws Exception {
 		ContentResolver cr = null;
 		try {
 			cr = MixView.class.newInstance().getContentResolver();
 		} catch (IllegalAccessException e) {
 			Log.d("OpenAlbum - Mixare", e.getMessage(), e);
+			// return null;
 		} catch (InstantiationException e) {
 			Log.d("OpenAlbum - Mixare", e.getMessage(), e);
+			// return null;
 		}
 		Cursor cur = cr.query(Uri.parse(urlStr), null, params, null, null);
 
@@ -483,15 +491,17 @@ public class DownloadManager implements Runnable {
 			String result = cur.getString(cur.getColumnIndex("RESULT"));
 			cur.deactivate();
 
-			return new ByteArrayInputStream(result
-					.getBytes());
+			return new ByteArrayInputStream(result.getBytes());
 		} else {
 			cur.deactivate();
+
+			throw new Exception("Invalid content:// mode " + mode);
 		}
 	}
 
 	public String getHttpInputString(InputStream is) {
-		BufferedReader reader = new BufferedReader(new InputStreamReader(is), 8 * 1024);
+		BufferedReader reader = new BufferedReader(new InputStreamReader(is),
+				8 * 1024);
 		StringBuilder sb = new StringBuilder();
 
 		try {
@@ -501,11 +511,10 @@ public class DownloadManager implements Runnable {
 			}
 		} catch (IOException e) {
 			Log.d("OpenAlbum - Mixare", e.getMessage(), e);
-		} finally {
 			try {
 				is.close();
-			} catch (IOException e) {
-				Log.d("OpenAlbum - Mixare", e.getMessage(), e);
+			} catch (IOException ex) {
+				Log.d("OpenAlbum - Mixare", ex.getMessage(), ex);
 			}
 		}
 		return sb.toString();
@@ -541,15 +550,15 @@ class DownloadResult {
 	List<Marker> markers;
 
 	boolean error;
-	String errorMsg="";
+	String errorMsg = "";
 	DownloadRequest errorRequest;
-
 
 	public List<Marker> getMarkers() {
 		return markers;
 	}
+
 	public void setMarkers(List<Marker> markers) {
 		this.markers = markers;
 	}
-	
+
 }
