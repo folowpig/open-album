@@ -36,6 +36,7 @@ import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.List;
 
+//Some devices reports error if these imports aren't included.
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -67,7 +68,7 @@ import org.mixare.data.Json;
 import org.mixare.data.XMLHandler;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
-import org.mixare.MixView;
+//import org.mixare.MixView;
 import android.content.ContentResolver;
 import android.content.res.AssetManager;
 import android.database.Cursor;
@@ -112,7 +113,7 @@ public class DownloadManager implements Runnable {
 		state = CONNECTING;
 
 		while (!stop) {
-			jobId = null;
+			jobId = "";
 			request = null;
 			result = null;
 
@@ -163,7 +164,7 @@ public class DownloadManager implements Runnable {
 		try {
 			Thread.sleep(ms);
 		} catch (java.lang.InterruptedException ex) {
-
+			Log.w("OpenAlbum - Mixare", "Thread interrupted, sleep() -> DownloadMang");
 		}
 	}
 
@@ -180,16 +181,16 @@ public class DownloadManager implements Runnable {
 			if( request!=null && request.source.getUrl() !=null){
 
 				is = getHttpGETInputStream(request.source.getUrl() + request.params);
-				String tmp = getHttpInputString(is);
+				final String tmp = getHttpInputString(is);
 
-				Json layer = new Json(); ////@FIXME OpenStreetMap Recieved data is XML
+				final Json layer = new Json(); ////@FIXME OpenStreetMap Recieved data is XML
 
 				// try loading JSON DATA
 				try {
 
 					Log.v(MixView.TAG, "try to load JSON data");
 
-					JSONObject root = new JSONObject(tmp);
+					final JSONObject root = new JSONObject(tmp);
 
 					Log.d(MixView.TAG, "loading JSON data");
 
@@ -198,7 +199,7 @@ public class DownloadManager implements Runnable {
 
 					result.source = request.source;
 					result.error = false;
-					result.errorMsg = null;
+					result.errorMsg = ""; 
 
 				}
 				catch (JSONException e) {
@@ -224,9 +225,9 @@ public class DownloadManager implements Runnable {
 
 						result.source = request.source;
 						result.error = false;
-						result.errorMsg = null;
+						result.errorMsg = "";
 					} catch (Exception e1) {
-						e1.printStackTrace();
+						Log.d("OpenAlbum - Mixare", e1.getMessage(), e1);
 					}				
 				}
 				closeHttpInputStream(is);
@@ -240,9 +241,10 @@ public class DownloadManager implements Runnable {
 			try {
 				closeHttpInputStream(is);
 			} catch (Exception ignore) {
+				Log.e("OpenAlbum - Mixare", ignore.getMessage());
 			}
 
-			ex.printStackTrace();
+			Log.d("OpenAlbum - Mixare", ex.getMessage(), ex);
 		}
 
 		currJobId = null;
@@ -463,12 +465,12 @@ public class DownloadManager implements Runnable {
 				sb.append(line + "\n");
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
+			Log.d("OpenAlbum - Mixare", e.getMessage(), e);
+		}finally{
 			try {
 				is.close();
-			} catch (IOException e) {
-				e.printStackTrace();
+			} catch (IOException ex) {
+				Log.d("OpenAlbum - Mixare", ex.getMessage(), ex);
 			}
 		}
 		return sb.toString();
