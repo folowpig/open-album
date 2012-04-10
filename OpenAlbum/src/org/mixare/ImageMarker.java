@@ -28,12 +28,12 @@ import java.net.URL;
  */
 public class ImageMarker extends Marker {
 
-	public static final int MAX_OBJECTS = 20;
+	public static final int MAX_OBJECTS = 2;
 	private  Bitmap image; //@TODO Should not be static
 	public static final int OSM_URL_MAX_OBJECTS = 5;
 	private static final boolean FLAG_DECODE_PHOTO_STREAM_WITH_SKIA = false;
 	private static final int IO_BUFFER_SIZE = 4 * 1024;
-	private int rectangleBackgroundColor = Color.argb(155, 255, 255, 255);
+	private int rectangleBackgroundColor = Color.BLUE;
 
 	public ImageMarker(String title, double latitude, double longitude,
 			double altitude, String URL, DataSource datasource, Bitmap image) {
@@ -129,15 +129,53 @@ public class ImageMarker extends Marker {
 	@Override
 	public void draw(PaintScreen dw) {
 		this.drawImage(dw);
-		super.drawTextBlock(dw);
+		drawTextBlock(dw);
 	}
 
+	@Override
+	public void drawCircle(PaintScreen dw) {
+		//if (isVisible) {
+			float maxHeight = dw.getHeight();
+			dw.setStrokeWidth(maxHeight / 100f);
+			dw.setFill(false);
+
+				dw.setColor(getColour());
+			
+			// draw circle with radius depending on distance
+			// 0.44 is approx. vertical fov in radians
+			double angle = 2.0 * Math.atan2(10, distance);
+			double radius = Math.max(
+					Math.min(angle / 0.44 * maxHeight, maxHeight),
+					maxHeight / 25f);
+
+			/*
+			 * distance 100 is the threshold to convert from circle to another
+			 * shape
+			 */
+			if (distance < 100.0)
+				drawImage(dw);
+			else
+				dw.paintCircle(cMarker.x, cMarker.y, (float) radius);
+
+		//}
+	}
 	public void drawImage(PaintScreen dw) {
-		if (isVisible) {
+		//if (isVisible) {
+		dw.setStrokeWidth(dw.getHeight() / 100f);
+		dw.setFill(false);
 			dw.setColor(rectangleBackgroundColor);
 			dw.paintBitmap(image, signMarker.x - (image.getWidth() / 2),
 					signMarker.y - (image.getHeight() / 2));
 			
-		}
+		//}
+	}
+	
+	public void drawThumbnails(PaintScreen dw) {
+		//if (isVisible) {
+			dw.setColor(rectangleBackgroundColor);
+			dw.paintBitmap(image, cMarker.x - (image.getWidth() / 2),
+					cMarker.y - (image.getHeight() / 2));
+			
+		//}
 	}
 }
