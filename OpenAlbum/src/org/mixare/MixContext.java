@@ -111,7 +111,7 @@ public class MixContext extends ContextWrapper {
 			dataSourceEditor.putString("DataSource0", "Wikipedia|http://api.geonames.org/findNearbyWikipediaJSON|0|0|true");
 			dataSourceEditor.putString("DataSource1", "Twitter|http://search.twitter.com/search.json|2|0|false");
 			dataSourceEditor.putString("DataSource2", "OpenStreetmap|http://open.mapquestapi.com/xapi/api/0.6/node[railway=station]|3|1|true");
-			dataSourceEditor.putString("DataSource3", "Panoramio|http://www.panoramio.com/map/get_panoramas.php|4|0|true");
+			dataSourceEditor.putString("DataSource3", "Panoramio|http://www.panoramio.com/map/get_panoramas.php|4|2|true");
 			dataSourceEditor.commit();
 			size = settings.getAll().size();
 		}
@@ -133,8 +133,10 @@ public class MixContext extends ContextWrapper {
 		boolean atLeastOneDatasourceSelected=false;
 		
 		for(DataSource ds: this.allDataSources) {
-			if(ds.getEnabled())
+			if(ds.getEnabled()){
 				atLeastOneDatasourceSelected=true; //? Why do we need that, why here
+				break;
+			}
 		}
 		// select Wikipedia if nothing was previously selected  
 		if(!atLeastOneDatasourceSelected){

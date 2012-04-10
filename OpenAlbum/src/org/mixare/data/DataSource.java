@@ -47,7 +47,7 @@ public class DataSource extends Activity {
 	
 	private String name;
 	private String url;
-	public enum TYPE { WIKIPEDIA,  PANORAMIO, TWITTER, OSM, MIXARE,OPENSTREETMAP,BUZZ }; //@TODO add panoramio
+	public enum TYPE { WIKIPEDIA, TWITTER, OSM, PANORAMIO, MIXARE,OPENSTREETMAP,BUZZ }; //@TODO add panoramio
 	public enum DISPLAY { CIRCLE_MARKER, NAVIGATION_MARKER, THUMBNAILS };
 	private boolean isenabled;
 	private TYPE type;
@@ -242,6 +242,9 @@ public class DataSource extends Activity {
 					break;
 			case WIKIPEDIA:	
 				ret=R.drawable.wikipedia; 
+				break;
+			case PANORAMIO:	
+				ret=R.drawable.panoramio; 
 				break;
 			default:		
 				ret=R.drawable.ic_launcher; 
