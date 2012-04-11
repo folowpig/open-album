@@ -305,7 +305,7 @@ public class MixView extends Activity implements SensorEventListener,
 								"OpenStreetmap|http://open.mapquestapi.com/xapi/api/0.6/node[railway=station]|3|1|false");
 				dataSourceEditor
 						.putString("DataSource3",
-								"Panoramio|http://www.panoramio.com/map/get_panoramas.php|4|2|true");
+								"Panoramio|http://www.panoramio.com/map/get_panoramas.php|4|0|true");
 				dataSourceEditor.commit();
 
 			}// end if first access

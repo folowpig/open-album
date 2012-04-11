@@ -119,9 +119,11 @@ public class Json extends DataHandler {
 //					datasource);
 			ma = new POIMarker(
 					unescapeHTML(jo.getString("photo_title"), 0), 
-					jo.getDouble("latitude"), 
-					jo.getDouble("longitude"), 
+//					jo.getDouble("latitude"), 
+//					jo.getDouble("longitude"), 
 //					jo.getDouble("elevation"), 
+					(double) 37.6588,
+					(double) -122.4433,
 					(double) 50, //@TODO elevation level for Panoramio
 					link, 
 					datasource);
