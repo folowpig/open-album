@@ -129,55 +129,17 @@ public class ImageMarker extends Marker {
 	@Override
 	public void draw(PaintScreen dw) {
 		this.drawImage(dw);
-		drawTextBlock(dw);
+		super.drawTextBlock(dw);
 	}
 
-//	@Override
-//	public void drawCircle(PaintScreen dw) {
-//		if (isVisible) {
-//			float maxHeight = dw.getHeight();
-//			dw.setStrokeWidth(maxHeight / 100f);
-//			dw.setFill(false);
-//
-//				dw.setColor(getColour());
-//			
-//			// draw circle with radius depending on distance
-//			// 0.44 is approx. vertical fov in radians
-//			double angle = 2.0 * Math.atan2(10, distance);
-//			double radius = Math.max(
-//					Math.min(angle / 0.44 * maxHeight, maxHeight),
-//					maxHeight / 25f);
-//
-//			/*
-//			 * distance 100 is the threshold to convert from circle to another
-//			 * shape
-//			 */
-//			if (distance < 100.0)
-//				drawImage(dw);
-//			else
-//				dw.paintCircle(cMarker.x, cMarker.y, (float) radius);
-//
-//		}
-//	}
 	public void drawImage(PaintScreen dw) {
 		//if (isVisible) {
-		//dw.setStrokeWidth(dw.getHeight() / 100f);
+		dw.setStrokeWidth(dw.getHeight() / 100f);
 		dw.setFill(false);
 			dw.setColor(rectangleBackgroundColor);
 			dw.paintBitmap(image, signMarker.x - (image.getWidth() / 2),
 					signMarker.y - (image.getHeight() / 2));
-//			dw.paintBitmap(image, signMarker.x - (dw.getWidth() / 2),
-//					signMarker.y - (dw.getHeight() / 2));
 			
 		//}
 	}
-	
-//	public void drawThumbnails(PaintScreen dw) {
-//		if (isVisible) {
-//			dw.setColor(rectangleBackgroundColor);
-//			dw.paintBitmap(image, cMarker.x - (image.getWidth() / 2),
-//					cMarker.y - (image.getHeight() / 2));
-//			
-//		}
-//	}
 }
