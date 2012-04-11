@@ -97,7 +97,7 @@ public class PaintScreen {
 	
 	public void paintBitmap(Bitmap bitmap, float left, float top) {
 		canvas.save();
-		canvas.drawBitmap(bitmap, 0, 0, paint); //@FIXME Changed from drawBitmap(bitmap, left, top, paint)
+		canvas.drawBitmap(bitmap, left, top, paint); //@FIXME Changed from drawBitmap(bitmap, left, top, paint)
 		canvas.restore();
 	}
 	

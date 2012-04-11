@@ -109,24 +109,24 @@ public class Json extends DataHandler {
 			Log.v(MixView.TAG, "processing Panoramio JSON object");
 			String link= jo.getString("photo_file_url");
 
-//			ma = new ImageMarker(
-//					unescapeHTML(jo.getString("photo_title"), 0), 
-//					jo.getDouble("latitude"), 
-//					jo.getDouble("longitude"), 
-////					jo.getDouble("elevation"), 
-//					(double) 50, //@TODO elevation level for Panoramio
-//					link, 
-//					datasource);
-			ma = new POIMarker(
+			ma = new ImageMarker(
 					unescapeHTML(jo.getString("photo_title"), 0), 
-//					jo.getDouble("latitude"), 
-//					jo.getDouble("longitude"), 
-//					jo.getDouble("elevation"), 
 					(double) 37.6588,
-					(double) -122.4433,
+			(double) -122.4433,
+//					jo.getDouble("elevation"), 
 					(double) 50, //@TODO elevation level for Panoramio
 					link, 
 					datasource);
+//			ma = new POIMarker(
+//					unescapeHTML(jo.getString("photo_title"), 0), 
+////					jo.getDouble("latitude"), 
+////					jo.getDouble("longitude"), 
+////					jo.getDouble("elevation"), 
+//					(double) 37.6588,
+//					(double) -122.4433,
+//					(double) 50, //@TODO elevation level for Panoramio
+//					link, 
+//					datasource);
 		}
 		return ma;
 	}
