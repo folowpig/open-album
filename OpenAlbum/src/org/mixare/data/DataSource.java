@@ -203,8 +203,16 @@ public class DataSource extends Activity {
 			case OSM: case OPENSTREETMAP: 
 				ret+= XMLHandler.getOSMBoundingBox(lat, lon, radius);
 			break;
-			case PANORAMIO: //Hardcoded for now
-				ret+= "?set=public&from=0&to=2&minx=-180&miny=-90&maxx=180&maxy=90&size=thumbnail&mapfilter=true";
+			case PANORAMIO: 
+				float minLong = (float) (lon-radius/100.0);
+				float minLat = (float) (lat-radius/100.0);
+				float maxLong = (float) (lon+radius/100.0);
+				float maxLat = (float) (lat+radius/100.0);
+				ret+= "?set=public&from=0&to=2&minx="+ minLong + 
+				"&miny="+ minLat+ 
+				"&maxx=" + maxLong +
+				"&maxy=" + maxLat + 
+				"&size=thumbnail&mapfilter=true";
 			}
 			
 		}
