@@ -208,7 +208,7 @@ public class DataSource extends Activity {
 				float minLat = (float) (lat-radius/100.0);
 				float maxLong = (float) (lon+radius/100.0);
 				float maxLat = (float) (lat+radius/100.0);
-				ret+= "?set=public&from=0&to=2&minx="+ minLong + 
+				ret+= "?set=public&from=0&to=20&minx="+ minLong + 
 				"&miny="+ minLat+ 
 				"&maxx=" + maxLong +
 				"&maxy=" + maxLat + 

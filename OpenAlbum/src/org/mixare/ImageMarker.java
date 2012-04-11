@@ -28,7 +28,7 @@ import java.net.URL;
  */
 public class ImageMarker extends Marker {
 
-	public static final int MAX_OBJECTS = 2;
+	public static final int MAX_OBJECTS = 20;
 	private  Bitmap image; //@TODO Should not be static
 	public static final int OSM_URL_MAX_OBJECTS = 5;
 	private static final boolean FLAG_DECODE_PHOTO_STREAM_WITH_SKIA = false;
@@ -160,14 +160,16 @@ public class ImageMarker extends Marker {
 //		}
 //	}
 	public void drawImage(PaintScreen dw) {
-		if (isVisible) {
+		//if (isVisible) {
 		//dw.setStrokeWidth(dw.getHeight() / 100f);
 		dw.setFill(false);
 			dw.setColor(rectangleBackgroundColor);
 			dw.paintBitmap(image, signMarker.x - (image.getWidth() / 2),
 					signMarker.y - (image.getHeight() / 2));
+//			dw.paintBitmap(image, signMarker.x - (dw.getWidth() / 2),
+//					signMarker.y - (dw.getHeight() / 2));
 			
-		}
+		//}
 	}
 	
 //	public void drawThumbnails(PaintScreen dw) {
