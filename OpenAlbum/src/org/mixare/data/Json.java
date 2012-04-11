@@ -34,7 +34,7 @@ import org.mixare.MixView;
 import org.mixare.NavigationMarker;
 import org.mixare.POIMarker;
 import org.mixare.SocialMarker;
-
+import java.util.Random;
 import android.util.Log;
 /**
  * This class can compose a list of markers. The markers are
@@ -108,7 +108,9 @@ public class Json extends DataHandler {
 
 			Log.v(MixView.TAG, "processing Panoramio JSON object");
 			String link= jo.getString("photo_file_url");
-
+			
+			//For Panoramio elevation, generate a random number ranged [30 - 120]
+			final Random elevation = new Random();
 			ma = new ImageMarker(
 					unescapeHTML(jo.getString("photo_title"), 0), 
 					jo.getDouble("latitude"), 
@@ -116,7 +118,7 @@ public class Json extends DataHandler {
 //					(double) 37.6588,
 //					(double) -122.4433,
 //					jo.getDouble("elevation"), 
-					(double) 50, //@TODO elevation level for Panoramio
+					(double) (elevation.nextInt(90)+30), //@TODO elevation level for Panoramio
 					link, 
 					datasource);
 //			ma = new POIMarker(
