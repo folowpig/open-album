@@ -110,6 +110,8 @@ public class Json extends DataHandler {
 			String link= jo.getString("photo_file_url");
 			
 			//For Panoramio elevation, generate a random number ranged [30 - 120]
+			//@TODO find better way http://www.geonames.org/export/web-services.html#astergdem
+			// http://asterweb.jpl.nasa.gov/gdem.asp
 			final Random elevation = new Random();
 			ma = new ImageMarker(
 					unescapeHTML(jo.getString("photo_title"), 0), 

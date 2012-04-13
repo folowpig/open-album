@@ -16,6 +16,15 @@
  * You should have received a copy of the GNU General Public License along with 
  * this program. If not, see <http://www.gnu.org/licenses/>
  */
+
+/*
+ *TODO's 
+ *1-Photo's text title 
+ *2-Fix rador accuracy with images. (optional twitter and open street)
+ *3-Elevation level by location http://asterweb.jpl.nasa.gov/gdem.asp
+ *4-Rador meter
+ *5-View Enhancements.
+ */
 package org.mixare;
 
 import static android.view.KeyEvent.KEYCODE_CAMERA;
@@ -72,7 +81,7 @@ public class DataView {
 
 	private Location curFix;
 	private DataHandler dataHandler = new DataHandler();	
-	private float radius = 20;
+	private float radius = 20; //@TODO user Dynamic data
 	
 	/**IDs for the MENU ITEMS and MENU OPTIONS used in MixView class*/
 	public static final int EMPTY_LIST_STRING_ID = R.string.empty_list;

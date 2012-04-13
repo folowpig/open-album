@@ -204,7 +204,7 @@ public class DataSource extends Activity {
 				ret+= XMLHandler.getOSMBoundingBox(lat, lon, radius);
 			break;
 			case PANORAMIO: 
-				float minLong = (float) (lon-radius/100.0);
+				float minLong = (float) (lon-radius/100.0); //@FIXME Use radious calculater
 				float minLat = (float) (lat-radius/100.0);
 				float maxLong = (float) (lon+radius/100.0);
 				float maxLat = (float) (lat+radius/100.0);

@@ -33,7 +33,7 @@ public class ImageMarker extends Marker {
 	public static final int OSM_URL_MAX_OBJECTS = 5;
 	private static final boolean FLAG_DECODE_PHOTO_STREAM_WITH_SKIA = false;
 	private static final int IO_BUFFER_SIZE = 4 * 1024;
-	private int rectangleBackgroundColor = Color.BLUE;
+	private int rectangleBackgroundColor = Color.WHITE;
 
 	public ImageMarker(String title, double latitude, double longitude,
 			double altitude, String URL, DataSource datasource, Bitmap image) {
@@ -54,13 +54,6 @@ public class ImageMarker extends Marker {
 		BufferedOutputStream out = null;
 		Bitmap myBitmap = null;
 		try {
-//			// workaround DNS lookup, resolves unknown host issue
-//			try {
-//				InetAddress.getByName(src);
-//				// InetAddress i = InetAddress.getByName(URLName);
-//			} catch (UnknownHostException e1) {
-//				e1.printStackTrace();
-//			}
 			URL url = new URL(src);
 			HttpURLConnection connection = (HttpURLConnection) url
 					.openConnection();
