@@ -287,10 +287,6 @@ public class MixView extends Activity implements SensorEventListener,
 				editor.putInt("osmMaxObject", 5);
 				editor.commit();
 
-				// add the default datasources to the preferences file
-				// ex of panoramio
-				// http://www.panoramio.com/map/get_panoramas.php
-				//query: ?set=public&from=0&to=20&minx=-180&miny=-90&maxx=180&maxy=90&size=medium&mapfilter=true
 				SharedPreferences.Editor dataSourceEditor = DataSourceSettings
 						.edit();
 				dataSourceEditor

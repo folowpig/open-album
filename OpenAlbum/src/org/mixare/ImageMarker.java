@@ -126,13 +126,13 @@ public class ImageMarker extends Marker {
 	}
 
 	public void drawImage(PaintScreen dw) {
-		//if (isVisible) {
+		if (isVisible) {
 		dw.setStrokeWidth(dw.getHeight() / 100f);
 		dw.setFill(false);
 			dw.setColor(rectangleBackgroundColor);
 			dw.paintBitmap(image, signMarker.x - (image.getWidth() / 2),
 					signMarker.y - (image.getHeight() / 2));
 			
-		//}
+		}
 	}
 }
