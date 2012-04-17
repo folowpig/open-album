@@ -257,12 +257,22 @@ public class MixContext extends ContextWrapper {
 		}
 	}
 
+	public void onStopContext(){
+		downloadManager.pause();
+		//@todo move destroy to onDestroy (user can relaunch app after it stops)
+		//downloadThread.destroy();
+	}
+	
+	public void onDestroyContext(){
+		downloadManager.stop();
+		downloadManager = null;
+	}
 	public void getRM(Matrix dest) {
 		synchronized (rotationM) {
 			dest.set(rotationM);
 		}
 	}
-
+	
 	public Location getCurrentLocation() {
 		synchronized (curLoc) {
 			return curLoc;

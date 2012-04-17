@@ -507,6 +507,27 @@ public class MixView extends Activity implements SensorEventListener,
 	}
 
 	@Override
+	protected void onStop(){
+//		if (downloadThread.isInterrupted()){
+//			downloadThread.interrupt();
+//		}
+		//@todo move destroy to onDestroy (user can relaunch app after it stops)
+		//downloadThread.destroy();
+		mixContext.stopService(getIntent());
+		mixContext.onStopContext();
+		super.onStop();
+	}
+	
+	@Override
+	protected void onDestroy(){
+		//downloadThread.destroy();
+		mixContext.stopService(getIntent());
+		mixContext.onDestroyContext();
+		downloadThread = null;
+		mixContext = null;
+		super.onDestroy();
+	}
+	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		int base = Menu.FIRST;
 		/* define the first */
@@ -611,7 +632,7 @@ public class MixView extends Activity implements SensorEventListener,
 			alert.show();
 			break;
 		/* Case 6: license agreements */
-		case 7:
+		case 7: //@TODO Add app Info
 			AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
 			builder1.setMessage(getString(DataView.LICENSE_TEXT));
 			/* Retry */
