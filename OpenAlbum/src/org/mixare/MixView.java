@@ -233,13 +233,13 @@ public class MixView extends Activity implements SensorEventListener,
 					DataSourceList.SHARED_PREFS, 0);
 
 			myZoomBar = new SeekBar(this);
-			myZoomBar.setVisibility(View.INVISIBLE);
+			//myZoomBar.setVisibility(View.INVISIBLE);
 			myZoomBar.setMax(100);
 			myZoomBar.setProgress(settings.getInt("zoomLevel", 65));
 			myZoomBar
 					.setOnSeekBarChangeListener(myZoomBarOnSeekBarChangeListener);
 			myZoomBar.setVisibility(View.INVISIBLE);
-
+			
 			FrameLayout frameLayout = new FrameLayout(this);
 
 			frameLayout.setMinimumWidth(3000);

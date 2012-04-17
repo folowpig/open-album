@@ -161,12 +161,12 @@ public class DataView {
 			cam = new Camera(width, height, true);
 			cam.setViewAngle(Camera.DEFAULT_VIEW_ANGLE);
 
-			lrl.set(0, -RadarPoints.RADIUS);
+			lrl.set(0, -RadarPoints.getRADIUS());
 			lrl.rotate(Camera.DEFAULT_VIEW_ANGLE / 2);
-			lrl.add(rx + RadarPoints.RADIUS, ry + RadarPoints.RADIUS);
-			rrl.set(0, -RadarPoints.RADIUS);
+			lrl.add(rx + RadarPoints.getRADIUS(), ry + RadarPoints.getRADIUS());
+			rrl.set(0, -RadarPoints.getRADIUS());
 			rrl.rotate(-Camera.DEFAULT_VIEW_ANGLE / 2);
-			rrl.add(rx + RadarPoints.RADIUS, ry + RadarPoints.RADIUS);
+			rrl.add(rx + RadarPoints.getRADIUS(), ry + RadarPoints.getRADIUS());
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -294,13 +294,13 @@ public class DataView {
 		dw.paintObj(radarPoints, rx, ry, -state.getCurBearing(), 1); 
 		dw.setFill(false);
 		dw.setColor(Color.argb(150,0,0,220)); 
-		dw.paintLine( lrl.x, lrl.y, rx+RadarPoints.RADIUS, ry+RadarPoints.RADIUS); 
-		dw.paintLine( rrl.x, rrl.y, rx+RadarPoints.RADIUS, ry+RadarPoints.RADIUS); 
+		dw.paintLine( lrl.x, lrl.y, rx+RadarPoints.getRADIUS(), ry+RadarPoints.getRADIUS()); 
+		dw.paintLine( rrl.x, rrl.y, rx+RadarPoints.getRADIUS(), ry+RadarPoints.getRADIUS()); 
 		dw.setColor(Color.rgb(255,255,255));
 		dw.setFontSize(12);
 
-		radarText(dw, MixUtils.formatDist(radius * 1000), rx + RadarPoints.RADIUS, ry + RadarPoints.RADIUS*2 -10, false);
-		radarText(dw, "" + bearing + ((char) 176) + " " + dirTxt, rx + RadarPoints.RADIUS, ry - 5, true); 
+		radarText(dw, MixUtils.formatDist(radius * 1000), rx + RadarPoints.getRADIUS(), ry + RadarPoints.getRADIUS()*2 -10, false);
+		radarText(dw, "" + bearing + ((char) 176) + " " + dirTxt, rx + RadarPoints.getRADIUS(), ry - 5, true); 
 
 		// Get next event
 		UIEvent evt = null;

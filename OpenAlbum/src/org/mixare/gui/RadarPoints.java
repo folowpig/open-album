@@ -35,7 +35,7 @@ public class RadarPoints implements ScreenObj {
 	/** The radar's range */
 	float range;
 	/** Radius in pixel on screen */
-	public static float RADIUS = 40;
+	private static float RADIUS = 40;
 	/** Position on screen */
 	static float originX = 0 , originY = 0;
 	/** Color */
@@ -47,10 +47,10 @@ public class RadarPoints implements ScreenObj {
 		/** Draw the radar */
 		dw.setFill(true);
 		dw.setColor(radarColor);
-		dw.paintCircle(originX + RADIUS, originY + RADIUS, RADIUS);
+		dw.paintCircle(originX + getRADIUS(), originY + getRADIUS(), getRADIUS());
 
 		/** put the markers in it */
-		float scale = range / RADIUS;
+		float scale = range / getRADIUS();
 
 		DataHandler jLayer = view.getDataHandler();
 
@@ -59,25 +59,39 @@ public class RadarPoints implements ScreenObj {
 			float x = pm.getLocationVector().x / scale;
 			float y = pm.getLocationVector().z / scale;
 
-			if (pm.isActive() && (x * x + y * y < RADIUS * RADIUS)) {
+			if (pm.isActive() && (x * x + y * y < getRADIUS() * getRADIUS())) {
 				dw.setFill(true);
 				
 				// For OpenStreetMap the color is changing based on the URL
 					dw.setColor(pm.getColour());
 				
-				dw.paintRect(x + RADIUS - 1, y + RADIUS - 1, 2, 2);
+				dw.paintRect(x + getRADIUS() - 1, y + getRADIUS() - 1, 2, 2);
 			}
 		}
 	}
 
 	/** Width on screen */
 	public float getWidth() {
-		return RADIUS * 2;
+		return getRADIUS() * 2;
 	}
 
 	/** Height on screen */
 	public float getHeight() {
-		return RADIUS * 2;
+		return getRADIUS() * 2;
+	}
+
+	/**
+	 * @return the rADIUS
+	 */
+	public static float getRADIUS() {
+		return RADIUS;
+	}
+
+	/**
+	 * @param rADIUS the rADIUS to set
+	 */
+	public static void setRADIUS(float rADIUS) {
+		RADIUS = rADIUS;
 	}
 }
 
