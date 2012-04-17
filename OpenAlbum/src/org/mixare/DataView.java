@@ -280,15 +280,14 @@ public class DataView {
 		String	dirTxt = ""; 
 		int bearing = (int) state.getCurBearing(); 
 		int range = (int) (state.getCurBearing() / (360f / 16f)); 
-		//TODO: get strings from the values xml file
-		if (range == 15 || range == 0) dirTxt = "N"; 
-		else if (range == 1 || range == 2) dirTxt = "NE"; 
-		else if (range == 3 || range == 4) dirTxt = "E"; 
-		else if (range == 5 || range == 6) dirTxt = "SE";
-		else if (range == 7 || range == 8) dirTxt= "S"; 
-		else if (range == 9 || range == 10) dirTxt = "SW"; 
-		else if (range == 11 || range == 12) dirTxt = "W"; 
-		else if (range == 13 || range == 14) dirTxt = "NW";
+		if (range == 15 || range == 0) dirTxt = this.getContext().getString(R.string.N); 
+		else if (range == 1 || range == 2) dirTxt = this.getContext().getString(R.string.NE); 
+		else if (range == 3 || range == 4) dirTxt = this.getContext().getString(R.string.E); 
+		else if (range == 5 || range == 6) dirTxt = this.getContext().getString(R.string.SE);
+		else if (range == 7 || range == 8) dirTxt= this.getContext().getString(R.string.S); 
+		else if (range == 9 || range == 10) dirTxt = this.getContext().getString(R.string.SW); 
+		else if (range == 11 || range == 12) dirTxt = this.getContext().getString(R.string.W); 
+		else if (range == 13 || range == 14) dirTxt = this.getContext().getString(R.string.NW);
 
 		radarPoints.view = this; 
 		dw.paintObj(radarPoints, rx, ry, -state.getCurBearing(), 1); 
