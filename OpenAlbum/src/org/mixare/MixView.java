@@ -159,7 +159,9 @@ public class MixView extends Activity implements SensorEventListener,
 	}
 
 	public void repaint() {
-		dataView = new DataView(getMixContext()); //@FIXME DESTROY PREVIOUS THREADS
+		dataView.clearEvents();
+		dataView = null; //smell code practices but enforce garbage collector to release data
+		dataView = new DataView(getMixContext()); 
 		dWindow = new PaintScreen();
 		setZoomLevel();
 	}
