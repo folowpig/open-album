@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources>
-    <string name="app_name">Mixare</string>
+    <string name="app_name">Open Album</string>
     <string name="search_hint">Cerca Luogo</string>
 
     <string name="N">N</string>
@@ -17,7 +17,7 @@
     <string name="empty_list">Purtroppo non sono disponibili informazioni\nin quest\'area. Provare ad aumentare il raggio.</string>
 	<string name="option_not_available">Questa opzione sará disponibile in\nuna versione futura dell\'applicazione!</string>
 	
-	<string name="license">Copyright (C) 2010- Peer internet solutions 
+	<string name="license">Open Album is fork version of Mixare AR Engine. Copyright (C) 2010- Peer internet solutions 
 		\n\nThis program is free software: 	you can redistribute it and/or modify it under the terms of the 
 		GNU General Public License as published by the Free Software Foundation, either version 3 of the License, 
 		or at your option) any later version. 
@@ -28,7 +28,7 @@
 		If not, see &lt;http://www.gnu.org/licenses/&gt;
 	</string>
 	
-	<string name="menu_item_1">Scelta delle fonti</string>
+	<string name="menu_item_1">Piatti</string>
 	<string name="menu_item_2">Lista dei risultati</string>
 	<string name="menu_item_3">Mappa</string>
 	<string name="menu_item_4">Raggio visualizzato</string>

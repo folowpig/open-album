@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Mixare</string>
+    <string name="app_name">Open Album</string>
     <string name="N">N</string>
     <string name="NE">NE</string>
     <string name="E">E</string>
@@ -14,7 +14,7 @@
     <string name="empty_list">Désolé, \nIl n\'a pas d\'information de position \nde disponible avec ce rayon.\nS\'il vous plaît essayez de rechercher dans un plus large éventail.</string>
 	<string name="option_not_available">Désolé, Nous y travaillons... \nCette option sera disponible bientôt!</string>
 	
-	<string name="license">Copyright (C) 2010- Peer internet solutions 
+	<string name="license">Open Album is fork version of Mixare AR Engine. Copyright (C) 2010- Peer internet solutions 
 		\n\nThis program is free software: 	you can redistribute it and/or modify it under the terms of the 
 		GNU General Public License as published by the Free Software Foundation, either version 3 of the License, 
 		or at your option) any later version. 
@@ -25,7 +25,7 @@
 		If not, see &lt;http://www.gnu.org/licenses/&gt;
 	</string>
 	
-	<string name="menu_item_1">Données</string>
+	<string name="menu_item_1">Plaques</string>
 	<string name="menu_item_2">Vue liste</string>
 	<string name="menu_item_3">Vue carte</string>
 	<string name="menu_item_4">Niveau de zoom</string>

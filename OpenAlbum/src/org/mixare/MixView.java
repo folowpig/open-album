@@ -547,7 +547,7 @@ public class MixView extends Activity implements SensorEventListener,
 				getString(DataView.MENU_ITEM_7));
 
 		/* assign icons to the menu items */
-		item1.setIcon(drawable.icon_datasource);
+		item1.setIcon(drawable.icon_plates);
 		item2.setIcon(android.R.drawable.ic_menu_view);
 		item3.setIcon(android.R.drawable.ic_menu_mapmode);
 		item4.setIcon(android.R.drawable.ic_menu_zoom);
