@@ -10,8 +10,11 @@ import android.content.Context;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Bundle;
+import android.util.Log;
 
 public class MixContextData {
+	protected static final String TAG = "Open Album";
 	private MixView mixView;
 	private Context ctx;
 	private boolean isURLvalid;
@@ -47,7 +50,10 @@ public class MixContextData {
 	
 		}
 	
-		public void onStatusChanged(String arg0, int arg1, Bundle arg2) {}
+		public void onStatusChanged(String provider, int status, Bundle extras) {
+			// TODO Auto-generated method stub
+			
+		}
 		
 	};
 	private LocationListener lcoarse = new LocationListener() {
