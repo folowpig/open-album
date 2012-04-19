@@ -33,12 +33,11 @@ import static android.hardware.SensorManager.SENSOR_DELAY_GAME;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
 
 import org.mixare.R.drawable;
 import org.mixare.data.DataHandler;
 import org.mixare.data.DataSourceList;
+import org.mixare.data.MixViewData;
 import org.mixare.gui.PaintScreen;
 import org.mixare.render.Matrix;
 
@@ -50,10 +49,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
-import android.hardware.Camera;
 import android.hardware.GeomagneticField;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -70,8 +66,6 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.View;
 import android.view.Window;
 //import android.view.WindowManager;//@del
@@ -840,243 +834,5 @@ public class MixView extends Activity implements SensorEventListener,
 	 */
 	private void setMixContext(MixContext mixContext) {
 		this.data.setMixContext(mixContext);
-	}
-}
-
-/**
- * @author daniele
- * 
- */
-class CameraSurface extends SurfaceView implements SurfaceHolder.Callback {
-	MixView app; // ?
-	SurfaceHolder holder;
-	Camera camera;
-
-	CameraSurface(Context context) {
-		super(context);
-
-		try {
-			app = (MixView) context;
-
-			holder = getHolder();
-			holder.addCallback(this);
-			holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-		} catch (Exception ex) {
-			Log.e(VIEW_LOG_TAG, ex.getMessage());
-		}
-	}
-
-	public void surfaceCreated(SurfaceHolder holder) {
-		try {
-			// release camera if it's in use
-			if (camera != null) {
-				try {
-					camera.stopPreview();
-				} catch (Exception ignore) {
-					Log.i(VIEW_LOG_TAG, ignore.getMessage());
-				}
-				try {
-					camera.release();
-				} catch (Exception ignore) {
-					Log.i(VIEW_LOG_TAG, ignore.getMessage());
-				}
-				// camera = null;
-			}
-
-			camera = Camera.open();
-			camera.setPreviewDisplay(holder);
-		} catch (Exception ex) {
-			Log.w(VIEW_LOG_TAG, ex.getMessage());
-			try {
-				if (camera != null) {
-					try {
-						camera.stopPreview();
-					} catch (Exception ignore) {
-						Log.e(VIEW_LOG_TAG, ignore.getMessage());
-					}
-					try {
-						camera.release();
-					} catch (Exception ignore) {
-						Log.e(VIEW_LOG_TAG, ignore.getMessage());
-					}
-					camera = null;
-				}
-			} catch (Exception ignore) {
-				Log.i(VIEW_LOG_TAG, ignore.getMessage());
-			}
-		}
-	}
-
-	public void surfaceDestroyed(SurfaceHolder holder) {
-		try {
-			if (camera != null) {
-				try {
-					camera.stopPreview();
-				} catch (Exception ignore) {
-					Log.i(VIEW_LOG_TAG, ignore.getMessage());
-				}
-				try {
-					camera.release();
-				} catch (Exception ignore) {
-					Log.i(VIEW_LOG_TAG, ignore.getMessage());
-				}
-				camera = null;
-			}
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-	}
-
-	public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
-		try {
-			Camera.Parameters parameters = camera.getParameters();
-			try {
-				List<Camera.Size> supportedSizes = null;
-				// On older devices (<1.6) the following will fail
-				// the camera will work nevertheless
-				supportedSizes = Compatibility
-						.getSupportedPreviewSizes(parameters);
-
-				// preview form factor
-				float ff = (float) w / h;
-				Log.d("OpenAlbum - Mixare", "Screen res: w:" + w + " h:" + h
-						+ " aspect ratio:" + ff);
-
-				// holder for the best form factor and size
-				float bff = 0;
-				int bestw = 0;
-				int besth = 0;
-				Iterator<Camera.Size> itr = supportedSizes.iterator();
-
-				// we look for the best preview size, it has to be the closest
-				// to the
-				// screen form factor, and be less wide than the screen itself
-				// the latter requirement is because the HTC Hero with update
-				// 2.1 will
-				// report camera preview sizes larger than the screen, and it
-				// will fail
-				// to initialize the camera
-				// other devices could work with previews larger than the screen
-				// though
-				while (itr.hasNext()) {
-					Camera.Size element = itr.next();
-					// current form factor
-					float cff = (float) element.width / element.height;
-					// check if the current element is a candidate to replace
-					// the best match so far
-					// current form factor should be closer to the bff
-					// preview width should be less than screen width
-					// preview width should be more than current bestw
-					// this combination will ensure that the highest resolution
-					// will win
-					Log.d("Mixare", "Candidate camera element: w:"
-							+ element.width + " h:" + element.height
-							+ " aspect ratio:" + cff);
-					if ((ff - cff <= ff - bff) && (element.width <= w)
-							&& (element.width >= bestw)) {
-						bff = cff;
-						bestw = element.width;
-						besth = element.height;
-					}
-				}
-				Log.d("Mixare", "Chosen camera element: w:" + bestw + " h:"
-						+ besth + " aspect ratio:" + bff);
-				// Some Samsung phones will end up with bestw and besth = 0
-				// because their minimum preview size is bigger then the screen
-				// size.
-				// In this case, we use the default values: 480x320
-				if ((bestw == 0) || (besth == 0)) {
-					Log.d("Mixare", "Using default camera parameters!");
-					bestw = 480;
-					besth = 320;
-				}
-				parameters.setPreviewSize(bestw, besth);
-			} catch (Exception ex) {
-				parameters.setPreviewSize(480, 320);
-			}
-
-			camera.setParameters(parameters);
-			camera.startPreview();
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-	}
-}
-
-class AugmentedView extends View {
-	MixView app; // ?
-	int xSearch = 200;
-	int ySearch = 10;
-	int searchObjWidth = 0;
-	int searchObjHeight = 0;
-
-	public AugmentedView(Context context) {
-		super(context);
-
-		try {
-			app = (MixView) context;
-
-			app.killOnError();
-		} catch (Exception ex) {
-			app.doError(ex);
-		}
-	}
-
-	@Override
-	protected void onDraw(Canvas canvas) {
-		try {
-			// if (app.fError) {
-			//
-			// Paint errPaint = new Paint();
-			// errPaint.setColor(Color.RED);
-			// errPaint.setTextSize(16);
-			//
-			// /*Draws the Error code*/
-			// canvas.drawText("ERROR: ", 10, 20, errPaint);
-			// canvas.drawText("" + app.fErrorTxt, 10, 40, errPaint);
-			//
-			// return;
-			// }
-
-			app.killOnError();
-
-			MixView.dWindow.setWidth(canvas.getWidth());
-			MixView.dWindow.setHeight(canvas.getHeight());
-
-			MixView.dWindow.setCanvas(canvas);
-
-			if (!MixView.dataView.isInited()) {
-				MixView.dataView.init(MixView.dWindow.getWidth(),
-						MixView.dWindow.getHeight());
-			}
-			if (app.isZoombarVisible()) {
-				Paint zoomPaint = new Paint();
-				zoomPaint.setColor(Color.WHITE);
-				zoomPaint.setTextSize(14);
-				String startKM, endKM;
-				endKM = "80km";
-				startKM = "0km";
-				/*
-				 * if(MixListView.getDataSource().equals("Twitter")){ startKM =
-				 * "1km"; }
-				 */
-				canvas.drawText(startKM, canvas.getWidth() / 100 * 4,
-						canvas.getHeight() / 100 * 85, zoomPaint);
-				canvas.drawText(endKM, canvas.getWidth() / 100 * 99 + 25,
-						canvas.getHeight() / 100 * 85, zoomPaint);
-
-				int height = canvas.getHeight() / 100 * 85;
-				int zoomProgress = app.getZoomProgress();
-				if (zoomProgress > 92 || zoomProgress < 6) {
-					height = canvas.getHeight() / 100 * 80;
-				}
-				canvas.drawText(app.getZoomLevel(), (canvas.getWidth()) / 100
-						* zoomProgress + 20, height, zoomPaint);
-			}
-
-			MixView.dataView.draw(MixView.dWindow);
-		} catch (Exception ex) {
-			app.doError(ex);
-		}
 	}
 }

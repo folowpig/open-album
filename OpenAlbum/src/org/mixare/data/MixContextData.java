@@ -1,9 +1,10 @@
-package org.mixare;
+package org.mixare.data;
 
 import java.util.ArrayList;
 import java.util.Random;
 
-import org.mixare.data.DataSource;
+import org.mixare.DownloadManager;
+import org.mixare.MixView;
 import org.mixare.render.Matrix;
 
 import android.content.Context;
