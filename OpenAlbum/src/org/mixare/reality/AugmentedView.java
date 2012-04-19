@@ -1,4 +1,6 @@
-package org.mixare;
+package org.mixare.reality;
+
+import org.mixare.MixView;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -43,14 +45,14 @@ public class AugmentedView extends View {
 
 			app.killOnError();
 
-			MixView.dWindow.setWidth(canvas.getWidth());
-			MixView.dWindow.setHeight(canvas.getHeight());
+			MixView.getdWindow().setWidth(canvas.getWidth());
+			MixView.getdWindow().setHeight(canvas.getHeight());
 
-			MixView.dWindow.setCanvas(canvas);
+			MixView.getdWindow().setCanvas(canvas);
 
-			if (!MixView.dataView.isInited()) {
-				MixView.dataView.init(MixView.dWindow.getWidth(),
-						MixView.dWindow.getHeight());
+			if (!MixView.getDataView().isInited()) {
+				MixView.getDataView().init(MixView.getdWindow().getWidth(),
+						MixView.getdWindow().getHeight());
 			}
 			if (app.isZoombarVisible()) {
 				Paint zoomPaint = new Paint();
@@ -77,7 +79,7 @@ public class AugmentedView extends View {
 						* zoomProgress + 20, height, zoomPaint);
 			}
 
-			MixView.dataView.draw(MixView.dWindow);
+			MixView.getDataView().draw(MixView.getdWindow());
 		} catch (Exception ex) {
 			app.doError(ex);
 		}

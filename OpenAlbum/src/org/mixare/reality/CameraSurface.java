@@ -1,7 +1,10 @@
-package org.mixare;
+package org.mixare.reality;
 
 import java.util.Iterator;
 import java.util.List;
+
+import org.mixare.Compatibility;
+import org.mixare.MixView;
 
 import android.content.Context;
 import android.hardware.Camera;
@@ -18,7 +21,7 @@ public class CameraSurface extends SurfaceView implements SurfaceHolder.Callback
 	SurfaceHolder holder;
 	Camera camera;
 
-	CameraSurface(Context context) {
+	public CameraSurface(Context context) {
 		super(context);
 
 		try {

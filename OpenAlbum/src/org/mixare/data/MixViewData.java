@@ -3,9 +3,9 @@ package org.mixare.data;
 import java.util.List;
 
 import org.mixare.MixContext;
+import org.mixare.reality.AugmentedView;
+import org.mixare.reality.CameraSurface;
 import org.mixare.render.Matrix;
-import org.mixare.CameraSurface;
-import org.mixare.AugmentedView;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.hardware.Sensor;

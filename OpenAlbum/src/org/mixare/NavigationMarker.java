@@ -51,7 +51,7 @@ public class NavigationMarker extends Marker {
 		// your surrounding sphere so we set the height component of 
 		// the position vector radius/2 (in meter) below the user
 
-		locationVector.y-=MixView.dataView.getRadius()*500f;
+		locationVector.y-=MixView.getDataView().getRadius()*500f;
 		//locationVector.y+=-1000;
 	}
 

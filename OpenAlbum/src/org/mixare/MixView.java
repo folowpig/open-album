@@ -39,6 +39,8 @@ import org.mixare.data.DataHandler;
 import org.mixare.data.DataSourceList;
 import org.mixare.data.MixViewData;
 import org.mixare.gui.PaintScreen;
+import org.mixare.reality.AugmentedView;
+import org.mixare.reality.CameraSurface;
 import org.mixare.render.Matrix;
 
 import android.app.Activity;
@@ -80,8 +82,8 @@ public class MixView extends Activity implements SensorEventListener,
 		OnTouchListener {
 
 	private static boolean isInited;
-	static PaintScreen dWindow;
-	static DataView dataView;
+	private static PaintScreen dWindow;
+	private static DataView dataView;
 	// TAG for logging
 	public static final String TAG = "Open Album";
 
@@ -114,10 +116,10 @@ public class MixView extends Activity implements SensorEventListener,
 	}
 
 	public void repaint() {
-		dataView.clearEvents();
-		dataView = null; //smell code practices but enforce garbage collector to release data
-		dataView = new DataView(getMixContext()); 
-		dWindow = new PaintScreen();
+		getDataView().clearEvents();
+		setDataView(null); //smell code practices but enforce garbage collector to release data
+		setDataView(new DataView(getMixContext())); 
+		setdWindow(new PaintScreen());
 		setZoomLevel();
 	}
 
@@ -216,8 +218,8 @@ public class MixView extends Activity implements SensorEventListener,
 				setMixContext(new MixContext(this)); // ?
 				getMixContext().data.setDownloadManager(new DownloadManager(
 						getMixContext()));// ?
-				dWindow = new PaintScreen();
-				dataView = new DataView(getMixContext());
+				setdWindow(new PaintScreen());
+				setDataView(new DataView(getMixContext()));
 
 				/* set the radius in data view to the last selected by the user */
 				setZoomLevel();
@@ -282,8 +284,8 @@ public class MixView extends Activity implements SensorEventListener,
 	}
 
 	private void doMixSearch(String query) {
-		DataHandler jLayer = dataView.getDataHandler();
-		if (!dataView.isFrozen()) {
+		DataHandler jLayer = getDataView().getDataHandler();
+		if (!getDataView().isFrozen()) {
 			MixListView.originalMarkerList = jLayer.getMarkerList();
 			MixMap.originalMarkerList = jLayer.getMarkerList();
 		}
@@ -300,7 +302,7 @@ public class MixView extends Activity implements SensorEventListener,
 			}
 		}
 		if (searchResults.size() > 0) {
-			dataView.setFrozen(true);
+			getDataView().setFrozen(true);
 			jLayer.setMarkerList(searchResults);
 		} else
 			Toast.makeText(this,
@@ -345,8 +347,8 @@ public class MixView extends Activity implements SensorEventListener,
 			// killOnError();
 			// SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 			getMixContext().data.setMixView(this);
-			dataView.doStart();
-			dataView.clearEvents();
+			getDataView().doStart();
+			getDataView().clearEvents();
 
 			getMixContext().refreshDataSources();
 
@@ -441,9 +443,9 @@ public class MixView extends Activity implements SensorEventListener,
 		}
 
 		Log.d("-------------------------------------------", "resume");
-		if (dataView.isFrozen() && data.getSearchNotificationTxt() == null) {
+		if (getDataView().isFrozen() && data.getSearchNotificationTxt() == null) {
 			data.setSearchNotificationTxt(new TextView(this));
-			data.getSearchNotificationTxt().setWidth(dWindow.getWidth());
+			data.getSearchNotificationTxt().setWidth(getdWindow().getWidth());
 			data.getSearchNotificationTxt().setPadding(10, 2, 0, 0);
 			data.getSearchNotificationTxt().setText(getString(DataView.SEARCH_ACTIVE_1)
 					+ " " + DataSourceList.getDataSourcesStringList()
@@ -454,7 +456,7 @@ public class MixView extends Activity implements SensorEventListener,
 			data.getSearchNotificationTxt().setOnTouchListener(this);
 			addContentView(data.getSearchNotificationTxt(), new LayoutParams(
 					LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
-		} else if (!dataView.isFrozen() && data.getSearchNotificationTxt() != null) {
+		} else if (!getDataView().isFrozen() && data.getSearchNotificationTxt() != null) {
 			data.getSearchNotificationTxt().setVisibility(View.GONE);
 			// searchNotificationTxt = null;
 			data.getSearchNotificationTxt().clearComposingText();
@@ -519,7 +521,7 @@ public class MixView extends Activity implements SensorEventListener,
 		switch (item.getItemId()) {
 		/* Data sources */
 		case 1:
-			if (!dataView.isLauncherStarted()) {
+			if (!getDataView().isLauncherStarted()) {
 				MixListView.setList(1);
 				Intent intent = new Intent(MixView.this, DataSourceList.class);
 				startActivityForResult(intent, 40);
@@ -537,7 +539,7 @@ public class MixView extends Activity implements SensorEventListener,
 			 * if the list of titles to show in alternative list view is not
 			 * empty
 			 */
-			if (dataView.getDataHandler().getMarkerCount() > 0) {
+			if (getDataView().getDataHandler().getMarkerCount() > 0) {
 				Intent intent1 = new Intent(MixView.this, MixListView.class);
 				startActivityForResult(intent1, 42);
 			}
@@ -700,7 +702,7 @@ public class MixView extends Activity implements SensorEventListener,
 			float xPress = me.getX();
 			float yPress = me.getY();
 			if (me.getAction() == MotionEvent.ACTION_UP) {
-				dataView.clickEvent(xPress, yPress);
+				getDataView().clickEvent(xPress, yPress);
 			}
 		} catch (Exception ex) {
 			// doError(ex);
@@ -716,9 +718,9 @@ public class MixView extends Activity implements SensorEventListener,
 			killOnError();
 
 			if (keyCode == KeyEvent.KEYCODE_BACK) {
-				if (dataView.isDetailsView()) {
-					dataView.keyEvent(keyCode);
-					dataView.setDetailsView(false);
+				if (getDataView().isDetailsView()) {
+					getDataView().keyEvent(keyCode);
+					getDataView().setDetailsView(false);
 					return true;
 				} else {
 					return super.onKeyDown(keyCode, event);
@@ -726,7 +728,7 @@ public class MixView extends Activity implements SensorEventListener,
 			} else if (keyCode == KeyEvent.KEYCODE_MENU) {
 				return super.onKeyDown(keyCode, event);
 			} else {
-				dataView.keyEvent(keyCode);
+				getDataView().keyEvent(keyCode);
 				return false;
 			}
 
@@ -750,7 +752,7 @@ public class MixView extends Activity implements SensorEventListener,
 	}
 
 	public boolean onTouch(View v, MotionEvent event) {
-		dataView.setFrozen(false);
+		getDataView().setFrozen(false);
 		if (data.getSearchNotificationTxt() != null) {
 			data.getSearchNotificationTxt().setVisibility(View.GONE);
 			// searchNotificationTxt = null;
@@ -767,13 +769,13 @@ public class MixView extends Activity implements SensorEventListener,
 	private void setZoomLevel() {
 		float myout = calcZoomLevel();
 
-		dataView.setRadius(myout);
+		getDataView().setRadius(myout);
 
 		data.getMyZoomBar().setVisibility(View.INVISIBLE);
 		data.setZoomLevel(String.valueOf(myout));
 
-		dataView.doStart();
-		dataView.clearEvents();
+		getDataView().doStart();
+		getDataView().clearEvents();
 		data.setDownloadThread(new Thread(getMixContext().data.getDownloadManager())); // Does
 																		// this
 																		// set's
@@ -834,5 +836,33 @@ public class MixView extends Activity implements SensorEventListener,
 	 */
 	private void setMixContext(MixContext mixContext) {
 		this.data.setMixContext(mixContext);
+	}
+
+	/**
+	 * @return the dWindow
+	 */
+	public static PaintScreen getdWindow() {
+		return dWindow;
+	}
+
+	/**
+	 * @param dWindow the dWindow to set
+	 */
+	public static void setdWindow(PaintScreen dWindow) {
+		MixView.dWindow = dWindow;
+	}
+
+	/**
+	 * @return the dataView
+	 */
+	public static DataView getDataView() {
+		return dataView;
+	}
+
+	/**
+	 * @param dataView the dataView to set
+	 */
+	public static void setDataView(DataView dataView) {
+		MixView.dataView = dataView;
 	}
 }
