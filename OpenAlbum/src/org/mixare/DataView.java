@@ -214,7 +214,7 @@ public class DataView {
 					/*when type is OpenStreetMap
 					 * iterate the URL list and for selected URL send data request 
 					 * */
-					if (ds.getEnabled()) { //@FIXME disabled get through!
+					if (ds.getEnabled()) { 
 						requestData(ds,lat, lon, alt, radius, Locale.getDefault().getLanguage());
 					}
 				}

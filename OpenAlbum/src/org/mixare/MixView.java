@@ -259,8 +259,8 @@ public class MixView extends Activity implements SensorEventListener,
 
 			if (!isInited) {
 				setMixContext(new MixContext(this)); // ?
-				getMixContext().downloadManager = new DownloadManager(
-						getMixContext());// ?
+				getMixContext().data.setDownloadManager(new DownloadManager(
+						getMixContext()));// ?
 				dWindow = new PaintScreen();
 				dataView = new DataView(getMixContext());
 
@@ -366,7 +366,7 @@ public class MixView extends Activity implements SensorEventListener,
 				// sensorMgr = null;
 
 				getMixContext().unregisterLocationManager();
-				getMixContext().downloadManager.stop();
+				getMixContext().data.getDownloadManager().stop();
 			} catch (Exception ignore) {
 				Log.w(TAG, ignore.getMessage());
 			}
@@ -389,7 +389,7 @@ public class MixView extends Activity implements SensorEventListener,
 
 			// killOnError();
 			// SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-			getMixContext().mixView = this;
+			getMixContext().data.setMixView(this);
 			dataView.doStart();
 			dataView.clearEvents();
 
@@ -450,20 +450,20 @@ public class MixView extends Activity implements SensorEventListener,
 			try {
 
 				GeomagneticField gmf = new GeomagneticField(
-						(float) getMixContext().curLoc.getLatitude(),
-						(float) getMixContext().curLoc.getLongitude(),
-						(float) getMixContext().curLoc.getAltitude(),
+						(float) getMixContext().data.getCurLoc().getLatitude(),
+						(float) getMixContext().data.getCurLoc().getLongitude(),
+						(float) getMixContext().data.getCurLoc().getAltitude(),
 						System.currentTimeMillis());
 
 				angleY = Math.toRadians(-gmf.getDeclination());
 				m4.set((float) Math.cos(angleY), 0f, (float) Math.sin(angleY),
 						0f, 1f, 0f, (float) -Math.sin(angleY), 0f,
 						(float) Math.cos(angleY));
-				getMixContext().declination = gmf.getDeclination();
+				getMixContext().data.setDeclination(gmf.getDeclination());
 			} catch (Exception ex) {
 				Log.d("mixare", "GPS Initialize Error", ex);
 			}
-			downloadThread = new Thread(getMixContext().downloadManager);
+			downloadThread = new Thread(getMixContext().data.getDownloadManager());
 			downloadThread.start();
 		} catch (Exception ex) {
 			doError(ex);
@@ -476,8 +476,8 @@ public class MixView extends Activity implements SensorEventListener,
 
 				if (getMixContext() != null) {
 					getMixContext().unregisterLocationManager();
-					if (getMixContext().downloadManager != null) {
-						getMixContext().downloadManager.stop();
+					if (getMixContext().data.getDownloadManager() != null) {
+						getMixContext().data.getDownloadManager().stop();
 					}
 				}
 			} catch (Exception ignore) {
@@ -760,8 +760,8 @@ public class MixView extends Activity implements SensorEventListener,
 			}
 			smoothR.mult(1 / (float) histR.length);
 
-			synchronized (getMixContext().rotationM) {
-				getMixContext().rotationM.set(smoothR);
+			synchronized (getMixContext().data.getRotationM()) {
+				getMixContext().data.getRotationM().set(smoothR);
 			}
 		} catch (Exception ex) {
 			Log.d(TAG, ex.getMessage(), ex);
@@ -850,7 +850,7 @@ public class MixView extends Activity implements SensorEventListener,
 
 		dataView.doStart();
 		dataView.clearEvents();
-		downloadThread = new Thread(getMixContext().downloadManager); // Does
+		downloadThread = new Thread(getMixContext().data.getDownloadManager()); // Does
 																		// this
 																		// set's
 																		// zoom
