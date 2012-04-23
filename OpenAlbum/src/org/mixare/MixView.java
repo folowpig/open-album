@@ -39,6 +39,7 @@ import org.mixare.data.DataHandler;
 import org.mixare.data.DataSourceList;
 import org.mixare.data.MixViewData;
 import org.mixare.gui.PaintScreen;
+import org.mixare.marker.Marker;
 import org.mixare.reality.AugmentedView;
 import org.mixare.reality.CameraSurface;
 import org.mixare.render.Matrix;
@@ -420,7 +421,7 @@ public class MixView extends Activity implements SensorEventListener,
 						(float) Math.cos(angleY));
 				getMixContext().data.setDeclination(-gmf.getDeclination());
 			} catch (Exception ex) {
-				Log.d("mixare", "GPS Initialize Error", ex);
+				Log.d("Open Album", "GPS Initialize Error", ex);
 			}
 			data.setDownloadThread(new Thread(getMixContext().data.getDownloadManager()));
 			data.getDownloadThread().start();
@@ -463,6 +464,9 @@ public class MixView extends Activity implements SensorEventListener,
 			// searchNotificationTxt = null;
 			data.getSearchNotificationTxt().clearComposingText();
 		}
+		//@TODO referesh augmented 
+		data.getAugScreen().refreshDrawableState();
+		//setZoomLevel();
 	}
 
 	@Override
@@ -616,6 +620,16 @@ public class MixView extends Activity implements SensorEventListener,
 
 		}
 		return true;
+	}
+	@Override
+	public void onOptionsMenuClosed (Menu menu){
+		  getMixContext().data.setMixView(this);
+			getDataView().doStart();
+			getDataView().clearEvents();
+			getDataView().drawRadar(getdWindow());
+			//getMixContext().refreshDataSources();
+			// super.onOptionsMenuClosed(menu);
+
 	}
 
 	public float calcZoomLevel() {

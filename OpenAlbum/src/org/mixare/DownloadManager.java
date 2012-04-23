@@ -66,6 +66,7 @@ import org.json.JSONObject;
 import org.mixare.data.DataSource;
 import org.mixare.data.Json;
 import org.mixare.data.XMLHandler;
+import org.mixare.marker.Marker;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 //import org.mixare.MixView;

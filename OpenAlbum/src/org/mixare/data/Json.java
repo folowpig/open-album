@@ -27,13 +27,14 @@ import java.util.regex.Pattern;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.mixare.Marker;
 //import org.mixare.MixContext;
-import org.mixare.ImageMarker;
 import org.mixare.MixView;
-import org.mixare.NavigationMarker;
-import org.mixare.POIMarker;
-import org.mixare.SocialMarker;
+import org.mixare.marker.ImageMarker;
+import org.mixare.marker.Marker;
+import org.mixare.marker.NavigationMarker;
+import org.mixare.marker.POIMarker;
+import org.mixare.marker.SocialMarker;
+
 import java.util.Random;
 import android.util.Log;
 /**

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.mixare;
+package org.mixare.marker;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;

@@ -17,10 +17,11 @@
  * this program. If not, see <http://www.gnu.org/licenses/>
  */
 
-package org.mixare;
+package org.mixare.marker;
 
 import java.text.DecimalFormat;
 
+import org.mixare.MixUtils;
 import org.mixare.data.DataSource;
 import org.mixare.gui.PaintScreen;
 import org.mixare.gui.TextObj;

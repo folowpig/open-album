@@ -71,8 +71,7 @@ public class AugmentedView extends View {
 						canvas.getHeight() / 100 * 85, zoomPaint);
 
 				int height = canvas.getHeight() / 100 * 85;
-				//int zoomProgress = app.getZoomProgress();
-				int zoomProgress = Integer.parseInt(app.getZoomLevel()); //@TODO change zoomLevel to int or float
+				int zoomProgress = app.getZoomProgress();
 				if (zoomProgress > 92 || zoomProgress < 6) {
 					height = canvas.getHeight() / 100 * 80;
 				}

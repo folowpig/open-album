@@ -16,11 +16,14 @@
  * You should have received a copy of the GNU General Public License along with 
  * this program. If not, see <http://www.gnu.org/licenses/>
  */
-package org.mixare;
+package org.mixare.marker;
 
 import java.net.URLDecoder;
 import java.text.DecimalFormat;
 
+import org.mixare.MixContext;
+import org.mixare.MixState;
+import org.mixare.MixUtils;
 import org.mixare.data.DataSource;
 import org.mixare.gui.PaintScreen;
 import org.mixare.gui.ScreenLine;

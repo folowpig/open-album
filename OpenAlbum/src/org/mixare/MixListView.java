@@ -25,6 +25,7 @@ import java.util.Vector;
 import org.mixare.data.DataHandler;
 import org.mixare.data.DataSource;
 import org.mixare.data.DataSourceList;
+import org.mixare.marker.Marker;
 
 import android.app.AlertDialog;
 import android.app.ListActivity;

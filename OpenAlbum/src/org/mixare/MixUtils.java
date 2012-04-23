@@ -23,7 +23,7 @@ package org.mixare;
  * points. It is able to check if a point is in a given rectangle and it also can
  * make a String out of a given distance-value which contains number and unit.
  */
-class MixUtils {
+public class MixUtils {
 	public static String parseAction(String action) {
 		return (action.substring(action.indexOf(':') + 1, action.length()))
 				.trim();
