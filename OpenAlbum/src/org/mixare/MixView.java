@@ -46,7 +46,6 @@ import org.mixare.render.Matrix;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.SearchManager;
-//import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -62,7 +61,6 @@ import android.os.Bundle;
 import android.os.PowerManager;
 import android.provider.Settings;
 import android.util.Log;
-//import android.view.Display; //@del
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -70,7 +68,6 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
-//import android.view.WindowManager;//@del
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.FrameLayout;
@@ -89,24 +86,24 @@ public class MixView extends Activity implements SensorEventListener,
 
 	/* string to name & access the preference file in the internal storage */
 	public static final String PREFS_NAME = "MyPrefsFileForMenuItems";
+	
+	/* Data holder class */
+	private MixViewData data = new MixViewData(new float[9], new float[9], new float[9],
+			new float[3], new float[3], 0, new Matrix(), new Matrix(),
+			new Matrix(), new Matrix[60], new Matrix(), new Matrix(),
+			new Matrix(), new Matrix(), 0);
 
 	public void doError(Exception ex1) {
 		if (!data.isfError()) {
-			data.setfError(true);
-
+			data.setfError(true); //?
 			setErrorDialog();
-
-			ex1.printStackTrace();
-			try {
-			} catch (Exception ex2) {
-				ex2.printStackTrace();
-			}
+			Log.d(TAG, ex1.getMessage(), ex1.fillInStackTrace());//@debug
 		}
 
 		try {
 			getAugScreen().invalidate();
 		} catch (Exception ignore) {
-			Log.d(TAG, ignore.getMessage());
+			Log.d(TAG, ignore.getMessage(), ignore.fillInStackTrace());//@debug
 		}
 	}
 
@@ -115,6 +112,11 @@ public class MixView extends Activity implements SensorEventListener,
 			throw new Exception();
 	}
 
+	/**
+	 * Clears "Events" and repaint screen.
+	 * *Data are not cleared, caller wishes to clear, clear data first then call repaint.
+	 * 
+	 */
 	public void repaint() {
 		getDataView().clearEvents();
 		setDataView(null); //smell code practices but enforce garbage collector to release data
@@ -132,14 +134,14 @@ public class MixView extends Activity implements SensorEventListener,
 		builder.setPositiveButton(DataView.CONNECTION_ERROR_DIALOG_BUTTON1,
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
-						data.setfError(false);
+						data.setfError(false); //?
 						// TODO improve
 						try {
 							repaint();
 						} catch (Exception ex) {
 							// Don't call doError, it will be a recursive call.
 							// doError(ex);
-							Log.d(TAG, ex.getMessage());
+							Log.d(TAG, ex.getMessage(), ex.fillInStackTrace());
 						}
 					}
 				});
@@ -312,8 +314,6 @@ public class MixView extends Activity implements SensorEventListener,
 
 	@Override
 	protected void onPause() {
-		super.onPause();
-
 		try {
 			this.data.getmWakeLock().release();
 
@@ -333,14 +333,16 @@ public class MixView extends Activity implements SensorEventListener,
 			}
 		} catch (Exception ex) {
 			doError(ex);
+		}finally {
+			super.onPause();
 		}
+		
 	}
 
 	// @TODO optimize onResume for faster transitions
 	@Override
 	protected void onResume() {
 		super.onResume();
-
 		try {
 			this.data.getmWakeLock().acquire();
 
@@ -416,7 +418,7 @@ public class MixView extends Activity implements SensorEventListener,
 				data.getM4().set((float) Math.cos(angleY), 0f, (float) Math.sin(angleY),
 						0f, 1f, 0f, (float) -Math.sin(angleY), 0f,
 						(float) Math.cos(angleY));
-				getMixContext().data.setDeclination(gmf.getDeclination());
+				getMixContext().data.setDeclination(-gmf.getDeclination());
 			} catch (Exception ex) {
 				Log.d("mixare", "GPS Initialize Error", ex);
 			}
@@ -480,6 +482,13 @@ public class MixView extends Activity implements SensorEventListener,
 		//downloadThread.destroy();
 		data.getMixContext().stopService(getIntent());
 		data.getMixContext().onDestroyContext();
+		//Destroy data and this class data if any.
+		if (getMixContext() != null) {
+			getMixContext().unregisterLocationManager();
+			if (getMixContext().data.getDownloadManager() != null) {
+				getMixContext().data.getDownloadManager().stop();
+			}
+		}
 		data.setDownloadThread(null);
 		data.setMixContext(null);
 		data = null;
@@ -631,10 +640,6 @@ public class MixView extends Activity implements SensorEventListener,
 		return myout;
 	}
 
-	private MixViewData data = new MixViewData(new float[9], new float[9], new float[9],
-			new float[3], new float[3], 0, new Matrix(), new Matrix(),
-			new Matrix(), new Matrix[60], new Matrix(), new Matrix(),
-			new Matrix(), new Matrix(), 0);
 
 	public void onSensorChanged(SensorEvent evt) {
 		try {
