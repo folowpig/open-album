@@ -37,76 +37,79 @@ import android.util.Log;
  * DataHandler is also the Factory for new Marker objects.
  */
 public class DataHandler {
-	
+
 	// complete marker list
 	private List<Marker> markerList = new ArrayList<Marker>();
-	
-	public void addMarkers(List<Marker> markers) {
 
-		Log.v(MixView.TAG, "Marker before: "+markerList.size());
-		for(Marker ma:markers) {
-			if(!markerList.contains(ma))
+	public void addMarkers(final List<Marker> markers) {
+
+		Log.v(MixView.TAG, "Marker before: " + markerList.size());
+		for (final Marker ma : markers) {
+			if (!markerList.contains(ma)) {
 				markerList.add(ma);
+			}
 		}
-		
-		Log.d(MixView.TAG, "Marker count: "+markerList.size());
+
+		Log.d(MixView.TAG, "Marker count: " + markerList.size());
 	}
-	
+
 	public void sortMarkerList() {
-		Collections.sort(markerList); 
+		Collections.sort(markerList);
 	}
-	
-	public void updateDistances(Location location) {
-		for(Marker ma: markerList) {
-			float[] dist=new float[3];
-			Location.distanceBetween(ma.getLatitude(), ma.getLongitude(), location.getLatitude(), location.getLongitude(), dist);
+
+	public void updateDistances(final Location location) {
+		for (final Marker ma : markerList) {
+			final float[] dist = new float[3];
+			Location.distanceBetween(ma.getLatitude(), ma.getLongitude(),
+					location.getLatitude(), location.getLongitude(), dist);
 			ma.setDistance(dist[0]);
 		}
 	}
-	
-	public void updateActivationStatus(MixContext mixContext) {
-		
-		Hashtable<Class, Integer> map = new Hashtable<Class, Integer>();
-				
-		for(Marker ma: markerList) {
 
-			Class<? extends Marker> mClass=ma.getClass();
-			map.put(mClass, (map.get(mClass)!=null)?map.get(mClass)+1:1);
-			
-			boolean belowMax = (map.get(mClass) <= ma.getMaxObjects());
-			//boolean dataSourceSelected = mixContext.isDataSourceSelected(ma.getDatasource());
-			
+	public void updateActivationStatus(final MixContext mixContext) {
+
+		final Hashtable<Class, Integer> map = new Hashtable<Class, Integer>();
+
+		for (final Marker ma : markerList) {
+
+			final Class<? extends Marker> mClass = ma.getClass();
+			map.put(mClass, (map.get(mClass) != null) ? map.get(mClass) + 1 : 1);
+
+			final boolean belowMax = (map.get(mClass) <= ma.getMaxObjects());
+			// boolean dataSourceSelected =
+			// mixContext.isDataSourceSelected(ma.getDatasource());
+
 			ma.setActive((belowMax));
 		}
 	}
-		
-	public void onLocationChanged(Location location) {
+
+	public void onLocationChanged(final Location location) {
 		updateDistances(location);
 		sortMarkerList();
-		for(Marker ma: markerList) {
+		for (final Marker ma : markerList) {
 			ma.update(location);
 		}
 	}
-	
+
 	/**
 	 * @fixed-deprecated return list type
 	 */
 	public List<Marker> getMarkerList() {
 		return markerList;
 	}
-	
+
 	/**
 	 * @fixed-deprecated List type setter
 	 */
-	public void setMarkerList(List<Marker> markerList) {
+	public void setMarkerList(final List<Marker> markerList) {
 		this.markerList = markerList;
 	}
 
 	public int getMarkerCount() {
 		return markerList.size();
 	}
-	
-	public Marker getMarker(int index) {
+
+	public Marker getMarker(final int index) {
 		return markerList.get(index);
 	}
 }

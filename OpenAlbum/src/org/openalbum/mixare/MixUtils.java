@@ -20,16 +20,17 @@ package org.openalbum.mixare;
 
 /**
  * This class has the ability to calculate the declination of a line between two
- * points. It is able to check if a point is in a given rectangle and it also can
- * make a String out of a given distance-value which contains number and unit.
+ * points. It is able to check if a point is in a given rectangle and it also
+ * can make a String out of a given distance-value which contains number and
+ * unit.
  */
 public class MixUtils {
-	public static String parseAction(String action) {
+	public static String parseAction(final String action) {
 		return (action.substring(action.indexOf(':') + 1, action.length()))
 				.trim();
 	}
 
-	public static String formatDist(float meters) {
+	public static String formatDist(final float meters) {
 		if (meters < 1000) {
 			return ((int) meters) + "m";
 		} else if (meters < 10000) {
@@ -39,26 +40,26 @@ public class MixUtils {
 		}
 	}
 
-	static String formatDec(float val, int dec) {
-		int factor = (int) Math.pow(10, dec);
+	static String formatDec(final float val, final int dec) {
+		final int factor = (int) Math.pow(10, dec);
 
-		int front = (int) (val );
-		int back = (int) Math.abs(val * (factor) ) % factor;
+		final int front = (int) (val);
+		final int back = (int) Math.abs(val * (factor)) % factor;
 
 		return front + "." + back;
 	}
 
-	public static boolean pointInside(float P_x, float P_y, float r_x,
-		float r_y, float r_w, float r_h) {
+	public static boolean pointInside(final float P_x, final float P_y,
+			final float r_x, final float r_y, final float r_w, final float r_h) {
 		return (P_x > r_x && P_x < r_x + r_w && P_y > r_y && P_y < r_y + r_h);
 	}
 
-	public static float getAngle(float center_x, float center_y, float post_x,
-			float post_y) {
-		float tmpv_x = post_x - center_x;
-		float tmpv_y = post_y - center_y;
-		float d = (float) Math.sqrt(tmpv_x * tmpv_x + tmpv_y * tmpv_y);
-		float cos = tmpv_x / d;
+	public static float getAngle(final float center_x, final float center_y,
+			final float post_x, final float post_y) {
+		final float tmpv_x = post_x - center_x;
+		final float tmpv_y = post_y - center_y;
+		final float d = (float) Math.sqrt(tmpv_x * tmpv_x + tmpv_y * tmpv_y);
+		final float cos = tmpv_x / d;
 		float angle = (float) Math.toDegrees(Math.acos(cos));
 
 		angle = (tmpv_y < 0) ? angle * -1 : angle;

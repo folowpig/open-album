@@ -22,12 +22,10 @@ import java.text.BreakIterator;
 import java.util.ArrayList;
 
 import android.graphics.Color;
-//import android.graphics.Paint;
-//import android.graphics.Typeface;
 
 /**
- *  This class stores the properties of the displayed text and uses the
- *  PaintScreen class to actually draw the text.
+ * This class stores the properties of the displayed text and uses the
+ * PaintScreen class to actually draw the text.
  */
 public class TextObj implements ScreenObj {
 	String txt;
@@ -42,17 +40,18 @@ public class TextObj implements ScreenObj {
 	int borderColor, bgColor, textColor, textShadowColor;
 	boolean underline;
 
-	public TextObj(String txtInit, float fontSizeInit, float maxWidth,
-			PaintScreen dw, boolean underline) {
+	public TextObj(final String txtInit, final float fontSizeInit,
+			final float maxWidth, final PaintScreen dw, final boolean underline) {
 		this(txtInit, fontSizeInit, maxWidth, Color.rgb(255, 255, 255), Color
-				.argb(128, 0, 0, 0), Color.rgb(255, 255, 255), Color.argb(64, 0, 0, 0),
-				dw.getTextAsc() / 2, dw, underline);
+				.argb(128, 0, 0, 0), Color.rgb(255, 255, 255), Color.argb(64,
+				0, 0, 0), dw.getTextAsc() / 2, dw, underline);
 	}
 
-	public TextObj(String txtInit, float fontSizeInit, float maxWidth,
-			int borderColor, int bgColor, int textColor, int textShadowColor, float pad,
-			PaintScreen dw, boolean underline) {
-		
+	public TextObj(final String txtInit, final float fontSizeInit,
+			final float maxWidth, final int borderColor, final int bgColor,
+			final int textColor, final int textShadowColor, final float pad,
+			final PaintScreen dw, final boolean underline) {
+
 		this.borderColor = borderColor;
 		this.bgColor = bgColor;
 		this.textColor = textColor;
@@ -62,40 +61,40 @@ public class TextObj implements ScreenObj {
 
 		try {
 			prepTxt(txtInit, fontSizeInit, maxWidth, dw);
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			ex.printStackTrace();
 			prepTxt("TEXT PARSE ERROR", 12, 200, dw);
 		}
 	}
 
-	private void prepTxt(String txtInit, float fontSizeInit, float maxWidth,
-			PaintScreen dw) {
+	private void prepTxt(final String txtInit, final float fontSizeInit,
+			final float maxWidth, final PaintScreen dw) {
 		dw.setFontSize(fontSizeInit);
 
 		txt = txtInit;
 		fontSize = fontSizeInit;
 		areaWidth = maxWidth - pad * 2;
-		lineHeight = dw.getTextAsc() + dw.getTextDesc()
-				+ dw.getTextLead();
+		lineHeight = dw.getTextAsc() + dw.getTextDesc() + dw.getTextLead();
 
-		ArrayList<String> lineList = new ArrayList<String>();
+		final ArrayList<String> lineList = new ArrayList<String>();
 
-		BreakIterator boundary = BreakIterator.getWordInstance();
+		final BreakIterator boundary = BreakIterator.getWordInstance();
 		boundary.setText(txt);
 
 		int start = boundary.first();
 		int end = boundary.next();
 		int prevEnd = start;
 		while (end != BreakIterator.DONE) {
-			String line = txt.substring(start, end);
-			String prevLine = txt.substring(start, prevEnd);
-			float lineWidth = dw.getTextWidth(line);
+			final String line = txt.substring(start, end);
+			final String prevLine = txt.substring(start, prevEnd);
+			final float lineWidth = dw.getTextWidth(line);
 
 			if (lineWidth > areaWidth) {
-				// If the first word is longer than lineWidth 
+				// If the first word is longer than lineWidth
 				// prevLine is empty and should be ignored
-				if(prevLine.length()>0)
+				if (prevLine.length() > 0) {
 					lineList.add(prevLine);
+				}
 
 				start = prevEnd;
 			}
@@ -103,7 +102,7 @@ public class TextObj implements ScreenObj {
 			prevEnd = end;
 			end = boundary.next();
 		}
-		String line = txt.substring(start, prevEnd);
+		final String line = txt.substring(start, prevEnd);
 		lineList.add(line);
 
 		lines = new String[lineList.size()];
@@ -113,8 +112,9 @@ public class TextObj implements ScreenObj {
 		maxLineWidth = 0;
 		for (int i = 0; i < lines.length; i++) {
 			lineWidths[i] = dw.getTextWidth(lines[i]);
-			if (maxLineWidth < lineWidths[i])
+			if (maxLineWidth < lineWidths[i]) {
 				maxLineWidth = lineWidths[i];
+			}
 		}
 		areaWidth = maxLineWidth;
 		areaHeight = lineHeight * lines.length;
@@ -123,7 +123,7 @@ public class TextObj implements ScreenObj {
 		height = areaHeight + pad * 2;
 	}
 
-	public void paint(PaintScreen dw) {
+	public void paint(final PaintScreen dw) {
 		dw.setFontSize(fontSize);
 
 		dw.setFill(true);
@@ -134,24 +134,24 @@ public class TextObj implements ScreenObj {
 		dw.setColor(borderColor);
 		dw.paintRect(0, 0, width, height);
 
-		
 		for (int i = 0; i < lines.length; i++) {
-			String line = lines[i];
-			
+			final String line = lines[i];
+
 			// stroke
-/* 			dw.setFill(false);
-			dw.setStrokeWidth(4);
-		    dw.setColor(textShadowColor);
-			dw.paintText(pad, pad + lineHeight * i + dw.getTextAsc(), line);
-*/
-			
+			/*
+			 * dw.setFill(false); dw.setStrokeWidth(4);
+			 * dw.setColor(textShadowColor); dw.paintText(pad, pad + lineHeight
+			 * * i + dw.getTextAsc(), line);
+			 */
+
 			// actual text
 
 			dw.setFill(true);
 			dw.setStrokeWidth(0);
 			dw.setColor(textColor);
-			dw.paintText(pad, pad + lineHeight * i + dw.getTextAsc(), line, underline);
-			
+			dw.paintText(pad, pad + lineHeight * i + dw.getTextAsc(), line,
+					underline);
+
 		}
 	}
 
@@ -162,10 +162,12 @@ public class TextObj implements ScreenObj {
 	public float getHeight() {
 		return height;
 	}
-	public void setBorderColor(int c){
-		this.borderColor=c;
+
+	public void setBorderColor(final int c) {
+		this.borderColor = c;
 	}
-	public void setBgColor(int c){
-		this.bgColor=c;
+
+	public void setBgColor(final int c) {
+		this.bgColor = c;
 	}
 }

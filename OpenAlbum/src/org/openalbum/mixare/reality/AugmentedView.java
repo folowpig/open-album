@@ -15,20 +15,20 @@ public class AugmentedView extends View {
 	int searchObjWidth = 0;
 	int searchObjHeight = 0;
 
-	public AugmentedView(Context context) {
+	public AugmentedView(final Context context) {
 		super(context);
 
 		try {
 			app = (MixView) context;
 
 			app.killOnError();
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			app.doError(ex);
 		}
 	}
 
 	@Override
-	protected void onDraw(Canvas canvas) {
+	protected void onDraw(final Canvas canvas) {
 		try {
 			// if (app.fError) {
 			//
@@ -55,7 +55,7 @@ public class AugmentedView extends View {
 						MixView.getdWindow().getHeight());
 			}
 			if (app.isZoombarVisible()) {
-				Paint zoomPaint = new Paint();
+				final Paint zoomPaint = new Paint();
 				zoomPaint.setColor(Color.WHITE);
 				zoomPaint.setTextSize(14);
 				String startKM, endKM;
@@ -71,7 +71,7 @@ public class AugmentedView extends View {
 						canvas.getHeight() / 100 * 85, zoomPaint);
 
 				int height = canvas.getHeight() / 100 * 85;
-				int zoomProgress = app.getZoomProgress();
+				final int zoomProgress = app.getZoomProgress();
 				if (zoomProgress > 92 || zoomProgress < 6) {
 					height = canvas.getHeight() / 100 * 80;
 				}
@@ -80,7 +80,7 @@ public class AugmentedView extends View {
 			}
 
 			MixView.getDataView().draw(MixView.getdWindow());
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			app.doError(ex);
 		}
 	}

@@ -23,10 +23,10 @@ import org.openalbum.mixare.render.MixVector;
 import android.location.Location;
 
 /**
- * The class stores the geographical information (latitude, longitude and altitude)
- * and represents a Place on the map. It also calculates the destination using
- * the theory of the great-circle-distance. Further it is able to convert the distances
- * between locations into vectors and vice versa.
+ * The class stores the geographical information (latitude, longitude and
+ * altitude) and represents a Place on the map. It also calculates the
+ * destination using the theory of the great-circle-distance. Further it is able
+ * to convert the distances between locations into vectors and vice versa.
  * 
  */
 
@@ -40,21 +40,23 @@ public class PhysicalPlace {
 
 	}
 
-	public PhysicalPlace(PhysicalPlace pl) {
+	public PhysicalPlace(final PhysicalPlace pl) {
 		this.setTo(pl.latitude, pl.longitude, pl.altitude);
 	}
 
-	public PhysicalPlace(double latitude, double longitude, double altitude) {
+	public PhysicalPlace(final double latitude, final double longitude,
+			final double altitude) {
 		this.setTo(latitude, longitude, altitude);
 	}
 
-	public void setTo(double latitude, double longitude, double altitude) {
+	public void setTo(final double latitude, final double longitude,
+			final double altitude) {
 		this.latitude = latitude;
 		this.longitude = longitude;
 		this.altitude = altitude;
 	}
 
-	public void setTo(PhysicalPlace pl) {
+	public void setTo(final PhysicalPlace pl) {
 		this.latitude = pl.latitude;
 		this.longitude = pl.longitude;
 		this.altitude = pl.altitude;
@@ -70,7 +72,7 @@ public class PhysicalPlace {
 		return latitude;
 	}
 
-	public void setLatitude(double latitude) {
+	public void setLatitude(final double latitude) {
 		this.latitude = latitude;
 	}
 
@@ -78,7 +80,7 @@ public class PhysicalPlace {
 		return longitude;
 	}
 
-	public void setLongitude(double longitude) {
+	public void setLongitude(final double longitude) {
 		this.longitude = longitude;
 	}
 
@@ -86,22 +88,23 @@ public class PhysicalPlace {
 		return altitude;
 	}
 
-	public void setAltitude(double altitude) {
+	public void setAltitude(final double altitude) {
 		this.altitude = altitude;
 	}
 
-	public static void calcDestination(double lat1Deg, double lon1Deg,
-			double bear, double d, PhysicalPlace dest) {
+	public static void calcDestination(final double lat1Deg,
+			final double lon1Deg, final double bear, final double d,
+			final PhysicalPlace dest) {
 		/** see http://en.wikipedia.org/wiki/Great-circle_distance */
 
-		double brng = Math.toRadians(bear);
-		double lat1 = Math.toRadians(lat1Deg);
-		double lon1 = Math.toRadians(lon1Deg);
-		double R = 6371.0 * 1000.0;
+		final double brng = Math.toRadians(bear);
+		final double lat1 = Math.toRadians(lat1Deg);
+		final double lon1 = Math.toRadians(lon1Deg);
+		final double R = 6371.0 * 1000.0;
 
-		double lat2 = Math.asin(Math.sin(lat1) * Math.cos(d / R)
+		final double lat2 = Math.asin(Math.sin(lat1) * Math.cos(d / R)
 				+ Math.cos(lat1) * Math.sin(d / R) * Math.cos(brng));
-		double lon2 = lon1
+		final double lon2 = lon1
 				+ Math.atan2(Math.sin(brng) * Math.sin(d / R) * Math.cos(lat1),
 						Math.cos(d / R) - Math.sin(lat1) * Math.sin(lat2));
 
@@ -109,32 +112,38 @@ public class PhysicalPlace {
 		dest.setLongitude(Math.toDegrees(lon2));
 	}
 
-	public static void convLocToVec(Location org, PhysicalPlace gp, MixVector v) {
-		float[] z = new float[1];
+	public static void convLocToVec(final Location org, final PhysicalPlace gp,
+			final MixVector v) {
+		final float[] z = new float[1];
 		z[0] = 0;
 		Location.distanceBetween(org.getLatitude(), org.getLongitude(),
 				gp.getLatitude(), org.getLongitude(), z);
-		float[] x = new float[1];
+		final float[] x = new float[1];
 		Location.distanceBetween(org.getLatitude(), org.getLongitude(),
 				org.getLatitude(), gp.getLongitude(), x);
-		double y = gp.getAltitude() - org.getAltitude();
-		if (org.getLatitude() < gp.getLatitude())
+		final double y = gp.getAltitude() - org.getAltitude();
+		if (org.getLatitude() < gp.getLatitude()) {
 			z[0] *= -1;
-		if (org.getLongitude() > gp.getLongitude())
+		}
+		if (org.getLongitude() > gp.getLongitude()) {
 			x[0] *= -1;
+		}
 
 		v.set(x[0], (float) y, z[0]);
 	}
 
-	public static void convertVecToLoc(MixVector v, Location org, Location gp) {
+	public static void convertVecToLoc(final MixVector v, final Location org,
+			final Location gp) {
 		double brngNS = 0, brngEW = 90;
-		if (v.z > 0)
+		if (v.z > 0) {
 			brngNS = 180;
-		if (v.x < 0)
+		}
+		if (v.x < 0) {
 			brngEW = 270;
+		}
 
-		PhysicalPlace tmp1Loc = new PhysicalPlace();
-		PhysicalPlace tmp2Loc = new PhysicalPlace();
+		final PhysicalPlace tmp1Loc = new PhysicalPlace();
+		final PhysicalPlace tmp2Loc = new PhysicalPlace();
 		PhysicalPlace.calcDestination(org.getLatitude(), org.getLongitude(),
 				brngNS, Math.abs(v.z), tmp1Loc);
 		PhysicalPlace.calcDestination(tmp1Loc.getLatitude(),

@@ -37,25 +37,25 @@ public class MixVector {
 		this(0, 0, 0);
 	}
 
-	public MixVector(MixVector v) {
+	public MixVector(final MixVector v) {
 		this(v.x, v.y, v.z);
 	}
 
-	public MixVector(float v[]) {
+	public MixVector(final float v[]) {
 		this(v[0], v[1], v[2]);
 	}
 
-	public MixVector(float x, float y, float z) {
+	public MixVector(final float x, final float y, final float z) {
 		set(x, y, z);
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		MixVector v = (MixVector) obj;
+	public boolean equals(final Object obj) {
+		final MixVector v = (MixVector) obj;
 		return (v.x == x && v.y == y && v.z == z);
 	}
 
-	public boolean equals(float x, float y, float z) {
+	public boolean equals(final float x, final float y, final float z) {
 		return (this.x == x && this.y == y && this.z == z);
 	}
 
@@ -64,41 +64,41 @@ public class MixVector {
 		return "<" + x + ", " + y + ", " + z + ">";
 	}
 
-	public void set(MixVector v) {
+	public void set(final MixVector v) {
 		set(v.x, v.y, v.z);
 	}
 
-	public void set(float x, float y, float z) {
+	public void set(final float x, final float y, final float z) {
 		this.x = x;
 		this.y = y;
 		this.z = z;
 	}
 
-	public void add(float x, float y, float z) {
+	public void add(final float x, final float y, final float z) {
 		this.x += x;
 		this.y += y;
 		this.z += z;
 	}
 
-	public void add(MixVector v) {
+	public void add(final MixVector v) {
 		add(v.x, v.y, v.z);
 	}
 
-	public void sub(float x, float y, float z) {
+	public void sub(final float x, final float y, final float z) {
 		add(-x, -y, -z);
 	}
 
-	public void sub(MixVector v) {
+	public void sub(final MixVector v) {
 		add(-v.x, -v.y, -v.z);
 	}
 
-	public void mult(float s) {
+	public void mult(final float s) {
 		x *= s;
 		y *= s;
 		z *= s;
 	}
 
-	public void divide(float s) {
+	public void divide(final float s) {
 		x /= s;
 		y /= s;
 		z /= s;
@@ -107,7 +107,7 @@ public class MixVector {
 	public float length() {
 		return (float) Math.sqrt(x * x + y * y + z * z);
 	}
-	
+
 	public float length2D() {
 		return (float) Math.sqrt(x * x + z * z);
 	}
@@ -116,23 +116,23 @@ public class MixVector {
 		divide(length());
 	}
 
-	public float dot(MixVector v) {
+	public float dot(final MixVector v) {
 		return x * v.x + y * v.y + z * v.z;
 	}
 
-	public void cross(MixVector u, MixVector v) {
-		float x = u.y * v.z - u.z * v.y;
-		float y = u.z * v.x - u.x * v.z;
-		float z = u.x * v.y - u.y * v.x;
+	public void cross(final MixVector u, final MixVector v) {
+		final float x = u.y * v.z - u.z * v.y;
+		final float y = u.z * v.x - u.x * v.z;
+		final float z = u.x * v.y - u.y * v.x;
 		this.x = x;
 		this.y = y;
 		this.z = z;
 	}
 
-	public void prod(Matrix m) {
-		float xTemp = m.a1 * x + m.a2 * y + m.a3 * z;
-		float yTemp = m.b1 * x + m.b2 * y + m.b3 * z;
-		float zTemp = m.c1 * x + m.c2 * y + m.c3 * z;
+	public void prod(final Matrix m) {
+		final float xTemp = m.a1 * x + m.a2 * y + m.a3 * z;
+		final float yTemp = m.b1 * x + m.b2 * y + m.b3 * z;
+		final float zTemp = m.c1 * x + m.c2 * y + m.c3 * z;
 
 		x = xTemp;
 		y = yTemp;

@@ -16,12 +16,13 @@ import android.view.SurfaceView;
  * @author daniele
  * 
  */
-public class CameraSurface extends SurfaceView implements SurfaceHolder.Callback {
+public class CameraSurface extends SurfaceView implements
+		SurfaceHolder.Callback {
 	MixView app; // ?
 	SurfaceHolder holder;
 	Camera camera;
 
-	public CameraSurface(Context context) {
+	public CameraSurface(final Context context) {
 		super(context);
 
 		try {
@@ -30,23 +31,23 @@ public class CameraSurface extends SurfaceView implements SurfaceHolder.Callback
 			holder = getHolder();
 			holder.addCallback(this);
 			holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			Log.e(VIEW_LOG_TAG, ex.getMessage());
 		}
 	}
 
-	public void surfaceCreated(SurfaceHolder holder) {
+	public void surfaceCreated(final SurfaceHolder holder) {
 		try {
 			// release camera if it's in use
 			if (camera != null) {
 				try {
 					camera.stopPreview();
-				} catch (Exception ignore) {
+				} catch (final Exception ignore) {
 					Log.i(VIEW_LOG_TAG, ignore.getMessage());
 				}
 				try {
 					camera.release();
-				} catch (Exception ignore) {
+				} catch (final Exception ignore) {
 					Log.i(VIEW_LOG_TAG, ignore.getMessage());
 				}
 				// camera = null;
@@ -54,51 +55,52 @@ public class CameraSurface extends SurfaceView implements SurfaceHolder.Callback
 
 			camera = Camera.open();
 			camera.setPreviewDisplay(holder);
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			Log.w(VIEW_LOG_TAG, ex.getMessage());
 			try {
 				if (camera != null) {
 					try {
 						camera.stopPreview();
-					} catch (Exception ignore) {
+					} catch (final Exception ignore) {
 						Log.e(VIEW_LOG_TAG, ignore.getMessage());
 					}
 					try {
 						camera.release();
-					} catch (Exception ignore) {
+					} catch (final Exception ignore) {
 						Log.e(VIEW_LOG_TAG, ignore.getMessage());
 					}
 					camera = null;
 				}
-			} catch (Exception ignore) {
+			} catch (final Exception ignore) {
 				Log.i(VIEW_LOG_TAG, ignore.getMessage());
 			}
 		}
 	}
 
-	public void surfaceDestroyed(SurfaceHolder holder) {
+	public void surfaceDestroyed(final SurfaceHolder holder) {
 		try {
 			if (camera != null) {
 				try {
 					camera.stopPreview();
-				} catch (Exception ignore) {
+				} catch (final Exception ignore) {
 					Log.i(VIEW_LOG_TAG, ignore.getMessage());
 				}
 				try {
 					camera.release();
-				} catch (Exception ignore) {
+				} catch (final Exception ignore) {
 					Log.i(VIEW_LOG_TAG, ignore.getMessage());
 				}
 				camera = null;
 			}
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			ex.printStackTrace();
 		}
 	}
 
-	public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
+	public void surfaceChanged(final SurfaceHolder holder, final int format,
+			final int w, final int h) {
 		try {
-			Camera.Parameters parameters = camera.getParameters();
+			final Camera.Parameters parameters = camera.getParameters();
 			try {
 				List<Camera.Size> supportedSizes = null;
 				// On older devices (<1.6) the following will fail
@@ -107,7 +109,7 @@ public class CameraSurface extends SurfaceView implements SurfaceHolder.Callback
 						.getSupportedPreviewSizes(parameters);
 
 				// preview form factor
-				float ff = (float) w / h;
+				final float ff = (float) w / h;
 				Log.d("OpenAlbum - Mixare", "Screen res: w:" + w + " h:" + h
 						+ " aspect ratio:" + ff);
 
@@ -115,7 +117,7 @@ public class CameraSurface extends SurfaceView implements SurfaceHolder.Callback
 				float bff = 0;
 				int bestw = 0;
 				int besth = 0;
-				Iterator<Camera.Size> itr = supportedSizes.iterator();
+				final Iterator<Camera.Size> itr = supportedSizes.iterator();
 
 				// we look for the best preview size, it has to be the closest
 				// to the
@@ -128,9 +130,9 @@ public class CameraSurface extends SurfaceView implements SurfaceHolder.Callback
 				// other devices could work with previews larger than the screen
 				// though
 				while (itr.hasNext()) {
-					Camera.Size element = itr.next();
+					final Camera.Size element = itr.next();
 					// current form factor
-					float cff = (float) element.width / element.height;
+					final float cff = (float) element.width / element.height;
 					// check if the current element is a candidate to replace
 					// the best match so far
 					// current form factor should be closer to the bff
@@ -160,13 +162,13 @@ public class CameraSurface extends SurfaceView implements SurfaceHolder.Callback
 					besth = 320;
 				}
 				parameters.setPreviewSize(bestw, besth);
-			} catch (Exception ex) {
+			} catch (final Exception ex) {
 				parameters.setPreviewSize(480, 320);
 			}
 
 			camera.setParameters(parameters);
 			camera.startPreview();
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			ex.printStackTrace();
 		}
 	}

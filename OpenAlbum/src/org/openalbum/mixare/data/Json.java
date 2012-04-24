@@ -21,13 +21,13 @@ package org.openalbum.mixare.data;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-//import org.openalbum.mixare.MixContext;
 import org.openalbum.mixare.MixView;
 import org.openalbum.mixare.marker.ImageMarker;
 import org.openalbum.mixare.marker.Marker;
@@ -35,37 +35,36 @@ import org.openalbum.mixare.marker.NavigationMarker;
 import org.openalbum.mixare.marker.POIMarker;
 import org.openalbum.mixare.marker.SocialMarker;
 
-import java.util.Random;
 import android.util.Log;
+
 /**
- * This class can compose a list of markers. The markers are
- * made by other methods in the class, which take information
- * from multiple sources.
+ * This class can compose a list of markers. The markers are made by other
+ * methods in the class, which take information from multiple sources.
  */
 public class Json extends DataHandler {
 
 	public static final int MAX_JSON_OBJECTS = 1000;
 
-	public List<Marker> load(JSONObject root, DataSource datasource) {
+	public List<Marker> load(final JSONObject root, final DataSource datasource) {
 		JSONObject jo = null;
 		JSONArray dataArray = null;
-		List<Marker> markers = new ArrayList<Marker>();
+		final List<Marker> markers = new ArrayList<Marker>();
 
 		try {
 			// Twitter & own schema
-			if (root.has("results"))
+			if (root.has("results")) {
 				dataArray = root.getJSONArray("results");
-			// Wikipedia
-			else if (root.has("geonames"))
+			} else if (root.has("geonames")) {
 				dataArray = root.getJSONArray("geonames");
-			else if (root.has("photos"))
+			} else if (root.has("photos")) {
 				dataArray = root.getJSONArray("photos");
-			
+			}
+
 			if (dataArray != null) {
 
 				Log.i(MixView.TAG, "processing " + datasource.getType()
 						+ " JSON Data Array");
-				int top = Math.min(MAX_JSON_OBJECTS, dataArray.length());
+				final int top = Math.min(MAX_JSON_OBJECTS, dataArray.length());
 
 				for (int i = 0; i < top; i++) {
 
@@ -79,18 +78,19 @@ public class Json extends DataHandler {
 						ma = processWikipediaJSONObject(jo, datasource);
 						break;
 					case PANORAMIO:
-						ma = processPanoramioJSONObject(jo,datasource);
+						ma = processPanoramioJSONObject(jo, datasource);
 						break;
 					case MIXARE:
-						default:
+					default:
 						ma = processMixareJSONObject(jo, datasource);
 						break;
 					}
-					if (ma != null)
+					if (ma != null) {
 						markers.add(ma);
+					}
 				}
 			}
-		} catch (JSONException e) {
+		} catch (final JSONException e) {
 			e.printStackTrace();
 		}
 		return markers;
@@ -99,54 +99,52 @@ public class Json extends DataHandler {
 	/**
 	 * Creates Markers for Panoramio JSON objects
 	 * 
-	 *  @return Marker
+	 * @return Marker
 	 */
-	private Marker processPanoramioJSONObject(JSONObject jo,
-			DataSource datasource) throws JSONException {
+	private Marker processPanoramioJSONObject(final JSONObject jo,
+			final DataSource datasource) throws JSONException {
 		Marker ma = null;
 		if (jo.has("photo_id") && jo.has("latitude") && jo.has("longitude")
 				&& jo.has("photo_file_url")) {
 
 			Log.v(MixView.TAG, "processing Panoramio JSON object");
-			String link= jo.getString("photo_file_url");
-			
-			//For Panoramio elevation, generate a random number ranged [30 - 120]
-			//@TODO find better way http://www.geonames.org/export/web-services.html#astergdem
+			final String link = jo.getString("photo_file_url");
+
+			// For Panoramio elevation, generate a random number ranged [30 -
+			// 120]
+			// @TODO find better way
+			// http://www.geonames.org/export/web-services.html#astergdem
 			// http://asterweb.jpl.nasa.gov/gdem.asp
 			final Random elevation = new Random();
-			ma = new ImageMarker(
-					unescapeHTML(jo.getString("photo_title"), 0), 
-					jo.getDouble("latitude"), 
-					jo.getDouble("longitude"), 
-//					(double) 37.6588,
-//					(double) -122.4433,
-//					jo.getDouble("elevation"), 
-					(double) (elevation.nextInt(90)+30), //@TODO elevation level for Panoramio
-					link, 
-					datasource);
-//			ma = new POIMarker(
-//					unescapeHTML(jo.getString("photo_title"), 0), 
-////					jo.getDouble("latitude"), 
-////					jo.getDouble("longitude"), 
-////					jo.getDouble("elevation"), 
-//					(double) 37.6588,
-//					(double) -122.4433,
-//					(double) 50, //@TODO elevation level for Panoramio
-//					link, 
-//					datasource);
+			ma = new ImageMarker(unescapeHTML(jo.getString("photo_title"), 0),
+					jo.getDouble("latitude"), jo.getDouble("longitude"),
+					(elevation.nextInt(90) + 30), // @TODO elevation level for
+													// Panoramio
+					link, datasource);
+			// ma = new POIMarker(
+			// unescapeHTML(jo.getString("photo_title"), 0),
+			// // jo.getDouble("latitude"),
+			// // jo.getDouble("longitude"),
+			// // jo.getDouble("elevation"),
+			// (double) 37.6588,
+			// (double) -122.4433,
+			// (double) 50, //@TODO elevation level for Panoramio
+			// link,
+			// datasource);
 		}
 		return ma;
 	}
 
-	public Marker processTwitterJSONObject(JSONObject jo, DataSource datasource)
-			throws NumberFormatException, JSONException {
+	public Marker processTwitterJSONObject(final JSONObject jo,
+			final DataSource datasource) throws NumberFormatException,
+			JSONException {
 		Marker ma = null;
 		if (jo.has("geo")) {
 			Double lat = null, lon = null;
 
 			if (!jo.isNull("geo")) {
-				JSONObject geo = jo.getJSONObject("geo");
-				JSONArray coordinates = geo.getJSONArray("coordinates");
+				final JSONObject geo = jo.getJSONObject("geo");
+				final JSONArray coordinates = geo.getJSONArray("coordinates");
 				lat = Double.parseDouble(coordinates.getString(0));
 				lon = Double.parseDouble(coordinates.getString(1));
 			} else if (jo.has("location")) {
@@ -157,9 +155,10 @@ public class Json extends DataHandler {
 				// ÃœT: 12.34,56.78
 				// 12.34,56.78
 
-				Pattern pattern = Pattern
+				final Pattern pattern = Pattern
 						.compile("\\D*([0-9.]+),\\s?([0-9.]+)");
-				Matcher matcher = pattern.matcher(jo.getString("location"));
+				final Matcher matcher = pattern.matcher(jo
+						.getString("location"));
 
 				if (matcher.find()) {
 					lat = Double.parseDouble(matcher.group(1));
@@ -168,69 +167,58 @@ public class Json extends DataHandler {
 			}
 			if (lat != null) {
 				Log.v(MixView.TAG, "processing Twitter JSON object");
-				String user=jo.getString("from_user");
-				String url="http://twitter.com/"+user;
-				
-				ma = new SocialMarker(
-						user+": "+jo.getString("text"), 
-						lat, 
-						lon, 
-						0, url, 
-						datasource);
+				final String user = jo.getString("from_user");
+				final String url = "http://twitter.com/" + user;
+
+				ma = new SocialMarker(user + ": " + jo.getString("text"), lat,
+						lon, 0, url, datasource);
 			}
 		}
 		return ma;
 	}
 
-	public Marker processMixareJSONObject(JSONObject jo, DataSource datasource) throws JSONException {
+	public Marker processMixareJSONObject(final JSONObject jo,
+			final DataSource datasource) throws JSONException {
 
 		Marker ma = null;
 		if (jo.has("title") && jo.has("lat") && jo.has("lng")
 				&& jo.has("elevation")) {
 
 			Log.v(MixView.TAG, "processing Mixare JSON object");
-			String link=null;
-	
-			if(jo.has("has_detail_page") && jo.getInt("has_detail_page")!=0 && jo.has("webpage"))
-				link=jo.getString("webpage");
-			
-        	if(datasource.getDisplay() == DataSource.DISPLAY.CIRCLE_MARKER) {
-			ma = new POIMarker(
-					unescapeHTML(jo.getString("title"), 0), 
-					jo.getDouble("lat"), 
-					jo.getDouble("lng"), 
-					jo.getDouble("elevation"), 
-					link, 
-					datasource);
-        	} else {
-            	ma = new NavigationMarker(
-            			unescapeHTML(jo.getString("title"), 0), 
-        				jo.getDouble("lat"), 
-        				jo.getDouble("lng"), 
-        				0, 
-        				link, 
-        				datasource);
-        	}
+			String link = null;
+
+			if (jo.has("has_detail_page") && jo.getInt("has_detail_page") != 0
+					&& jo.has("webpage")) {
+				link = jo.getString("webpage");
+			}
+
+			if (datasource.getDisplay() == DataSource.DISPLAY.CIRCLE_MARKER) {
+				ma = new POIMarker(unescapeHTML(jo.getString("title"), 0),
+						jo.getDouble("lat"), jo.getDouble("lng"),
+						jo.getDouble("elevation"), link, datasource);
+			} else {
+				ma = new NavigationMarker(
+						unescapeHTML(jo.getString("title"), 0),
+						jo.getDouble("lat"), jo.getDouble("lng"), 0, link,
+						datasource);
+			}
 		}
 		return ma;
 	}
 
-	public Marker processWikipediaJSONObject(JSONObject jo, DataSource datasource)
-			throws JSONException {
+	public Marker processWikipediaJSONObject(final JSONObject jo,
+			final DataSource datasource) throws JSONException {
 
 		Marker ma = null;
 		if (jo.has("title") && jo.has("lat") && jo.has("lng")
 				&& jo.has("elevation") && jo.has("wikipediaUrl")) {
 
 			Log.v(MixView.TAG, "processing Wikipedia JSON object");
-	
-			ma = new POIMarker(
-					unescapeHTML(jo.getString("title"), 0), 
-					jo.getDouble("lat"), 
-					jo.getDouble("lng"), 
-					jo.getDouble("elevation"), 
-					"http://"+jo.getString("wikipediaUrl"), 
-					datasource);
+
+			ma = new POIMarker(unescapeHTML(jo.getString("title"), 0),
+					jo.getDouble("lat"), jo.getDouble("lng"),
+					jo.getDouble("elevation"), "http://"
+							+ jo.getString("wikipediaUrl"), datasource);
 		}
 		return ma;
 	}
@@ -265,7 +253,7 @@ public class Json extends DataHandler {
 		htmlEntities.put("&iuml;", "Ã¯");
 		htmlEntities.put("&Iuml;", "Ã�");
 		htmlEntities.put("&ocirc;", "Ã´");
-		htmlEntities.put("&Ocirc;", "Ã�?");
+		htmlEntities.put("&Ocirc;", "Ã�?");
 		htmlEntities.put("&ouml;", "Ã¶");
 		htmlEntities.put("&Ouml;", "Ã–");
 		htmlEntities.put("&oslash;", "Ã¸");
@@ -283,15 +271,15 @@ public class Json extends DataHandler {
 		htmlEntities.put("&euro;", "\u20a0");
 	}
 
-	public String unescapeHTML(String source, int start) {
+	public String unescapeHTML(String source, final int start) {
 		int i, j;
 
 		i = source.indexOf("&", start);
 		if (i > -1) {
 			j = source.indexOf(";", i);
 			if (j > i) {
-				String entityToLookFor = source.substring(i, j + 1);
-				String value = (String) htmlEntities.get(entityToLookFor);
+				final String entityToLookFor = source.substring(i, j + 1);
+				final String value = htmlEntities.get(entityToLookFor);
 				if (value != null) {
 					source = new StringBuffer().append(source.substring(0, i))
 							.append(value).append(source.substring(j + 1))

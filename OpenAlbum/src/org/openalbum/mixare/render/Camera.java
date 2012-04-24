@@ -36,11 +36,11 @@ public class Camera {
 	float viewAngle;
 	float dist;
 
-	public Camera(int width, int height) {
+	public Camera(final int width, final int height) {
 		this(width, height, true);
 	}
 
-	public Camera(int width, int height, boolean init) {
+	public Camera(final int width, final int height, final boolean init) {
 		this.width = width;
 		this.height = height;
 
@@ -48,18 +48,19 @@ public class Camera {
 		lco.set(0, 0, 0);
 	}
 
-	public void setViewAngle(float viewAngle) {
+	public void setViewAngle(final float viewAngle) {
 		this.viewAngle = viewAngle;
 		this.dist = (this.width / 2) / (float) Math.tan(viewAngle / 2);
 	}
 
-	public void setViewAngle(int width, int height, float viewAngle) {
+	public void setViewAngle(final int width, final int height,
+			final float viewAngle) {
 		this.viewAngle = viewAngle;
 		this.dist = (width / 2) / (float) Math.tan(viewAngle / 2);
 	}
 
-	public void projectPoint(MixVector orgPoint, MixVector prjPoint,
-			float addX, float addY) {
+	public void projectPoint(final MixVector orgPoint,
+			final MixVector prjPoint, final float addX, final float addY) {
 		prjPoint.x = dist * orgPoint.x / -orgPoint.z;
 		prjPoint.y = dist * orgPoint.y / -orgPoint.z;
 		prjPoint.z = orgPoint.z;

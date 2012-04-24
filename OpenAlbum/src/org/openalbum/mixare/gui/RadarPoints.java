@@ -21,13 +21,14 @@ package org.openalbum.mixare.gui;
 import org.openalbum.mixare.DataView;
 import org.openalbum.mixare.data.DataHandler;
 import org.openalbum.mixare.marker.Marker;
-//import org.openalbum.mixare.data.DataSource;
 
 import android.graphics.Color;
 
-/** Takes care of the small radar in the top left corner and of its points
+/**
+ * Takes care of the small radar in the top left corner and of its points
+ * 
  * @author daniele
- *
+ * 
  */
 public class RadarPoints implements ScreenObj {
 	/** The screen */
@@ -37,34 +38,35 @@ public class RadarPoints implements ScreenObj {
 	/** Radius in pixel on screen */
 	private static float RADIUS = 40;
 	/** Position on screen */
-	static float originX = 0 , originY = 0;
+	static float originX = 0, originY = 0;
 	/** Color */
 	static int radarColor = Color.argb(100, 0, 0, 200);
-	
-	public void paint(PaintScreen dw) {
+
+	public void paint(final PaintScreen dw) {
 		/** radius is in KM. */
 		range = view.getRadius() * 1000;
 		/** Draw the radar */
 		dw.setFill(true);
 		dw.setColor(radarColor);
-		dw.paintCircle(originX + getRADIUS(), originY + getRADIUS(), getRADIUS());
+		dw.paintCircle(originX + getRADIUS(), originY + getRADIUS(),
+				getRADIUS());
 
 		/** put the markers in it */
-		float scale = range / getRADIUS();
+		final float scale = range / getRADIUS();
 
-		DataHandler jLayer = view.getDataHandler();
+		final DataHandler jLayer = view.getDataHandler();
 
 		for (int i = 0; i < jLayer.getMarkerCount(); i++) {
-			Marker pm = jLayer.getMarker(i);
-			float x = pm.getLocationVector().x / scale;
-			float y = pm.getLocationVector().z / scale;
+			final Marker pm = jLayer.getMarker(i);
+			final float x = pm.getLocationVector().x / scale;
+			final float y = pm.getLocationVector().z / scale;
 
 			if (pm.isActive() && (x * x + y * y < getRADIUS() * getRADIUS())) {
 				dw.setFill(true);
-				
+
 				// For OpenStreetMap the color is changing based on the URL
-					dw.setColor(pm.getColour());
-				
+				dw.setColor(pm.getColour());
+
 				dw.paintRect(x + getRADIUS() - 1, y + getRADIUS() - 1, 2, 2);
 			}
 		}
@@ -88,10 +90,10 @@ public class RadarPoints implements ScreenObj {
 	}
 
 	/**
-	 * @param rADIUS the rADIUS to set
+	 * @param rADIUS
+	 *            the rADIUS to set
 	 */
-	public static void setRADIUS(float rADIUS) {
+	public static void setRADIUS(final float rADIUS) {
 		RADIUS = rADIUS;
 	}
 }
-

@@ -28,88 +28,125 @@ public class MixContextData {
 	private Location locationAtLastDownload;
 	private ArrayList<DataSource> allDataSources;
 	private LocationListener lbounce = new LocationListener() {
-	
-		public void onLocationChanged(Location location) {
-			Log.d(TAG, "bounce Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy());
-			//Toast.makeText(ctx, "BOUNCE: Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy(), Toast.LENGTH_LONG).show();
-	
-			//@FIXME Check location changes before purging, make use of cache - leak
+
+		public void onLocationChanged(final Location location) {
+			Log.d(TAG,
+					"bounce Location Changed: " + location.getProvider()
+							+ " lat: " + location.getLatitude() + " lon: "
+							+ location.getLongitude() + " alt: "
+							+ location.getAltitude() + " acc: "
+							+ location.getAccuracy());
+			// Toast.makeText(ctx,
+			// "BOUNCE: Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy(),
+			// Toast.LENGTH_LONG).show();
+
+			// @FIXME Check location changes before purging, make use of cache -
+			// leak
 			downloadManager.purgeLists();
-			
+
 			if (location.getAccuracy() < 40) {
 				lm.removeUpdates(lcoarse);
-				lm.removeUpdates(lbounce);			
+				lm.removeUpdates(lbounce);
 			}
 		}
-	
-		public void onProviderDisabled(String arg0) {
+
+		public void onProviderDisabled(final String arg0) {
 			Log.d(TAG, "bounce disabled");
 		}
-	
-		public void onProviderEnabled(String arg0) {
+
+		public void onProviderEnabled(final String arg0) {
 			Log.d(TAG, "bounce enabled");
-	
+
 		}
-	
-		public void onStatusChanged(String provider, int status, Bundle extras) {
+
+		public void onStatusChanged(final String provider, final int status,
+				final Bundle extras) {
 			// TODO Auto-generated method stub
-			
+
 		}
-		
+
 	};
 	private LocationListener lcoarse = new LocationListener() {
-	
-		public void onLocationChanged(Location location) {
+
+		public void onLocationChanged(final Location location) {
 			try {
-				Log.d(TAG, "coarse Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy());
-				//Toast.makeText(ctx, "COARSE: Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy(), Toast.LENGTH_LONG).show();
-	//				if (lm != null)
-	//					lm. =  location;
-	//				lm.removeUpdates(lcoarse); //?
-				//@FIXME Check location changes before purging, make use of cache - leak
+				Log.d(TAG,
+						"coarse Location Changed: " + location.getProvider()
+								+ " lat: " + location.getLatitude() + " lon: "
+								+ location.getLongitude() + " alt: "
+								+ location.getAltitude() + " acc: "
+								+ location.getAccuracy());
+				// Toast.makeText(ctx,
+				// "COARSE: Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy(),
+				// Toast.LENGTH_LONG).show();
+				 if (lm != null)
+				 lm.removeUpdates(lcoarse); //?
 				downloadManager.purgeLists();
-			} catch (Exception ex) {
+			} catch (final Exception ex) {
 				ex.printStackTrace();
 			}
 		}
-	
-		public void onProviderDisabled(String arg0) {}
-	
-		public void onProviderEnabled(String arg0) {}
-	
-		public void onStatusChanged(String arg0, int arg1, Bundle arg2) {}
-		
+
+		public void onProviderDisabled(final String arg0) {
+			
+			//@TODO Display warning or redirect to provider
+		}
+
+		public void onProviderEnabled(final String arg0) {
+		}
+
+		public void onStatusChanged(final String arg0, final int arg1,
+				final Bundle arg2) {
+		}
+
 	};
 	private LocationListener lnormal = new LocationListener() {
-		public void onProviderDisabled(String provider) {}
-	
-		public void onProviderEnabled(String provider) {}
-	
-		public void onStatusChanged(String provider, int status, Bundle extras) {}
-	
-		public void onLocationChanged(Location location) {
-			Log.d(TAG, "normal Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy());
-			//Toast.makeText(ctx, "NORMAL: Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy(), Toast.LENGTH_LONG).show();
+		public void onProviderDisabled(final String provider) {
+		}
+
+		public void onProviderEnabled(final String provider) {
+		}
+
+		public void onStatusChanged(final String provider, final int status,
+				final Bundle extras) {
+		}
+
+		public void onLocationChanged(final Location location) {
+			Log.d(TAG,
+					"normal Location Changed: " + location.getProvider()
+							+ " lat: " + location.getLatitude() + " lon: "
+							+ location.getLongitude() + " alt: "
+							+ location.getAltitude() + " acc: "
+							+ location.getAccuracy());
+			// Toast.makeText(ctx,
+			// "NORMAL: Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy(),
+			// Toast.LENGTH_LONG).show();
 			try {
-	
+
 				downloadManager.purgeLists();
-				Log.v(TAG,"Location Changed: "+location.getProvider()+" lat: "+location.getLatitude()+" lon: "+location.getLongitude()+" alt: "+location.getAltitude()+" acc: "+location.getAccuracy());
-					synchronized (curLoc) {
-						curLoc = location;
-					}
-					mixView.repaint();
-					Location lastLoc=getLocationAtLastDownload();
-					if(lastLoc==null)
-						setLocationAtLastDownload(location);
-			} catch (Exception ex) {
+				Log.v(TAG,
+						"Location Changed: " + location.getProvider()
+								+ " lat: " + location.getLatitude() + " lon: "
+								+ location.getLongitude() + " alt: "
+								+ location.getAltitude() + " acc: "
+								+ location.getAccuracy());
+				synchronized (curLoc) {
+					curLoc = location;
+				}
+				mixView.repaint();
+				final Location lastLoc = getLocationAtLastDownload();
+				if (lastLoc == null) {
+					setLocationAtLastDownload(location);
+				}
+			} catch (final Exception ex) {
 				ex.printStackTrace();
 			}
 		}
-	
+
 	};
 
-	public MixContextData(boolean isURLvalid, Matrix rotationM,
-			float declination, ArrayList<DataSource> allDataSources) {
+	public MixContextData(final boolean isURLvalid, final Matrix rotationM,
+			final float declination, final ArrayList<DataSource> allDataSources) {
 		this.isURLvalid = isURLvalid;
 		this.rotationM = rotationM;
 		this.declination = declination;
@@ -120,7 +157,7 @@ public class MixContextData {
 		return mixView;
 	}
 
-	public void setMixView(MixView mixView) {
+	public void setMixView(final MixView mixView) {
 		this.mixView = mixView;
 	}
 
@@ -128,7 +165,7 @@ public class MixContextData {
 		return ctx;
 	}
 
-	public void setCtx(Context ctx) {
+	public void setCtx(final Context ctx) {
 		this.ctx = ctx;
 	}
 
@@ -136,7 +173,7 @@ public class MixContextData {
 		return isURLvalid;
 	}
 
-	public void setURLvalid(boolean isURLvalid) {
+	public void setURLvalid(final boolean isURLvalid) {
 		this.isURLvalid = isURLvalid;
 	}
 
@@ -144,7 +181,7 @@ public class MixContextData {
 		return rand;
 	}
 
-	public void setRand(Random rand) {
+	public void setRand(final Random rand) {
 		this.rand = rand;
 	}
 
@@ -152,7 +189,7 @@ public class MixContextData {
 		return downloadManager;
 	}
 
-	public void setDownloadManager(DownloadManager downloadManager) {
+	public void setDownloadManager(final DownloadManager downloadManager) {
 		this.downloadManager = downloadManager;
 	}
 
@@ -160,7 +197,7 @@ public class MixContextData {
 		return rotationM;
 	}
 
-	public void setRotationM(Matrix rotationM) {
+	public void setRotationM(final Matrix rotationM) {
 		this.rotationM = rotationM;
 	}
 
@@ -168,7 +205,7 @@ public class MixContextData {
 		return declination;
 	}
 
-	public void setDeclination(float declination) {
+	public void setDeclination(final float declination) {
 		this.declination = declination;
 	}
 
@@ -176,7 +213,7 @@ public class MixContextData {
 		return lm;
 	}
 
-	public void setLm(LocationManager lm) {
+	public void setLm(final LocationManager lm) {
 		this.lm = lm;
 	}
 
@@ -184,7 +221,7 @@ public class MixContextData {
 		return curLoc;
 	}
 
-	public void setCurLoc(Location curLoc) {
+	public void setCurLoc(final Location curLoc) {
 		this.curLoc = curLoc;
 	}
 
@@ -192,7 +229,7 @@ public class MixContextData {
 		return locationAtLastDownload;
 	}
 
-	public void setLocationAtLastDownload(Location locationAtLastDownload) {
+	public void setLocationAtLastDownload(final Location locationAtLastDownload) {
 		this.locationAtLastDownload = locationAtLastDownload;
 	}
 
@@ -200,7 +237,7 @@ public class MixContextData {
 		return allDataSources;
 	}
 
-	public void setAllDataSources(ArrayList<DataSource> allDataSources) {
+	public void setAllDataSources(final ArrayList<DataSource> allDataSources) {
 		this.allDataSources = allDataSources;
 	}
 
@@ -208,7 +245,7 @@ public class MixContextData {
 		return lbounce;
 	}
 
-	public void setLbounce(LocationListener lbounce) {
+	public void setLbounce(final LocationListener lbounce) {
 		this.lbounce = lbounce;
 	}
 
@@ -216,7 +253,7 @@ public class MixContextData {
 		return lcoarse;
 	}
 
-	public void setLcoarse(LocationListener lcoarse) {
+	public void setLcoarse(final LocationListener lcoarse) {
 		this.lcoarse = lcoarse;
 	}
 
@@ -224,7 +261,7 @@ public class MixContextData {
 		return lnormal;
 	}
 
-	public void setLnormal(LocationListener lnormal) {
+	public void setLnormal(final LocationListener lnormal) {
 		this.lnormal = lnormal;
 	}
 }

@@ -26,7 +26,8 @@ import android.graphics.Path;
 import android.graphics.RectF;
 
 /**
- * This class has the ability to set up the main view and it paints objects on the screen
+ * This class has the ability to set up the main view and it paints objects on
+ * the screen
  */
 
 public class PaintScreen {
@@ -42,27 +43,33 @@ public class PaintScreen {
 		paint.setStyle(Paint.Style.STROKE);
 	}
 
-	public void paintLine(float x1, float y1, float x2, float y2) {
+	public void paintLine(final float x1, final float y1, final float x2,
+			final float y2) {
 		canvas.drawLine(x1, y1, x2, y2, paint);
 	}
 
-	public void paintRect(float x, float y, float width, float height) {
+	public void paintRect(final float x, final float y, final float width,
+			final float height) {
 		canvas.drawRect(x, y, x + width, y + height, paint);
 	}
 
-	public void paintRoundedRect(float x, float y, float width, float height) {
-		//rounded edges. patch by Ignacio Avellino
-		RectF rect = new RectF(x, y, x + width, y + height);
+	public void paintRoundedRect(final float x, final float y,
+			final float width, final float height) {
+		// rounded edges. patch by Ignacio Avellino
+		final RectF rect = new RectF(x, y, x + width, y + height);
 		canvas.drawRoundRect(rect, 15F, 15F, paint);
 	}
-	
-	public void paintBitmap(Bitmap bitmap, float left, float top) {
+
+	public void paintBitmap(final Bitmap bitmap, final float left,
+			final float top) {
 		canvas.save();
-		canvas.drawBitmap(bitmap, left , top , paint); 
+		canvas.drawBitmap(bitmap, left, top, paint);
 		canvas.restore();
 	}
-	
-	public void paintPath(Path path,float x, float y, float width, float height, float rotation, float scale) {
+
+	public void paintPath(final Path path, final float x, final float y,
+			final float width, final float height, final float rotation,
+			final float scale) {
 		canvas.save();
 		canvas.translate(x + width / 2, y + height / 2);
 		canvas.rotate(rotation);
@@ -72,17 +79,18 @@ public class PaintScreen {
 		canvas.restore();
 	}
 
-	public void paintCircle(float x, float y, float radius) {
+	public void paintCircle(final float x, final float y, final float radius) {
 		canvas.drawCircle(x, y, radius, paint);
 	}
 
-	public void paintText(float x, float y, String text, boolean underline) {
+	public void paintText(final float x, final float y, final String text,
+			final boolean underline) {
 		paint.setUnderlineText(underline);
 		canvas.drawText(text, x, y, paint);
 	}
 
-	public void paintObj(ScreenObj obj, float x, float y, float rotation,
-			float scale) {
+	public void paintObj(final ScreenObj obj, final float x, final float y,
+			final float rotation, final float scale) {
 		canvas.save();
 		canvas.translate(x + obj.getWidth() / 2, y + obj.getHeight() / 2);
 		canvas.rotate(rotation);
@@ -92,7 +100,7 @@ public class PaintScreen {
 		canvas.restore();
 	}
 
-	/* ********** Getters and Setters *************/
+	/* ********** Getters and Setters ************ */
 	public int getWidth() {
 		return width;
 	}
@@ -101,26 +109,27 @@ public class PaintScreen {
 		return height;
 	}
 
-	public void setFill(boolean fill) {
-		if (fill)
+	public void setFill(final boolean fill) {
+		if (fill) {
 			paint.setStyle(Paint.Style.FILL);
-		else
+		} else {
 			paint.setStyle(Paint.Style.STROKE);
+		}
 	}
 
-	public void setColor(int c) {
+	public void setColor(final int c) {
 		paint.setColor(c);
 	}
 
-	public void setStrokeWidth(float w) {
+	public void setStrokeWidth(final float w) {
 		paint.setStrokeWidth(w);
 	}
-	
-	public void setWidth(int width) {
+
+	public void setWidth(final int width) {
 		this.width = width;
 	}
 
-	public void setHeight(int height) {
+	public void setHeight(final int height) {
 		this.height = height;
 	}
 
@@ -128,11 +137,11 @@ public class PaintScreen {
 		return canvas;
 	}
 
-	public void setCanvas(Canvas canvas) {
+	public void setCanvas(final Canvas canvas) {
 		this.canvas = canvas;
 	}
-	
-	public float getTextWidth(String txt) {
+
+	public float getTextWidth(final String txt) {
 		return paint.measureText(txt);
 	}
 
@@ -148,7 +157,7 @@ public class PaintScreen {
 		return 0;
 	}
 
-	public void setFontSize(float size) {
+	public void setFontSize(final float size) {
 		paint.setTextSize(size);
 	}
 }

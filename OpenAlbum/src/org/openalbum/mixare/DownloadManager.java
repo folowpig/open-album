@@ -36,23 +36,6 @@ import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.List;
 
-//Some devices reports error if these imports aren't included.
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.NameValuePair;
-import org.apache.http.ParseException;
-import org.apache.http.auth.AuthenticationException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.conn.params.ConnManagerParams;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
-import org.apache.http.util.EntityUtils;
-
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -69,7 +52,7 @@ import org.openalbum.mixare.data.XMLHandler;
 import org.openalbum.mixare.marker.Marker;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
-//import org.openalbum.mixare.MixView;
+
 import android.content.ContentResolver;
 import android.content.res.AssetManager;
 import android.database.Cursor;
@@ -78,26 +61,28 @@ import android.os.Build;
 import android.util.Log;
 
 /**
- * This class establishes a connection and downloads the data for
- * each entry in its todo list one after another.
+ * This class establishes a connection and downloads the data for each entry in
+ * its todo list one after another.
  * 
  * @TODO Customize Class + decouple it, fix performance issues.
- * @TODO http://grepcode.com/file/repository.grepcode.com/java/ext/com.google.android/android/2.3.1_r1/android/app/DownloadManager.java#DownloadManager  
+ * @TODO http://grepcode.com/file/repository.grepcode.com/java/ext/com.google.android
+ *       /android/2.3.1_r1/android/app/DownloadManager.java#DownloadManager
  */
 public class DownloadManager implements Runnable {
 
 	private boolean stop = false, pause = false, proceed = false;
-	public static int NOT_STARTED = 0, CONNECTING = 1, CONNECTED = 2, PAUSED = 3, STOPPED = 4;
+	public static int NOT_STARTED = 0, CONNECTING = 1, CONNECTED = 2,
+			PAUSED = 3, STOPPED = 4;
 	private int state = NOT_STARTED;
 
 	private int id = 0;
-	private HashMap<String, DownloadRequest> todoList = new HashMap<String, DownloadRequest>();
-	private HashMap<String, DownloadResult> doneList = new HashMap<String, DownloadResult>();
+	private final HashMap<String, DownloadRequest> todoList = new HashMap<String, DownloadRequest>();
+	private final HashMap<String, DownloadResult> doneList = new HashMap<String, DownloadResult>();
 	InputStream is;
 
 	private String currJobId = null;
 
-	public DownloadManager(MixContext ctx) {
+	public DownloadManager(final MixContext ctx) {
 	}
 
 	public void run() {
@@ -117,7 +102,7 @@ public class DownloadManager implements Runnable {
 
 			// Wait for proceed
 			while (!stop && !pause) {
-				synchronized (this) { //@FIXME Important - Thread deadLock
+				synchronized (this) { // @FIXME Important - Thread deadLock
 					if (todoList.size() > 0) {
 						jobId = getNextReqId();
 						request = todoList.get(jobId);
@@ -139,8 +124,9 @@ public class DownloadManager implements Runnable {
 				}
 				state = CONNECTING;
 
-				if (!stop && !pause)
+				if (!stop && !pause) {
 					sleep(100);
+				}
 			}
 
 			// Do pause
@@ -154,15 +140,16 @@ public class DownloadManager implements Runnable {
 		state = STOPPED;
 	}
 
-	public int checkForConnection(){
+	public int checkForConnection() {
 		return state;
 	}
 
-	private void sleep(long ms){
+	private void sleep(final long ms) {
 		try {
 			Thread.sleep(ms);
-		} catch (java.lang.InterruptedException ex) {
-			Log.w("OpenAlbum - Mixare", "Thread interrupted, sleep() -> DownloadMang");
+		} catch (final java.lang.InterruptedException ex) {
+			Log.w("OpenAlbum - Mixare",
+					"Thread interrupted, sleep() -> DownloadMang");
 		}
 	}
 
@@ -170,18 +157,20 @@ public class DownloadManager implements Runnable {
 		return todoList.keySet().iterator().next();
 	}
 
-	private DownloadResult processRequest(DownloadRequest request) {
+	private DownloadResult processRequest(final DownloadRequest request) {
 		final DownloadResult result = new DownloadResult();
-		//assume an error until everything is fine
+		// assume an error until everything is fine
 		result.error = true;
-		
-		try {
-			if( request!=null && request.source.getUrl() !=null){
 
-				is = getHttpGETInputStream(request.source.getUrl() + request.params);
+		try {
+			if (request != null && request.source.getUrl() != null) {
+
+				is = getHttpGETInputStream(request.source.getUrl()
+						+ request.params);
 				final String tmp = getHttpInputString(is);
 
-				final Json layer = new Json(); ////@FIXME OpenStreetMap Recieved data is XML
+				final Json layer = new Json(); // //@FIXME OpenStreetMap
+												// Recieved data is XML
 
 				// try loading JSON DATA
 				try {
@@ -192,53 +181,54 @@ public class DownloadManager implements Runnable {
 
 					Log.d(MixView.TAG, "loading JSON data");
 
-					List<Marker> markers = layer.load(root,request.source);
+					final List<Marker> markers = layer.load(root,
+							request.source);
 					result.setMarkers(markers);
 
 					result.source = request.source;
 					result.error = false;
-					result.errorMsg = ""; 
+					result.errorMsg = "";
 
-				}
-				catch (JSONException e) {
+				} catch (final JSONException e) {
 
 					Log.v(MixView.TAG, "no JSON data");
 					Log.v(MixView.TAG, "try to load XML data");
 
 					try {
-						DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-						//Document doc = builder.parse(is);d
-						Document doc = builder.parse(new InputSource(new StringReader(tmp)));
+						final DocumentBuilder builder = DocumentBuilderFactory
+								.newInstance().newDocumentBuilder();
+						// Document doc = builder.parse(is);d
+						final Document doc = builder.parse(new InputSource(
+								new StringReader(tmp)));
 
-						//Document doc = builder.parse(is);
+						// Document doc = builder.parse(is);
 
-						XMLHandler xml = new XMLHandler();
+						final XMLHandler xml = new XMLHandler();
 
-						Log.i(MixView.TAG, "loading XML data");	
-						
+						Log.i(MixView.TAG, "loading XML data");
 
-						List<Marker> markers = xml.load(doc, request.source);
-						
+						final List<Marker> markers = xml.load(doc,
+								request.source);
+
 						result.setMarkers(markers);
 
 						result.source = request.source;
 						result.error = false;
 						result.errorMsg = "";
-					} catch (Exception e1) {
+					} catch (final Exception e1) {
 						Log.d("OpenAlbum - Mixare", e1.getMessage(), e1);
-					}				
+					}
 				}
 				closeHttpInputStream(is);
 				is = null;
 			}
-		}
-		catch (Exception ex) {
+		} catch (final Exception ex) {
 			result.errorMsg = ex.getMessage();
 			result.errorRequest = request;
 
 			try {
 				closeHttpInputStream(is);
-			} catch (Exception ignore) {
+			} catch (final Exception ignore) {
 				Log.e("OpenAlbum - Mixare", ignore.getMessage());
 			}
 
@@ -255,39 +245,38 @@ public class DownloadManager implements Runnable {
 		doneList.clear();
 	}
 
-	public synchronized String submitJob(DownloadRequest job) {
-		if(job!=null) {
+	public synchronized String submitJob(final DownloadRequest job) {
+		if (job != null) {
 			String jobId = "";
-			//ensure that we only have one download per each datasource
-			String currDSname = job.source.getName();
+			// ensure that we only have one download per each datasource
+			final String currDSname = job.source.getName();
 			boolean found = false;
-			if (!todoList.isEmpty()){
-			for (String k: todoList.keySet()) {
-				if (currDSname.equals(todoList.get(k).source.getName())) {
-					found = true;
-					jobId = k;
+			if (!todoList.isEmpty()) {
+				for (final String k : todoList.keySet()) {
+					if (currDSname.equals(todoList.get(k).source.getName())) {
+						found = true;
+						jobId = k;
+					}
 				}
 			}
-			}
 			if (!found) {
-			jobId = "ID_" + (id++);
-			todoList.put(jobId, job);
-			Log.i(MixView.TAG, "Submitted Job with " + jobId + ", type: "
-					+ job.source.getType() + ", params: " + job.params + ", url: "
-					+ job.source.getUrl());
+				jobId = "ID_" + (id++);
+				todoList.put(jobId, job);
+				Log.i(MixView.TAG, "Submitted Job with " + jobId + ", type: "
+						+ job.source.getType() + ", params: " + job.params
+						+ ", url: " + job.source.getUrl());
 			}
 			return jobId;
 		}
 		return null;
 	}
-	
 
-	public synchronized boolean isReqComplete(String jobId) {
+	public synchronized boolean isReqComplete(final String jobId) {
 		return doneList.containsKey(jobId);
 	}
 
-	public synchronized DownloadResult getReqResult(String jobId) {
-		DownloadResult result = doneList.get(jobId);
+	public synchronized DownloadResult getReqResult(final String jobId) {
+		final DownloadResult result = doneList.get(jobId);
 		doneList.remove(jobId);
 
 		return result;
@@ -296,6 +285,7 @@ public class DownloadManager implements Runnable {
 	public String getActiveReqId() {
 		return currJobId;
 	}
+
 	public void pause() {
 		pause = true;
 	}
@@ -307,32 +297,34 @@ public class DownloadManager implements Runnable {
 	public void stop() {
 		stop = true;
 	}
-	
+
 	public synchronized DownloadResult getNextResult() {
-		if(!doneList.isEmpty()) {
-			String nextId=doneList.keySet().iterator().next();
-			DownloadResult result = doneList.get(nextId);
+		if (!doneList.isEmpty()) {
+			final String nextId = doneList.keySet().iterator().next();
+			final DownloadResult result = doneList.get(nextId);
 			doneList.remove(nextId);
 			return result;
 		}
 		return null;
 	}
+
 	public Boolean isDone() {
 		return todoList.isEmpty();
 	}
 
-	//Moved from mixContext
-	public InputStream getHttpPOSTInputStream(String urlStr,
-			String params) throws Exception {
+	// Moved from mixContext
+	public InputStream getHttpPOSTInputStream(final String urlStr,
+			final String params) throws Exception {
 		InputStream is = null;
 		OutputStream os = null;
 		HttpURLConnection conn = null;
 
-		if (urlStr.startsWith("content://"))
+		if (urlStr.startsWith("content://")) {
 			return getContentInputStream(urlStr, params);
+		}
 
 		try {
-			URL url = new URL(urlStr);
+			final URL url = new URL(urlStr);
 			conn = (HttpURLConnection) url.openConnection();
 			conn.setReadTimeout(10000);
 			conn.setConnectTimeout(10000);
@@ -340,112 +332,125 @@ public class DownloadManager implements Runnable {
 			if (params != null) {
 				conn.setDoOutput(true);
 				os = conn.getOutputStream();
-				OutputStreamWriter wr = new OutputStreamWriter(os);
+				final OutputStreamWriter wr = new OutputStreamWriter(os);
 				wr.write(params);
 				wr.close();
 			}
 
 			is = conn.getInputStream();
-			
+
 			return is;
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 
 			try {
 				is.close();
-			} catch (Exception ignore) {			
+			} catch (final Exception ignore) {
 
 			}
 			try {
 				os.close();
-			} catch (Exception ignore) {			
+			} catch (final Exception ignore) {
 
 			}
 			try {
 				conn.disconnect();
-			} catch (Exception ignore) {
+			} catch (final Exception ignore) {
 			}
 
 			if (conn != null && conn.getResponseCode() == 405) {
 				return getHttpGETInputStream(urlStr);
-			} else {		
+			} else {
 
 				throw ex;
 			}
 		}
 	}
-	public InputStream getHttpGETInputStream(String urlStr)
+
+	public InputStream getHttpGETInputStream(final String urlStr)
 			throws Exception {
-				InputStream is = null;
-				URLConnection conn = null;
+		InputStream is = null;
+		URLConnection conn = null;
 
-			    // HTTP connection reuse which was buggy pre-froyo
-			    if (Integer.parseInt(Build.VERSION.SDK) < Build.VERSION_CODES.FROYO) {
-			        System.setProperty("http.keepAlive", "false");
-			    }
-			    
-				if (urlStr.startsWith("file://"))			
-					return new FileInputStream(urlStr.replace("file://", ""));
+		// HTTP connection reuse which was buggy pre-froyo
+		if (Integer.parseInt(Build.VERSION.SDK) < Build.VERSION_CODES.FROYO) {
+			System.setProperty("http.keepAlive", "false");
+		}
 
-				if (urlStr.startsWith("content://"))
-					return getContentInputStream(urlStr, null);
+		if (urlStr.startsWith("file://")) {
+			return new FileInputStream(urlStr.replace("file://", ""));
+		}
 
-				if (urlStr.startsWith("https://")) {
-					HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier(){
-		    			public boolean verify(String hostname, SSLSession session) {
-		    				return true;
-		    			}});
-				SSLContext context = SSLContext.getInstance("TLS");
-				context.init(null, new X509TrustManager[]{new X509TrustManager(){
-					public void checkClientTrusted(X509Certificate[] chain,
-							String authType) throws CertificateException {}
-					public void checkServerTrusted(X509Certificate[] chain,
-							String authType) throws CertificateException {}
-					public X509Certificate[] getAcceptedIssuers() {
-						return new X509Certificate[0];
-					}}}, new SecureRandom());
-				HttpsURLConnection.setDefaultSSLSocketFactory(
-						context.getSocketFactory());
+		if (urlStr.startsWith("content://")) {
+			return getContentInputStream(urlStr, null);
+		}
+
+		if (urlStr.startsWith("https://")) {
+			HttpsURLConnection
+					.setDefaultHostnameVerifier(new HostnameVerifier() {
+						public boolean verify(final String hostname,
+								final SSLSession session) {
+							return true;
+						}
+					});
+			final SSLContext context = SSLContext.getInstance("TLS");
+			context.init(null, new X509TrustManager[] { new X509TrustManager() {
+				public void checkClientTrusted(final X509Certificate[] chain,
+						final String authType) throws CertificateException {
 				}
-				
-				try {
-					URL url = new URL(urlStr);
-					conn =  url.openConnection();
-					conn.setReadTimeout(10000);
-					conn.setConnectTimeout(10000);
 
-					is = conn.getInputStream(); //@TODO fix openMap error (URL Params)
-					
-					return is;
-				} catch (Exception ex) {
-					try {
-						is.close();
-					} catch (Exception ignore) {			
-					}
-					try {
-						if(conn instanceof HttpURLConnection)
-							((HttpURLConnection)conn).disconnect();
-					} catch (Exception ignore) {			
-					}
-					
-					throw ex;				
-
+				public void checkServerTrusted(final X509Certificate[] chain,
+						final String authType) throws CertificateException {
 				}
+
+				public X509Certificate[] getAcceptedIssuers() {
+					return new X509Certificate[0];
+				}
+			} }, new SecureRandom());
+			HttpsURLConnection.setDefaultSSLSocketFactory(context
+					.getSocketFactory());
+		}
+
+		try {
+			final URL url = new URL(urlStr);
+			conn = url.openConnection();
+			conn.setReadTimeout(10000);
+			conn.setConnectTimeout(10000);
+
+			is = conn.getInputStream(); // @TODO fix openMap error (URL Params)
+
+			return is;
+		} catch (final Exception ex) {
+			try {
+				is.close();
+			} catch (final Exception ignore) {
+			}
+			try {
+				if (conn instanceof HttpURLConnection) {
+					((HttpURLConnection) conn).disconnect();
+				}
+			} catch (final Exception ignore) {
 			}
 
-	public InputStream getContentInputStream(String urlStr, String params)
-	throws Exception {
-		ContentResolver cr = MixView.class.newInstance().getContentResolver();
-		Cursor cur = cr.query(Uri.parse(urlStr), null, params, null, null);
+			throw ex;
+
+		}
+	}
+
+	public InputStream getContentInputStream(final String urlStr,
+			final String params) throws Exception {
+		final ContentResolver cr = MixView.class.newInstance()
+				.getContentResolver();
+		final Cursor cur = cr
+				.query(Uri.parse(urlStr), null, params, null, null);
 
 		cur.moveToFirst();
-		int mode = cur.getInt(cur.getColumnIndex("MODE"));
+		final int mode = cur.getInt(cur.getColumnIndex("MODE"));
 
 		if (mode == 1) {
-			String result = cur.getString(cur.getColumnIndex("RESULT"));
+			final String result = cur.getString(cur.getColumnIndex("RESULT"));
 			cur.deactivate();
 
-			return new ByteArrayInputStream(result
-					.getBytes());
+			return new ByteArrayInputStream(result.getBytes());
 		} else {
 			cur.deactivate();
 
@@ -453,41 +458,44 @@ public class DownloadManager implements Runnable {
 		}
 	}
 
-	public String getHttpInputString(InputStream is) {
-		BufferedReader reader = new BufferedReader(new InputStreamReader(is), 8 * 1024);
-		StringBuilder sb = new StringBuilder();
+	public String getHttpInputString(final InputStream is) {
+		final BufferedReader reader = new BufferedReader(new InputStreamReader(
+				is), 8 * 1024);
+		final StringBuilder sb = new StringBuilder();
 
 		try {
 			String line;
 			while ((line = reader.readLine()) != null) {
 				sb.append(line + "\n");
 			}
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			Log.d("OpenAlbum - Mixare", e.getMessage(), e);
-		}finally{
+		} finally {
 			try {
 				is.close();
-			} catch (IOException ex) {
+			} catch (final IOException ex) {
 				Log.d("OpenAlbum - Mixare", ex.getMessage(), ex);
 			}
 		}
 		return sb.toString();
 	}
 
-	public void closeHttpInputStream(InputStream is) throws Exception {
+	public void closeHttpInputStream(final InputStream is) throws Exception {
 		if (is != null) {
 			is.close();
 		}
 	}
 
-	public InputStream getResourceInputStream(String name) throws Exception {
-		AssetManager mgr = MixView.class.newInstance().getAssets();
+	public InputStream getResourceInputStream(final String name)
+			throws Exception {
+		final AssetManager mgr = MixView.class.newInstance().getAssets();
 		return mgr.open(name);
 	}
 
-	public void closeResourceInputStream(InputStream is) throws Exception {
-		if (is != null)
+	public void closeResourceInputStream(final InputStream is) throws Exception {
+		if (is != null) {
 			is.close();
+		}
 	}
 }
 
@@ -504,15 +512,15 @@ class DownloadResult {
 	List<Marker> markers;
 
 	boolean error;
-	String errorMsg="";
+	String errorMsg = "";
 	DownloadRequest errorRequest;
-
 
 	public List<Marker> getMarkers() {
 		return markers;
 	}
-	public void setMarkers(List<Marker> markers) {
+
+	public void setMarkers(final List<Marker> markers) {
 		this.markers = markers;
 	}
-	
+
 }

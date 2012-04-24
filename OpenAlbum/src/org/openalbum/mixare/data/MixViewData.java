@@ -7,16 +7,11 @@ import org.openalbum.mixare.reality.AugmentedView;
 import org.openalbum.mixare.reality.CameraSurface;
 import org.openalbum.mixare.render.Matrix;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.os.PowerManager.WakeLock;
-import android.view.View;
 import android.widget.SeekBar;
-import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class MixViewData {
 	private CameraSurface camScreen;
@@ -48,52 +43,12 @@ public class MixViewData {
 	private String zoomLevel;
 	private int zoomProgress;
 	private TextView searchNotificationTxt;
-	public static final String PREFS_NAME = "MyPrefsFileForMenuItems";
-	private OnSeekBarChangeListener myZoomBarOnSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
-		Toast t;
-	
-		public void onProgressChanged(SeekBar seekBar, int progress,
-				boolean fromUser) {
-			float myout = calcZoomLevel();
-	
-			zoomLevel = String.valueOf(myout);
-			zoomProgress = myZoomBar.getProgress();
-	
-			t.setText("Radius: " + String.valueOf(myout));
-			t.show();
-		}
-	
-		public void onStartTrackingTouch(SeekBar seekBar) {
-			Context ctx = seekBar.getContext();
-			t = Toast.makeText(ctx, "Radius: ", Toast.LENGTH_LONG);
-			// zoomChanging= true;
-		}
-	
-		public void onStopTrackingTouch(SeekBar seekBar) {
-			SharedPreferences settings = getMixContext().getSharedPreferences(PREFS_NAME, 0);
-			SharedPreferences.Editor editor = settings.edit();
-			/* store the zoom range of the zoom bar selected by the user */
-			editor.putInt("zoomLevel", myZoomBar.getProgress());
-			editor.commit();
-			myZoomBar.setVisibility(View.INVISIBLE);
-			// zoomChanging= false;
-	
-			myZoomBar.getProgress();
-	
-			t.cancel();
-			//refreashZoomLevel();
-		}
+	public static final String PREFS_NAME = "OpenAlbumPrefsFileForMenuItems";
 
-		//private void //refreashZoomLevel() {
-			// TODO Auto-generated method stub
-			
-		//}
-	
-	};
 
 	public float calcZoomLevel() {
 
-		int myZoomLevel = getMyZoomBar().getProgress();
+		final int myZoomLevel = getMyZoomBar().getProgress();
 		float myout = 5;
 
 		if (myZoomLevel <= 26) {
@@ -112,10 +67,12 @@ public class MixViewData {
 
 		return myout;
 	}
-	public MixViewData(float[] rTmp, float[] rot, float[] i, float[] grav,
-			float[] mag, int rHistIdx, Matrix tempR, Matrix finalR,
-			Matrix smoothR, Matrix[] histR, Matrix m1, Matrix m2, Matrix m3,
-			Matrix m4, int compassErrorDisplayed) {
+
+	public MixViewData(final float[] rTmp, final float[] rot, final float[] i,
+			final float[] grav, final float[] mag, final int rHistIdx,
+			final Matrix tempR, final Matrix finalR, final Matrix smoothR,
+			final Matrix[] histR, final Matrix m1, final Matrix m2,
+			final Matrix m3, final Matrix m4, final int compassErrorDisplayed) {
 		RTmp = rTmp;
 		Rot = rot;
 		I = i;
@@ -137,7 +94,7 @@ public class MixViewData {
 		return camScreen;
 	}
 
-	public void setCamScreen(CameraSurface camScreen) {
+	public void setCamScreen(final CameraSurface camScreen) {
 		this.camScreen = camScreen;
 	}
 
@@ -145,7 +102,7 @@ public class MixViewData {
 		return augScreen;
 	}
 
-	public void setAugScreen(AugmentedView augScreen) {
+	public void setAugScreen(final AugmentedView augScreen) {
 		this.augScreen = augScreen;
 	}
 
@@ -153,7 +110,7 @@ public class MixViewData {
 		return mixContext;
 	}
 
-	public void setMixContext(MixContext mixContext) {
+	public void setMixContext(final MixContext mixContext) {
 		this.mixContext = mixContext;
 	}
 
@@ -161,7 +118,7 @@ public class MixViewData {
 		return downloadThread;
 	}
 
-	public void setDownloadThread(Thread downloadThread) {
+	public void setDownloadThread(final Thread downloadThread) {
 		this.downloadThread = downloadThread;
 	}
 
@@ -169,7 +126,7 @@ public class MixViewData {
 		return RTmp;
 	}
 
-	public void setRTmp(float[] rTmp) {
+	public void setRTmp(final float[] rTmp) {
 		RTmp = rTmp;
 	}
 
@@ -177,7 +134,7 @@ public class MixViewData {
 		return Rot;
 	}
 
-	public void setRot(float[] rot) {
+	public void setRot(final float[] rot) {
 		Rot = rot;
 	}
 
@@ -185,7 +142,7 @@ public class MixViewData {
 		return I;
 	}
 
-	public void setI(float[] i) {
+	public void setI(final float[] i) {
 		I = i;
 	}
 
@@ -193,7 +150,7 @@ public class MixViewData {
 		return grav;
 	}
 
-	public void setGrav(float[] grav) {
+	public void setGrav(final float[] grav) {
 		this.grav = grav;
 	}
 
@@ -201,7 +158,7 @@ public class MixViewData {
 		return mag;
 	}
 
-	public void setMag(float[] mag) {
+	public void setMag(final float[] mag) {
 		this.mag = mag;
 	}
 
@@ -209,7 +166,7 @@ public class MixViewData {
 		return sensorMgr;
 	}
 
-	public void setSensorMgr(SensorManager sensorMgr) {
+	public void setSensorMgr(final SensorManager sensorMgr) {
 		this.sensorMgr = sensorMgr;
 	}
 
@@ -217,7 +174,7 @@ public class MixViewData {
 		return sensors;
 	}
 
-	public void setSensors(List<Sensor> sensors) {
+	public void setSensors(final List<Sensor> sensors) {
 		this.sensors = sensors;
 	}
 
@@ -225,7 +182,7 @@ public class MixViewData {
 		return sensorGrav;
 	}
 
-	public void setSensorGrav(Sensor sensorGrav) {
+	public void setSensorGrav(final Sensor sensorGrav) {
 		this.sensorGrav = sensorGrav;
 	}
 
@@ -233,7 +190,7 @@ public class MixViewData {
 		return sensorMag;
 	}
 
-	public void setSensorMag(Sensor sensorMag) {
+	public void setSensorMag(final Sensor sensorMag) {
 		this.sensorMag = sensorMag;
 	}
 
@@ -241,7 +198,7 @@ public class MixViewData {
 		return rHistIdx;
 	}
 
-	public void setrHistIdx(int rHistIdx) {
+	public void setrHistIdx(final int rHistIdx) {
 		this.rHistIdx = rHistIdx;
 	}
 
@@ -249,7 +206,7 @@ public class MixViewData {
 		return tempR;
 	}
 
-	public void setTempR(Matrix tempR) {
+	public void setTempR(final Matrix tempR) {
 		this.tempR = tempR;
 	}
 
@@ -257,7 +214,7 @@ public class MixViewData {
 		return finalR;
 	}
 
-	public void setFinalR(Matrix finalR) {
+	public void setFinalR(final Matrix finalR) {
 		this.finalR = finalR;
 	}
 
@@ -265,7 +222,7 @@ public class MixViewData {
 		return smoothR;
 	}
 
-	public void setSmoothR(Matrix smoothR) {
+	public void setSmoothR(final Matrix smoothR) {
 		this.smoothR = smoothR;
 	}
 
@@ -273,7 +230,7 @@ public class MixViewData {
 		return histR;
 	}
 
-	public void setHistR(Matrix[] histR) {
+	public void setHistR(final Matrix[] histR) {
 		this.histR = histR;
 	}
 
@@ -281,7 +238,7 @@ public class MixViewData {
 		return m1;
 	}
 
-	public void setM1(Matrix m1) {
+	public void setM1(final Matrix m1) {
 		this.m1 = m1;
 	}
 
@@ -289,7 +246,7 @@ public class MixViewData {
 		return m2;
 	}
 
-	public void setM2(Matrix m2) {
+	public void setM2(final Matrix m2) {
 		this.m2 = m2;
 	}
 
@@ -297,7 +254,7 @@ public class MixViewData {
 		return m3;
 	}
 
-	public void setM3(Matrix m3) {
+	public void setM3(final Matrix m3) {
 		this.m3 = m3;
 	}
 
@@ -305,7 +262,7 @@ public class MixViewData {
 		return m4;
 	}
 
-	public void setM4(Matrix m4) {
+	public void setM4(final Matrix m4) {
 		this.m4 = m4;
 	}
 
@@ -313,7 +270,7 @@ public class MixViewData {
 		return myZoomBar;
 	}
 
-	public void setMyZoomBar(SeekBar myZoomBar) {
+	public void setMyZoomBar(final SeekBar myZoomBar) {
 		this.myZoomBar = myZoomBar;
 	}
 
@@ -321,7 +278,7 @@ public class MixViewData {
 		return mWakeLock;
 	}
 
-	public void setmWakeLock(WakeLock mWakeLock) {
+	public void setmWakeLock(final WakeLock mWakeLock) {
 		this.mWakeLock = mWakeLock;
 	}
 
@@ -329,7 +286,7 @@ public class MixViewData {
 		return fError;
 	}
 
-	public void setfError(boolean fError) {
+	public void setfError(final boolean fError) {
 		this.fError = fError;
 	}
 
@@ -337,7 +294,7 @@ public class MixViewData {
 		return compassErrorDisplayed;
 	}
 
-	public void setCompassErrorDisplayed(int compassErrorDisplayed) {
+	public void setCompassErrorDisplayed(final int compassErrorDisplayed) {
 		this.compassErrorDisplayed = compassErrorDisplayed;
 	}
 
@@ -345,7 +302,7 @@ public class MixViewData {
 		return zoomLevel;
 	}
 
-	public void setZoomLevel(String zoomLevel) {
+	public void setZoomLevel(final String zoomLevel) {
 		this.zoomLevel = zoomLevel;
 	}
 
@@ -353,7 +310,7 @@ public class MixViewData {
 		return zoomProgress;
 	}
 
-	public void setZoomProgress(int zoomProgress) {
+	public void setZoomProgress(final int zoomProgress) {
 		this.zoomProgress = zoomProgress;
 	}
 
@@ -361,16 +318,8 @@ public class MixViewData {
 		return searchNotificationTxt;
 	}
 
-	public void setSearchNotificationTxt(TextView searchNotificationTxt) {
+	public void setSearchNotificationTxt(final TextView searchNotificationTxt) {
 		this.searchNotificationTxt = searchNotificationTxt;
 	}
 
-	public OnSeekBarChangeListener getMyZoomBarOnSeekBarChangeListener() {
-		return myZoomBarOnSeekBarChangeListener;
-	}
-
-	public void setMyZoomBarOnSeekBarChangeListener(
-			OnSeekBarChangeListener myZoomBarOnSeekBarChangeListener) {
-		this.myZoomBarOnSeekBarChangeListener = myZoomBarOnSeekBarChangeListener;
-	}
 }
