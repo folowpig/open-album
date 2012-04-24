@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-      android:versionCode="20" android:debuggable="true" android:versionName="0.7.6.4" package="org.openalbum.mixare" android:installLocation="auto">
+      android:versionCode="20" android:debuggable="true" android:versionName="0.7.6.10" package="org.openalbum.mixare" android:installLocation="auto">
 
     <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="10"/>
 	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -63,7 +63,7 @@
                    	android:resource="@xml/searchable"/>
 		</activity>
 		 <activity android:name=".data.DataSource" />
-		 <activity android:name=".data.DataSourceList.data.DataSourceList.data.DataSourceList" />
+		 <activity android:name=".data.DataSourceList" />
 		 
  		<uses-library android:name="com.google.android.maps" />
 </application>
