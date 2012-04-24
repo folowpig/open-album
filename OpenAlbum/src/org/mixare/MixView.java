@@ -465,7 +465,7 @@ public class MixView extends Activity implements SensorEventListener,
 			data.getSearchNotificationTxt().clearComposingText();
 		}
 		//@TODO referesh augmented 
-		data.getAugScreen().refreshDrawableState();
+		// data.getAugScreen().refreshDrawableState();
 		//setZoomLevel();
 	}
 
@@ -620,16 +620,6 @@ public class MixView extends Activity implements SensorEventListener,
 
 		}
 		return true;
-	}
-	@Override
-	public void onOptionsMenuClosed (Menu menu){
-		  getMixContext().data.setMixView(this);
-			getDataView().doStart();
-			getDataView().clearEvents();
-			getDataView().drawRadar(getdWindow());
-			//getMixContext().refreshDataSources();
-			// super.onOptionsMenuClosed(menu);
-
 	}
 
 	public float calcZoomLevel() {

@@ -42,45 +42,6 @@ public class PaintScreen {
 		paint.setStyle(Paint.Style.STROKE);
 	}
 
-	public Canvas getCanvas() {
-		return canvas;
-	}
-
-	public void setCanvas(Canvas canvas) {
-		this.canvas = canvas;
-	}
-
-	public void setWidth(int width) {
-		this.width = width;
-	}
-
-	public void setHeight(int height) {
-		this.height = height;
-	}
-
-	public int getWidth() {
-		return width;
-	}
-
-	public int getHeight() {
-		return height;
-	}
-
-	public void setFill(boolean fill) {
-		if (fill)
-			paint.setStyle(Paint.Style.FILL);
-		else
-			paint.setStyle(Paint.Style.STROKE);
-	}
-
-	public void setColor(int c) {
-		paint.setColor(c);
-	}
-
-	public void setStrokeWidth(float w) {
-		paint.setStrokeWidth(w);
-	}
-
 	public void paintLine(float x1, float y1, float x2, float y2) {
 		canvas.drawLine(x1, y1, x2, y2, paint);
 	}
@@ -97,7 +58,7 @@ public class PaintScreen {
 	
 	public void paintBitmap(Bitmap bitmap, float left, float top) {
 		canvas.save();
-		canvas.drawBitmap(bitmap, left, top, paint); 
+		canvas.drawBitmap(bitmap, left , top , paint); 
 		canvas.restore();
 	}
 	
@@ -131,6 +92,46 @@ public class PaintScreen {
 		canvas.restore();
 	}
 
+	/* ********** Getters and Setters *************/
+	public int getWidth() {
+		return width;
+	}
+
+	public int getHeight() {
+		return height;
+	}
+
+	public void setFill(boolean fill) {
+		if (fill)
+			paint.setStyle(Paint.Style.FILL);
+		else
+			paint.setStyle(Paint.Style.STROKE);
+	}
+
+	public void setColor(int c) {
+		paint.setColor(c);
+	}
+
+	public void setStrokeWidth(float w) {
+		paint.setStrokeWidth(w);
+	}
+	
+	public void setWidth(int width) {
+		this.width = width;
+	}
+
+	public void setHeight(int height) {
+		this.height = height;
+	}
+
+	public Canvas getCanvas() {
+		return canvas;
+	}
+
+	public void setCanvas(Canvas canvas) {
+		this.canvas = canvas;
+	}
+	
 	public float getTextWidth(String txt) {
 		return paint.measureText(txt);
 	}

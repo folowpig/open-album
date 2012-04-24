@@ -13,14 +13,17 @@ import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import org.mixare.MixUtils;
 import org.mixare.data.DataSource;
 import org.mixare.gui.PaintScreen;
+import org.mixare.gui.TextObj;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.location.Location;
 import java.net.URL;
+import java.text.DecimalFormat;
 
 /**
  * @author A.Egal
@@ -122,7 +125,47 @@ public class ImageMarker extends Marker {
 	@Override
 	public void draw(PaintScreen dw) {
 		this.drawImage(dw);
-		super.drawTextBlock(dw);
+		this.drawTitle(dw);
+	}
+
+	/**
+	 *  Draw a title for image.
+	 *  It displays full title if title's length is less than 10 chars,
+	 *  otherwise, it displays the first 10 chars and concatenate three dots "..."
+	 * @param PaintScreen dw
+	 */
+	public void drawTitle(PaintScreen dw) {
+		float maxHeight = Math.round(dw.getHeight() / 10f) + 1;
+		
+		//TODO: change textblock only when distance changes
+		String textStr="";
+		double d = distance;
+		DecimalFormat df = new DecimalFormat("@#");
+		String imageTitle = "";
+		if (title.length() > 10){
+			imageTitle = title.substring(0, 10) + "...";
+		}else {
+			imageTitle = title;
+		}
+		if(d<1000.0) {
+			textStr = imageTitle + " ("+ df.format(d) + "m)";			
+		}
+		else {
+			d=d/1000.0;
+			textStr = imageTitle + " (" + df.format(d) + "km)";
+		}
+		textBlock = new TextObj(textStr, Math.round(maxHeight / 2f) + 1,
+				250, dw, underline);
+	
+		if (isVisible) {
+			//dw.setColor(DataSource.getColor(type));
+			float currentAngle = MixUtils.getAngle(cMarker.x, cMarker.y, signMarker.x, signMarker.y);
+			txtLab.prepare(textBlock);
+			dw.setStrokeWidth(1f);
+			dw.setFill(true);
+			dw.paintObj(txtLab, signMarker.x - txtLab.getWidth()
+					/ 2, signMarker.y + maxHeight, currentAngle + 90, 1);
+		}
 	}
 
 	public void drawImage(PaintScreen dw) {
