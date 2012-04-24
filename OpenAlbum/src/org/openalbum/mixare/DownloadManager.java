@@ -76,13 +76,13 @@ public class DownloadManager implements Runnable {
 	private int state = NOT_STARTED;
 
 	private int id = 0;
-	private final HashMap<String, DownloadRequest> todoList = new HashMap<String, DownloadRequest>();
-	private final HashMap<String, DownloadResult> doneList = new HashMap<String, DownloadResult>();
+	private HashMap<String, DownloadRequest> todoList = new HashMap<String, DownloadRequest>();
+	private HashMap<String, DownloadResult> doneList = new HashMap<String, DownloadResult>();
 	InputStream is;
 
 	private String currJobId = null;
 
-	public DownloadManager(final MixContext ctx) {
+	public DownloadManager(MixContext ctx) {
 	}
 
 	public void run() {
@@ -189,7 +189,8 @@ public class DownloadManager implements Runnable {
 					result.error = false;
 					result.errorMsg = "";
 
-				} catch (final JSONException e) {
+				}
+				catch (JSONException e) {
 
 					Log.v(MixView.TAG, "no JSON data");
 					Log.v(MixView.TAG, "try to load XML data");
@@ -215,20 +216,21 @@ public class DownloadManager implements Runnable {
 						result.source = request.source;
 						result.error = false;
 						result.errorMsg = "";
-					} catch (final Exception e1) {
+					} catch (Exception e1) {
 						Log.d("OpenAlbum - Mixare", e1.getMessage(), e1);
 					}
 				}
 				closeHttpInputStream(is);
 				is = null;
 			}
-		} catch (final Exception ex) {
+		}
+		catch (Exception ex) {
 			result.errorMsg = ex.getMessage();
 			result.errorRequest = request;
 
 			try {
 				closeHttpInputStream(is);
-			} catch (final Exception ignore) {
+			} catch (Exception ignore) {
 				Log.e("OpenAlbum - Mixare", ignore.getMessage());
 			}
 
@@ -245,8 +247,8 @@ public class DownloadManager implements Runnable {
 		doneList.clear();
 	}
 
-	public synchronized String submitJob(final DownloadRequest job) {
-		if (job != null) {
+	public synchronized String submitJob(DownloadRequest job) {
+		if(job!=null) {
 			String jobId = "";
 			// ensure that we only have one download per each datasource
 			final String currDSname = job.source.getName();
@@ -270,13 +272,14 @@ public class DownloadManager implements Runnable {
 		}
 		return null;
 	}
+	
 
-	public synchronized boolean isReqComplete(final String jobId) {
+	public synchronized boolean isReqComplete(String jobId) {
 		return doneList.containsKey(jobId);
 	}
 
-	public synchronized DownloadResult getReqResult(final String jobId) {
-		final DownloadResult result = doneList.get(jobId);
+	public synchronized DownloadResult getReqResult(String jobId) {
+		DownloadResult result = doneList.get(jobId);
 		doneList.remove(jobId);
 
 		return result;
@@ -313,8 +316,8 @@ public class DownloadManager implements Runnable {
 	}
 
 	// Moved from mixContext
-	public InputStream getHttpPOSTInputStream(final String urlStr,
-			final String params) throws Exception {
+	public InputStream getHttpPOSTInputStream(String urlStr,
+			String params) throws Exception {
 		InputStream is = null;
 		OutputStream os = null;
 		HttpURLConnection conn = null;
@@ -340,21 +343,21 @@ public class DownloadManager implements Runnable {
 			is = conn.getInputStream();
 
 			return is;
-		} catch (final Exception ex) {
+		} catch (Exception ex) {
 
 			try {
 				is.close();
-			} catch (final Exception ignore) {
+			} catch (Exception ignore) {			
 
 			}
 			try {
 				os.close();
-			} catch (final Exception ignore) {
+			} catch (Exception ignore) {			
 
 			}
 			try {
 				conn.disconnect();
-			} catch (final Exception ignore) {
+			} catch (Exception ignore) {
 			}
 
 			if (conn != null && conn.getResponseCode() == 405) {
@@ -468,31 +471,31 @@ public class DownloadManager implements Runnable {
 			while ((line = reader.readLine()) != null) {
 				sb.append(line + "\n");
 			}
-		} catch (final IOException e) {
+		} catch (IOException e) {
 			Log.d("OpenAlbum - Mixare", e.getMessage(), e);
 		} finally {
 			try {
 				is.close();
-			} catch (final IOException ex) {
+			} catch (IOException ex) {
 				Log.d("OpenAlbum - Mixare", ex.getMessage(), ex);
 			}
 		}
 		return sb.toString();
 	}
 
-	public void closeHttpInputStream(final InputStream is) throws Exception {
+	public void closeHttpInputStream(InputStream is) throws Exception {
 		if (is != null) {
 			is.close();
 		}
 	}
 
-	public InputStream getResourceInputStream(final String name)
+	public InputStream getResourceInputStream(String name)
 			throws Exception {
 		final AssetManager mgr = MixView.class.newInstance().getAssets();
 		return mgr.open(name);
 	}
 
-	public void closeResourceInputStream(final InputStream is) throws Exception {
+	public void closeResourceInputStream(InputStream is) throws Exception {
 		if (is != null) {
 			is.close();
 		}

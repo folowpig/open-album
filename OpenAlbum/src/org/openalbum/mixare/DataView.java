@@ -136,8 +136,9 @@ public class DataView {
 	public static final int SEARCH_ACTIVE_2 = R.string.search_active_2;
 
 	private boolean isLauncherStarted;
+	
+	private ArrayList<UIEvent> uiEvents = new ArrayList<UIEvent>();
 
-	private final ArrayList<UIEvent> uiEvents = new ArrayList<UIEvent>();
 
 	private final RadarPoints radarPoints = new RadarPoints();
 	private final ScreenLine lrl = new ScreenLine();
@@ -148,7 +149,7 @@ public class DataView {
 	/**
 	 * Constructor
 	 */
-	public DataView(final MixContext ctx) {
+	public DataView(MixContext ctx) {
 		this.mixContext = ctx;
 	}
 
@@ -166,7 +167,7 @@ public class DataView {
 			rrl.set(0, -RadarPoints.getRADIUS());
 			rrl.rotate(-Camera.DEFAULT_VIEW_ANGLE / 2);
 			rrl.add(rx + RadarPoints.getRADIUS(), ry + RadarPoints.getRADIUS());
-		} catch (final Exception ex) {
+		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
 		frozen = false;
@@ -184,12 +185,9 @@ public class DataView {
 
 	}
 
-	public void requestData(final DataSource datasource, final double lat,
-			final double lon, final double alt, final float radius,
-			final String locale) {
-		final DownloadRequest request = new DownloadRequest();
-		request.params = datasource.createRequestParams(lat, lon, alt, radius,
-				locale);
+	public void requestData(DataSource datasource, double lat, double lon, double alt, float radius, String locale) {
+		DownloadRequest request = new DownloadRequest();
+		request.params = datasource.createRequestParams(lat, lon, alt, radius, locale);
 		request.source = datasource;
 
 		mixContext.getDownloader().submitJob(request); // @FIXME logic and pano
@@ -197,8 +195,7 @@ public class DataView {
 		state.nextLStatus = MixState.PROCESSING;
 
 	}
-
-	public void draw(final PaintScreen dw) {
+	public void draw(PaintScreen dw) {
 		mixContext.getRM(cam.transform);
 		curFix = mixContext.getCurrentLocation();
 
@@ -318,27 +315,18 @@ public class DataView {
 	/**
 	 * Draw Radar
 	 */
-	public void drawRadar(final PaintScreen dw) {
-		String dirTxt = "";
-		final int bearing = (int) state.getCurBearing();
-		final int range = (int) (state.getCurBearing() / (360f / 16f));
-		if (range == 15 || range == 0) {
-			dirTxt = this.getContext().getString(R.string.N);
-		} else if (range == 1 || range == 2) {
-			dirTxt = this.getContext().getString(R.string.NE);
-		} else if (range == 3 || range == 4) {
-			dirTxt = this.getContext().getString(R.string.E);
-		} else if (range == 5 || range == 6) {
-			dirTxt = this.getContext().getString(R.string.SE);
-		} else if (range == 7 || range == 8) {
-			dirTxt = this.getContext().getString(R.string.S);
-		} else if (range == 9 || range == 10) {
-			dirTxt = this.getContext().getString(R.string.SW);
-		} else if (range == 11 || range == 12) {
-			dirTxt = this.getContext().getString(R.string.W);
-		} else if (range == 13 || range == 14) {
-			dirTxt = this.getContext().getString(R.string.NW);
-		}
+	public void drawRadar(PaintScreen dw) {
+		String	dirTxt = ""; 
+		int bearing = (int) state.getCurBearing(); 
+		int range = (int) (state.getCurBearing() / (360f / 16f)); 
+		if (range == 15 || range == 0) dirTxt = this.getContext().getString(R.string.N); 
+		else if (range == 1 || range == 2) dirTxt = this.getContext().getString(R.string.NE); 
+		else if (range == 3 || range == 4) dirTxt = this.getContext().getString(R.string.E); 
+		else if (range == 5 || range == 6) dirTxt = this.getContext().getString(R.string.SE);
+		else if (range == 7 || range == 8) dirTxt= this.getContext().getString(R.string.S); 
+		else if (range == 9 || range == 10) dirTxt = this.getContext().getString(R.string.SW); 
+		else if (range == 11 || range == 12) dirTxt = this.getContext().getString(R.string.W); 
+		else if (range == 13 || range == 14) dirTxt = this.getContext().getString(R.string.NW);
 
 		if (radarPoints.view != null) {
 			radarPoints.view = null;
@@ -361,7 +349,7 @@ public class DataView {
 				+ RadarPoints.getRADIUS(), ry - 5, true);
 	}
 
-	private void handleKeyEvent(final KeyEvent evt) {
+	private void handleKeyEvent(KeyEvent evt) {
 		/** Adjust marker position with keypad */
 		final float CONST = 10f;
 		switch (evt.keyCode) {
@@ -385,8 +373,8 @@ public class DataView {
 			break; // freeze the overlay with the camera button
 		}
 	}
-
-	boolean handleClickEvent(final ClickEvent evt) {
+	
+	boolean handleClickEvent(ClickEvent evt) {
 		boolean evtHandled = false;
 
 		// Handle event
@@ -408,7 +396,7 @@ public class DataView {
 		mixContext.setLocationAtLastDownload(curFix);
 	}
 
-	private void radarText(final PaintScreen dw, final String txt,
+	private void radarText(PaintScreen dw, final String txt,
 			final float x, final float y, final boolean bg) {
 		final float padw = 4, padh = 2;
 		final float w = dw.getTextWidth(txt) + padw * 2;
@@ -495,7 +483,7 @@ class UIEvent {
 class ClickEvent extends UIEvent {
 	public float x, y;
 
-	public ClickEvent(final float x, final float y) {
+	public ClickEvent(float x, float y) {
 		this.type = CLICK;
 		this.x = x;
 		this.y = y;
@@ -510,7 +498,7 @@ class ClickEvent extends UIEvent {
 class KeyEvent extends UIEvent {
 	public int keyCode;
 
-	public KeyEvent(final int keyCode) {
+	public KeyEvent(int keyCode) {
 		this.type = KEY;
 		this.keyCode = keyCode;
 	}

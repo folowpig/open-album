@@ -148,7 +148,7 @@ public class MixView extends Activity implements SensorEventListener,
 
 		try {
 			getAugScreen().invalidate();
-		} catch (final Exception ignore) {
+		} catch (Exception ignore) {
 			Log.d(TAG, ignore.getMessage(), ignore.fillInStackTrace());// @debug
 		}
 	}
@@ -181,13 +181,12 @@ public class MixView extends Activity implements SensorEventListener,
 		/* Retry */
 		builder.setPositiveButton(DataView.CONNECTION_ERROR_DIALOG_BUTTON1,
 				new DialogInterface.OnClickListener() {
-					public void onClick(final DialogInterface dialog,
-							final int id) {
-						data.setfError(false); // ?
+					public void onClick(DialogInterface dialog, int id) {
+						data.setfError(false); //?
 						// TODO improve
 						try {
 							repaint();
-						} catch (final Exception ex) {
+						} catch (Exception ex) {
 							// Don't call doError, it will be a recursive call.
 							// doError(ex);
 							Log.d(TAG, ex.getMessage(), ex.fillInStackTrace());
@@ -197,9 +196,8 @@ public class MixView extends Activity implements SensorEventListener,
 		/* Open settings */
 		builder.setNeutralButton(DataView.CONNECTION_ERROR_DIALOG_BUTTON2,
 				new DialogInterface.OnClickListener() {
-					public void onClick(final DialogInterface dialog,
-							final int id) {
-						final Intent intent1 = new Intent(
+					public void onClick(DialogInterface dialog, int id) {
+						Intent intent1 = new Intent(
 								Settings.ACTION_WIRELESS_SETTINGS);
 						startActivityForResult(intent1, 42);
 					}
@@ -207,19 +205,18 @@ public class MixView extends Activity implements SensorEventListener,
 		/* Close application */
 		builder.setNegativeButton(DataView.CONNECTION_ERROR_DIALOG_BUTTON3,
 				new DialogInterface.OnClickListener() {
-					public void onClick(final DialogInterface dialog,
-							final int id) {
+					public void onClick(DialogInterface dialog, int id) {
 						// System.exit(0);
 						finish();
 
 					}
 				});
-		final AlertDialog alert = builder.create();
+		AlertDialog alert = builder.create();
 		alert.show();
 	}
 
 	@Override
-	public void onCreate(final Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		try {
@@ -321,20 +318,20 @@ public class MixView extends Activity implements SensorEventListener,
 
 			}// end if first access
 
-		} catch (final Exception ex) {
+		} catch (Exception ex) {
 			doError(ex);
 		}
 	}
 
-	private void handleIntent(final Intent intent) {
+	private void handleIntent(Intent intent) {
 		if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-			final String query = intent.getStringExtra(SearchManager.QUERY);
+			String query = intent.getStringExtra(SearchManager.QUERY);
 			doMixSearch(query);
 		}
 	}
 
 	@Override
-	protected void onNewIntent(final Intent intent) {
+	protected void onNewIntent(Intent intent) {
 		setIntent(intent);
 		handleIntent(intent);
 	}
@@ -381,14 +378,14 @@ public class MixView extends Activity implements SensorEventListener,
 
 				getMixContext().unregisterLocationManager();
 				getMixContext().data.getDownloadManager().stop();
-			} catch (final Exception ignore) {
+			} catch (Exception ignore) {
 				Log.w(TAG, ignore.getMessage());
 			}
 
 			if (data.isfError()) {
 				finish();
 			}
-		} catch (final Exception ex) {
+		} catch (Exception ex) {
 			doError(ex);
 		} finally {
 			super.onPause();
@@ -486,13 +483,13 @@ public class MixView extends Activity implements SensorEventListener,
 								(float) -Math.sin(angleY), 0f,
 								(float) Math.cos(angleY));
 				getMixContext().data.setDeclination(-gmf.getDeclination());
-			} catch (final Exception ex) {
+			} catch (Exception ex) {
 				Log.d("Open Album", "GPS Initialize Error", ex);
 			}
 			data.setDownloadThread(new Thread(getMixContext().data
 					.getDownloadManager()));
 			data.getDownloadThread().start();
-		} catch (final Exception ex) {
+		} catch (Exception ex) {
 			doError(ex);
 			try {
 				if (data.getSensorMgr() != null) {
@@ -509,7 +506,7 @@ public class MixView extends Activity implements SensorEventListener,
 						getMixContext().data.getDownloadManager().stop();
 					}
 				}
-			} catch (final Exception ignore) {
+			} catch (Exception ignore) {
 				Log.e(TAG, ignore.getMessage());
 			}
 		}
@@ -548,8 +545,8 @@ public class MixView extends Activity implements SensorEventListener,
 		// @todo move destroy to onDestroy (user can relaunch app after it
 		// stops)
 		// downloadThread.destroy();
-		data.getMixContext().onStopContext();
 		data.getMixContext().stopService(getIntent());
+		data.getMixContext().onStopContext();
 		super.onStop();
 	}
 
@@ -609,8 +606,7 @@ public class MixView extends Activity implements SensorEventListener,
 		case 1:
 			if (!getDataView().isLauncherStarted()) {
 				MixListView.setList(1);
-				final Intent intent = new Intent(MixView.this,
-						DataSourceList.class);
+				Intent intent = new Intent(MixView.this, DataSourceList.class);
 				startActivityForResult(intent, 40);
 			} else {
 				Toast.makeText(this,
@@ -627,8 +623,7 @@ public class MixView extends Activity implements SensorEventListener,
 			 * empty
 			 */
 			if (getDataView().getDataHandler().getMarkerCount() > 0) {
-				final Intent intent1 = new Intent(MixView.this,
-						MixListView.class);
+				Intent intent1 = new Intent(MixView.this, MixListView.class);
 				startActivityForResult(intent1, 42);
 			}
 			/* if the list is empty */
@@ -639,7 +634,7 @@ public class MixView extends Activity implements SensorEventListener,
 			break;
 		/* Map View */
 		case 3:
-			final Intent intent2 = new Intent(MixView.this, MixMap.class);
+			Intent intent2 = new Intent(MixView.this, MixMap.class);
 			startActivityForResult(intent2, 20);
 			break;
 		/* zoom level */
@@ -670,8 +665,7 @@ public class MixView extends Activity implements SensorEventListener,
 					+ new Date(currentGPSInfo.getTime()).toString() + "\n");
 			builder.setNegativeButton(getString(DataView.CLOSE_BUTTON),
 					new DialogInterface.OnClickListener() {
-						public void onClick(final DialogInterface dialog,
-								final int id) {
+						public void onClick(DialogInterface dialog, int id) {
 							dialog.dismiss();
 						}
 					});
@@ -686,12 +680,11 @@ public class MixView extends Activity implements SensorEventListener,
 			/* Retry */
 			builder1.setNegativeButton(getString(DataView.CLOSE_BUTTON),
 					new DialogInterface.OnClickListener() {
-						public void onClick(final DialogInterface dialog,
-								final int id) {
+						public void onClick(DialogInterface dialog, int id) {
 							dialog.dismiss();
 						}
 					});
-			final AlertDialog alert1 = builder1.create();
+			AlertDialog alert1 = builder1.create();
 			alert1.setTitle(getString(DataView.LICENSE_TITLE));
 			alert1.show();
 			break;
@@ -722,7 +715,8 @@ public class MixView extends Activity implements SensorEventListener,
 		return myout;
 	}
 
-	public void onSensorChanged(final SensorEvent evt) {
+
+	public void onSensorChanged(SensorEvent evt) {
 		try {
 
 			if (evt.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
@@ -781,13 +775,13 @@ public class MixView extends Activity implements SensorEventListener,
 			synchronized (getMixContext().data.getRotationM()) {
 				getMixContext().data.getRotationM().set(data.getSmoothR());
 			}
-		} catch (final Exception ex) {
+		} catch (Exception ex) {
 			Log.d(TAG, ex.getMessage(), ex);
 		}
 	}
 
 	@Override
-	public boolean onTouchEvent(final MotionEvent me) {
+	public boolean onTouchEvent(MotionEvent me) {
 		try {
 			killOnError();
 
@@ -796,7 +790,7 @@ public class MixView extends Activity implements SensorEventListener,
 			if (me.getAction() == MotionEvent.ACTION_UP) {
 				getDataView().clickEvent(xPress, yPress);
 			}
-		} catch (final Exception ex) {
+		} catch (Exception ex) {
 			// doError(ex);
 			ex.printStackTrace();
 			return super.onTouchEvent(me);
@@ -805,7 +799,7 @@ public class MixView extends Activity implements SensorEventListener,
 	}
 
 	@Override
-	public boolean onKeyDown(final int keyCode, final KeyEvent event) {
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		try {
 			killOnError();
 
@@ -824,13 +818,13 @@ public class MixView extends Activity implements SensorEventListener,
 				return false;
 			}
 
-		} catch (final Exception ex) {
+		} catch (Exception ex) {
 			ex.printStackTrace();
 			return super.onKeyDown(keyCode, event);
 		}
 	}
 
-	public void onAccuracyChanged(final Sensor sensor, final int accuracy) {
+	public void onAccuracyChanged(Sensor sensor, int accuracy) {
 		if (sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD
 				&& accuracy == SensorManager.SENSOR_STATUS_UNRELIABLE
 				&& data.getCompassErrorDisplayed() == 0) {
@@ -843,7 +837,7 @@ public class MixView extends Activity implements SensorEventListener,
 		}
 	}
 
-	public boolean onTouch(final View v, final MotionEvent event) {
+	public boolean onTouch(View v, MotionEvent event) {
 		getDataView().setFrozen(false);
 		if (data.getSearchNotificationTxt() != null) {
 			data.getSearchNotificationTxt().setVisibility(View.GONE);
@@ -908,7 +902,7 @@ public class MixView extends Activity implements SensorEventListener,
 	 * @param camScreen
 	 *            the camScreen to set
 	 */
-	private void setCamScreen(final CameraSurface camScreen) {
+	private void setCamScreen(CameraSurface camScreen) {
 		this.data.setCamScreen(camScreen);
 	}
 
@@ -923,7 +917,7 @@ public class MixView extends Activity implements SensorEventListener,
 	 * @param augScreen
 	 *            the augScreen to set
 	 */
-	private void setAugScreen(final AugmentedView augScreen) {
+	private void setAugScreen(AugmentedView augScreen) {
 		this.data.setAugScreen(augScreen);
 	}
 
@@ -938,7 +932,7 @@ public class MixView extends Activity implements SensorEventListener,
 	 * @param mixContext
 	 *            the mixContext to set
 	 */
-	private void setMixContext(final MixContext mixContext) {
+	private void setMixContext(MixContext mixContext) {
 		this.data.setMixContext(mixContext);
 	}
 
@@ -950,10 +944,9 @@ public class MixView extends Activity implements SensorEventListener,
 	}
 
 	/**
-	 * @param dWindow
-	 *            the dWindow to set
+	 * @param dWindow the dWindow to set
 	 */
-	public static void setdWindow(final PaintScreen dWindow) {
+	public static void setdWindow(PaintScreen dWindow) {
 		MixView.dWindow = dWindow;
 	}
 
@@ -965,10 +958,9 @@ public class MixView extends Activity implements SensorEventListener,
 	}
 
 	/**
-	 * @param dataView
-	 *            the dataView to set
+	 * @param dataView the dataView to set
 	 */
-	public static void setDataView(final DataView dataView) {
+	public static void setDataView(DataView dataView) {
 		MixView.dataView = dataView;
 	}
 
