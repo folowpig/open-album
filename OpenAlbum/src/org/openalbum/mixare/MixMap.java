@@ -24,12 +24,14 @@ import java.util.List;
 
 import org.openalbum.mixare.data.DataHandler;
 import org.openalbum.mixare.data.DataSourceList;
+import org.openalbum.mixare.marker.ImageMarker;
 import org.openalbum.mixare.marker.Marker;
 
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
@@ -139,6 +141,9 @@ public class MixMap extends MapActivity implements OnTouchListener {
 						(int) (marker.getLatitude() * 1E6),
 						(int) (marker.getLongitude() * 1E6));
 				item = new OverlayItem(point, "", "");
+//				if (marker.equals(ImageMarker.class)){
+//					this.drawable = new BitmapDrawable(((ImageMarker) marker).getImage());
+//				}
 				mixOverlay.addOverlay(item);
 			}
 		}
