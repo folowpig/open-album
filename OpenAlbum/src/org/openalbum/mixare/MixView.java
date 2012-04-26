@@ -235,24 +235,12 @@ public class MixView extends Activity implements SensorEventListener,
 			 */
 			final SharedPreferences settings = getSharedPreferences(PREFS_NAME,
 					0);
-			final SharedPreferences.Editor editor = settings.edit();
+			/* check if the application is launched for the first time */
+			if (settings.getBoolean("firstAccess", false) == false) {
+				firstAccess(settings);
+			}
 
-			final SharedPreferences DataSourceSettings = getSharedPreferences(
-					DataSourceList.SHARED_PREFS, 0);
-
-			data.setMyZoomBar(new SeekBar(this));
-			// myZoomBar.setVisibility(View.INVISIBLE);
-			data.getMyZoomBar().setMax(100);
-			data.getMyZoomBar().setProgress(settings.getInt("zoomLevel", 65));
-			data.getMyZoomBar().setOnSeekBarChangeListener(
-					getMyZoomBarOnSeekBarChangeListener());
-			data.getMyZoomBar().setVisibility(View.INVISIBLE);
-
-			final FrameLayout frameLayout = new FrameLayout(this);
-
-			frameLayout.setMinimumWidth(3000);
-			frameLayout.addView(data.getMyZoomBar());
-			frameLayout.setPadding(10, 0, 10, 10);
+			final FrameLayout frameLayout = createZoomBar(settings);
 
 			setCamScreen(new CameraSurface(this));
 			setAugScreen(new AugmentedView(this));
@@ -277,50 +265,80 @@ public class MixView extends Activity implements SensorEventListener,
 				isInited = true;
 			}
 
-			/* check if the application is launched for the first time */
-			if (settings.getBoolean("firstAccess", false) == false) {
-				final AlertDialog.Builder builder1 = new AlertDialog.Builder(
-						this);
-				builder1.setMessage(getString(DataView.LICENSE_TEXT));
-				builder1.setNegativeButton(getString(DataView.CLOSE_BUTTON),
-						new DialogInterface.OnClickListener() {
-							public void onClick(final DialogInterface dialog,
-									final int id) {
-								dialog.dismiss();
-							}
-						});
-				final AlertDialog alert1 = builder1.create();
-				alert1.setTitle(getString(DataView.LICENSE_TITLE));
-				alert1.show();
-				editor.putBoolean("firstAccess", true);
-
-				// value for maximum POI for each selected OSM URL to be active
-				// by default is 5
-				editor.putInt("osmMaxObject", 5);
-				editor.commit();
-
-				final SharedPreferences.Editor dataSourceEditor = DataSourceSettings
-						.edit();
-				dataSourceEditor
-						.putString("DataSource0",
-								"Wikipedia|http://api.geonames.org/findNearbyWikipediaJSON|0|0|true");
-				dataSourceEditor
-						.putString("DataSource1",
-								"Twitter|http://search.twitter.com/search.json|2|0|false");
-				dataSourceEditor
-						.putString(
-								"DataSource2",
-								"OpenStreetmap|http://open.mapquestapi.com/xapi/api/0.6/node[railway=station]|3|1|false");
-				dataSourceEditor
-						.putString("DataSource3",
-								"Panoramio|http://www.panoramio.com/map/get_panoramas.php|4|0|true");
-				dataSourceEditor.commit();
-
-			}// end if first access
-
 		} catch (Exception ex) {
 			doError(ex);
 		}
+	}
+
+	/**
+	 * Creates zoom Seek bar on FrameLayout.
+	 * Seek bar is set to invisble by default.
+	 * @param SharedPreferences settings
+	 * @return FrameLayout
+	 */
+	private FrameLayout createZoomBar(final SharedPreferences settings) {
+		data.setMyZoomBar(new SeekBar(this));
+		// myZoomBar.setVisibility(View.INVISIBLE);
+		data.getMyZoomBar().setMax(100);
+		data.getMyZoomBar().setProgress(settings.getInt("zoomLevel", 65));
+		data.getMyZoomBar().setOnSeekBarChangeListener(
+				getMyZoomBarOnSeekBarChangeListener());
+		data.getMyZoomBar().setVisibility(View.INVISIBLE);
+
+		final FrameLayout frameLayout = new FrameLayout(this);
+
+		frameLayout.setMinimumWidth(3000);
+		frameLayout.addView(data.getMyZoomBar());
+		frameLayout.setPadding(10, 0, 10, 10);
+		return frameLayout;
+	}
+
+	/**
+	 * First Access users. display the license agreement.
+	 * @param SharedPreferences settings
+	 */
+	private void firstAccess(final SharedPreferences settings) {
+		final SharedPreferences.Editor editor = settings.edit();
+		final SharedPreferences DataSourceSettings = getSharedPreferences(
+				DataSourceList.SHARED_PREFS, 0);
+		final AlertDialog.Builder builder1 = new AlertDialog.Builder(
+				this);
+		
+		builder1.setMessage(getString(DataView.LICENSE_TEXT));
+		builder1.setNegativeButton(getString(DataView.CLOSE_BUTTON),
+				new DialogInterface.OnClickListener() {
+					public void onClick(final DialogInterface dialog,
+							final int id) {
+						dialog.dismiss();
+					}
+				});
+		final AlertDialog alert1 = builder1.create();
+		alert1.setTitle(getString(DataView.LICENSE_TITLE));
+		alert1.show();
+		editor.putBoolean("firstAccess", true);
+
+		// value for maximum POI for each selected OSM URL to be active
+		// by default is 5
+		editor.putInt("osmMaxObject", 5);
+		editor.commit();
+
+		//setting the default values
+		final SharedPreferences.Editor dataSourceEditor = DataSourceSettings
+				.edit();
+		dataSourceEditor
+				.putString("DataSource0",
+						"Wikipedia|http://api.geonames.org/findNearbyWikipediaJSON|0|0|true");
+		dataSourceEditor
+				.putString("DataSource1",
+						"Twitter|http://search.twitter.com/search.json|2|0|false");
+		dataSourceEditor
+				.putString(
+						"DataSource2",
+						"OpenStreetmap|http://open.mapquestapi.com/xapi/api/0.6/node[railway=station]|3|1|false");
+		dataSourceEditor
+				.putString("DataSource3",
+						"Panoramio|http://www.panoramio.com/map/get_panoramas.php|4|0|true");
+		dataSourceEditor.commit();
 	}
 
 	private void handleIntent(Intent intent) {
