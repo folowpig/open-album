@@ -196,7 +196,7 @@ public class DataView {
 
 	}
 	public void draw(PaintScreen dw) {
-		mixContext.getRM(cam.transform);
+		mixContext.setRM(cam.transform);
 		curFix = mixContext.getCurrentLocation();
 
 		state.calcPitchBearing(cam.transform);

@@ -67,42 +67,11 @@ public class MixContext extends ContextWrapper {
 
 	// TAG for logging
 	public static final String TAG = "Open Album";
-
-	// @TODO reorganize + centralize datasource input
-	public void refreshDataSources() {
-		this.data.getAllDataSources().clear();
-		final SharedPreferences settings = getSharedPreferences(
-				DataSourceList.SHARED_PREFS, 0);
-		int size = settings.getAll().size();
-		if (size == 0) {
-			final SharedPreferences.Editor dataSourceEditor = settings.edit();
-			dataSourceEditor
-					.putString("DataSource0",
-							"Wikipedia|http://api.geonames.org/findNearbyWikipediaJSON|0|0|false");
-			dataSourceEditor.putString("DataSource1",
-					"Twitter|http://search.twitter.com/search.json|2|0|false");
-			dataSourceEditor
-					.putString(
-							"DataSource2",
-							"OpenStreetmap|http://open.mapquestapi.com/xapi/api/0.6/node[railway=station]|3|1|false");
-			dataSourceEditor
-					.putString("DataSource3",
-							"Panoramio|http://www.panoramio.com/map/get_panoramas.php|4|2|true");
-			dataSourceEditor.commit();
-			size = settings.getAll().size();
-		}
-		// copy the value from shared preference to adapter
-		for (int i = 0; i < size; i++) {
-			final String fields[] = settings.getString("DataSource" + i, "")
-					.split("\\|", -1);
-			this.data.getAllDataSources().add(
-					new DataSource(fields[0], fields[1], fields[2], fields[3],
-							fields[4]));
-		}
-	}
-
+	
+	public MixContextData data = new MixContextData(true, new Matrix(), 0f,
+			new ArrayList<DataSource>());
+	
 	public MixContext(final Context appCtx) {
-
 		super(appCtx);
 		this.data.setMixView((MixView) appCtx);
 		this.data.setCtx(appCtx.getApplicationContext());
@@ -113,8 +82,7 @@ public class MixContext extends ContextWrapper {
 
 		for (final DataSource ds : this.data.getAllDataSources()) {
 			if (ds.getEnabled()) {
-				atLeastOneDatasourceSelected = true; // ? Why do we need that,
-														// why here
+				atLeastOneDatasourceSelected = true;
 				break;
 			}
 		}
@@ -127,16 +95,21 @@ public class MixContext extends ContextWrapper {
 
 		data.setLm((LocationManager) getSystemService(Context.LOCATION_SERVICE));
 
+		searchForGPSProvider();
+
+		setLocationAtLastDownload(data.getCurLoc());
+
+	}
+	
+	/**
+	 * Internal function that search's for the best GPS provider.
+	 * 1- looks for more precise (fine)
+	 * 2- looks for approimation first (Coarse)
+	 * 3- Hard code location (reverse geo)
+	 * 
+	 */
+	private void searchForGPSProvider() {
 		final Criteria c = new Criteria();
-		// try to use the coarse provider first to get a rough position
-		c.setAccuracy(Criteria.ACCURACY_COARSE);
-		final String coarseProvider = data.getLm().getBestProvider(c, true);
-		try {
-			data.getLm().requestLocationUpdates(coarseProvider, 0, 0,
-					data.getLcoarse());
-		} catch (final Exception e) {
-			Log.d(TAG, "Could not initialize the coarse provider");
-		}
 
 		// need to be precise
 		c.setAccuracy(Criteria.ACCURACY_FINE);
@@ -151,6 +124,17 @@ public class MixContext extends ContextWrapper {
 					data.getLbounce());
 		} catch (final Exception e) {
 			Log.d(TAG, "Could not initialize the bounce provider");
+		}
+		
+		// try to use the coarse provider first to get a rough position
+		// Sidenote: rough estimate approach is not being used.
+		c.setAccuracy(Criteria.ACCURACY_COARSE);
+		final String coarseProvider = data.getLm().getBestProvider(c, true);
+		try {
+			data.getLm().requestLocationUpdates(coarseProvider, 0, 0,
+					data.getLcoarse());
+		} catch (final Exception e) {
+			Log.d(TAG, "Could not initialize the coarse provider");
 		}
 
 		// fallback for the case where GPS and network providers are disabled
@@ -205,12 +189,31 @@ public class MixContext extends ContextWrapper {
 					getString(DataView.CONNECTION_GPS_DIALOG_TEXT),
 					Toast.LENGTH_LONG).show();
 		}
-
-		setLocationAtLastDownload(data.getCurLoc());
-
-		// @TODO fix logic
-
 	}
+	// @TODO reorganize + centralize datasource input
+	public void refreshDataSources() {
+		this.data.getAllDataSources().clear();
+		 SharedPreferences settings = getSharedPreferences(
+				DataSourceList.SHARED_PREFS, 0);
+		int size = settings.getAll().size();
+		if (size == 0) {
+			//@TODO make all access to setting through this class only
+			data.getMixView().storeDefaultSources();
+			settings = getSharedPreferences(
+					DataSourceList.SHARED_PREFS, 0);
+			size = settings.getAll().size();
+		}
+		// copy the value from shared preference to adapter
+		for (int i = 0; i < size; i++) {
+			final String fields[] = settings.getString("DataSource" + i, "")
+					.split("\\|", -1);
+			this.data.getAllDataSources().add(
+					new DataSource(fields[0], fields[1], fields[2], fields[3],
+							fields[4]));
+		}
+	}
+
+
 
 	/***** Getters and Setters ********/
 	public ArrayList<DataSource> getAllDataSources() {
@@ -255,9 +258,14 @@ public class MixContext extends ContextWrapper {
 	public void onDestroyContext() {
 		data.getDownloadManager().stop();
 		data.setDownloadManager(null);
+		unregisterLocationManager();
 	}
 
-	public void getRM(final Matrix dest) {
+	/**
+	 * sets rotation manager of dest
+	 * @param dest
+	 */
+	public void setRM(final Matrix dest) {
 		synchronized (data.getRotationM()) {
 			dest.set(data.getRotationM());
 		}
@@ -298,8 +306,9 @@ public class MixContext extends ContextWrapper {
 				LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT,
 				Gravity.BOTTOM));
 
+		d.setCancelable(true);
+		d.setCanceledOnTouchOutside(true);
 		d.show();
-
 		webview.loadUrl(url);
 	}
 
@@ -332,6 +341,8 @@ public class MixContext extends ContextWrapper {
 				LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT,
 				Gravity.BOTTOM));
 
+		d.setCancelable(true);
+		d.setCanceledOnTouchOutside(true);
 		d.show();
 
 		webview.loadUrl(url);
@@ -345,6 +356,5 @@ public class MixContext extends ContextWrapper {
 		this.data.setLocationAtLastDownload(locationAtLastDownload);
 	}
 
-	public MixContextData data = new MixContextData(true, new Matrix(), 0f,
-			new ArrayList<DataSource>());
+
 }

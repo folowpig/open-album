@@ -299,8 +299,7 @@ public class MixView extends Activity implements SensorEventListener,
 	 */
 	private void firstAccess(final SharedPreferences settings) {
 		final SharedPreferences.Editor editor = settings.edit();
-		final SharedPreferences DataSourceSettings = getSharedPreferences(
-				DataSourceList.SHARED_PREFS, 0);
+		
 		final AlertDialog.Builder builder1 = new AlertDialog.Builder(
 				this);
 		
@@ -322,6 +321,15 @@ public class MixView extends Activity implements SensorEventListener,
 		editor.putInt("osmMaxObject", 5);
 		editor.commit();
 
+		storeDefaultSources();
+	}
+
+	/**
+	 * Stores default Data Source into "Shared_Prefs"
+	 */
+	public void storeDefaultSources() {
+		final SharedPreferences DataSourceSettings = getSharedPreferences(
+				DataSourceList.SHARED_PREFS, 0);
 		//setting the default values
 		final SharedPreferences.Editor dataSourceEditor = DataSourceSettings
 				.edit();
