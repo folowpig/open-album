@@ -51,8 +51,13 @@ public class MixVector {
 
 	@Override
 	public boolean equals(final Object obj) {
+		if (obj != null){
 		final MixVector v = (MixVector) obj;
 		return (v.x == x && v.y == y && v.z == z);
+		}else {
+			return false;
+		}
+		
 	}
 
 	public boolean equals(final float x, final float y, final float z) {

@@ -178,8 +178,8 @@ public class ImageMarker extends Marker {
 			dw.setStrokeWidth(dw.getHeight() / 100f);
 			dw.setFill(false);
 			dw.setColor(rectangleBackgroundColor);
-			dw.paintBitmap(getImage(), signMarker.x - (getImage().getWidth() / 2),
-					signMarker.y - (getImage().getHeight() / 2));
+			dw.paintBitmap(getImage(), (float) (signMarker.x - (getImage().getWidth() / 2f)),
+					(float) (signMarker.y - (getImage().getHeight() / 2f)));
 
 		}
 	}

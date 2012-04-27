@@ -190,7 +190,7 @@ public class MixContext extends ContextWrapper {
 					Toast.LENGTH_LONG).show();
 		}
 	}
-	// @TODO reorganize + centralize datasource input
+
 	public void refreshDataSources() {
 		this.data.getAllDataSources().clear();
 		 SharedPreferences settings = getSharedPreferences(
@@ -280,7 +280,7 @@ public class MixContext extends ContextWrapper {
 	public void loadMixViewWebPage(final String url) throws Exception {
 		final WebView webview = new WebView(data.getMixView());
 		webview.getSettings().setJavaScriptEnabled(true);
-
+		webview.getSettings().setAppCacheEnabled(true);
 		webview.setWebViewClient(new WebViewClient() {
 			@Override
 			public boolean shouldOverrideUrlLoading(final WebView view,
@@ -296,6 +296,7 @@ public class MixContext extends ContextWrapper {
 			public boolean onKeyDown(final int keyCode, final KeyEvent event) {
 				if (keyCode == KeyEvent.KEYCODE_BACK) {
 					this.dismiss();
+					webview.destroy();
 				}
 				return true;
 			}
@@ -315,7 +316,7 @@ public class MixContext extends ContextWrapper {
 	public void loadWebPage(final String url, final Context context)
 			throws Exception {
 		final WebView webview = new WebView(context);
-
+		webview.getSettings().setAppCacheEnabled(true);
 		webview.setWebViewClient(new WebViewClient() {
 			@Override
 			public boolean shouldOverrideUrlLoading(final WebView view,
@@ -331,6 +332,7 @@ public class MixContext extends ContextWrapper {
 			public boolean onKeyDown(final int keyCode, final KeyEvent event) {
 				if (keyCode == KeyEvent.KEYCODE_BACK) {
 					this.dismiss();
+					webview.destroy();
 				}
 				return true;
 			}

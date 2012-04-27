@@ -270,8 +270,8 @@ public abstract class Marker implements Comparable<Marker> {
 	}
 
 	@Override
-	public boolean equals(final Object marker) {
-		return this.ID.equals(((Marker) marker).getID());
+	public boolean equals(final Object marker) {//@FIXME Marker casting Dangours
+		return (marker != null)? this.ID.equals(((Marker) marker).getID()) : false;
 	}
 
 	// ?!!

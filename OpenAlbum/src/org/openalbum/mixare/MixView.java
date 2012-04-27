@@ -134,30 +134,9 @@ public class MixView extends Activity implements SensorEventListener,
 	};
 
 	/* Data holder class */
-	private MixViewData data = new MixViewData(new float[9], new float[9],
-			new float[9], new float[3], new float[3], 0, new Matrix(),
-			new Matrix(), new Matrix(), new Matrix[60], new Matrix(),
-			new Matrix(), new Matrix(), new Matrix(), 0);
+	private MixViewData data = new MixViewData();
 
-	public void doError(final Exception ex1) {
-		if (!data.isfError()) {
-			data.setfError(true); // ?
-			setErrorDialog();
-			Log.d(TAG, ex1.getMessage(), ex1.fillInStackTrace());// @debug
-		}
 
-		try {
-			getAugScreen().invalidate();
-		} catch (Exception ignore) {
-			Log.d(TAG, ignore.getMessage(), ignore.fillInStackTrace());// @debug
-		}
-	}
-
-	public void killOnError() throws Exception {
-		if (data.isfError()) {
-			throw new Exception();
-		}
-	}
 
 	/**
 	 * Clears "Events" and repaint screen. *Data are not cleared, caller wishes
@@ -254,15 +233,16 @@ public class MixView extends Activity implements SensorEventListener,
 					Gravity.BOTTOM));
 
 			if (!isInited) {
-				setMixContext(new MixContext(this)); // ?
+				setMixContext(new MixContext(this)); 
 				getMixContext().data.setDownloadManager(new DownloadManager(
-						getMixContext()));// ?
+						getMixContext()));
 				setdWindow(new PaintScreen());
 				setDataView(new DataView(getMixContext()));
 
 				/* set the radius in data view to the last selected by the user */
 				setZoomLevel();
 				isInited = true;
+				refreshDownload();
 			}
 
 		} catch (Exception ex) {
@@ -714,6 +694,9 @@ public class MixView extends Activity implements SensorEventListener,
 			alert1.setTitle(getString(DataView.LICENSE_TITLE));
 			alert1.show();
 			break;
+			default:
+				//do nothing
+				break;
 
 		}
 		return true;
@@ -740,7 +723,27 @@ public class MixView extends Activity implements SensorEventListener,
 
 		return myout;
 	}
+	
+	/* ********* Handlers *************/
+	public void doError(final Exception ex1) {
+		if (!data.isfError()) {
+			data.setfError(true); // ?
+			setErrorDialog();
+			Log.d(TAG, ex1.getMessage(), ex1.fillInStackTrace());// @debug
+		}
 
+		try {
+			getAugScreen().invalidate();
+		} catch (Exception ignore) {
+			Log.d(TAG, ignore.getMessage(), ignore.fillInStackTrace());// @debug
+		}
+	}
+
+	public void killOnError() throws Exception {
+		if (data.isfError()) {
+			throw new Exception();
+		}
+	}
 
 	public void onSensorChanged(SensorEvent evt) {
 		try {
@@ -887,6 +890,12 @@ public class MixView extends Activity implements SensorEventListener,
 		data.getMyZoomBar().setVisibility(View.INVISIBLE);
 		data.setZoomLevel(String.valueOf(myout));
 
+	}
+
+	/**
+	 * 
+	 */
+	public void refreshDownload() {
 		getDataView().doStart();
 		getDataView().clearEvents();
 		if (data.getDownloadThread() != null){
@@ -906,8 +915,7 @@ public class MixView extends Activity implements SensorEventListener,
 		// zoom
 		// level?
 		data.getDownloadThread().start();
-
-	};
+	}
 
 	public int getZoomProgress() {
 		return data.getZoomProgress();

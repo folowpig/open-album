@@ -50,13 +50,13 @@ public class Camera {
 
 	public void setViewAngle(final float viewAngle) {
 		this.viewAngle = viewAngle;
-		this.dist = (this.width / 2) / (float) Math.tan(viewAngle / 2);
+		this.dist = (this.width / 2f) / (float) Math.tan(viewAngle / 2f);
 	}
 
 	public void setViewAngle(final int width, final int height,
 			final float viewAngle) {
 		this.viewAngle = viewAngle;
-		this.dist = (width / 2) / (float) Math.tan(viewAngle / 2);
+		this.dist = (width / 2f) / (float) Math.tan(viewAngle / 2f);
 	}
 
 	public void projectPoint(final MixVector orgPoint,
@@ -64,8 +64,8 @@ public class Camera {
 		prjPoint.x = dist * orgPoint.x / -orgPoint.z;
 		prjPoint.y = dist * orgPoint.y / -orgPoint.z;
 		prjPoint.z = orgPoint.z;
-		prjPoint.x = prjPoint.x + addX + width / 2;
-		prjPoint.y = -prjPoint.y + addY + height / 2;
+		prjPoint.x = prjPoint.x + addX + (float) width / 2f;
+		prjPoint.y = -prjPoint.y + addY + (float) height / 2f;
 	}
 
 	@Override

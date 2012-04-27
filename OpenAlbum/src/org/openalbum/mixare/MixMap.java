@@ -130,7 +130,7 @@ public class MixMap extends MapActivity implements OnTouchListener {
 	}
 
 	public void createOverlay() {
-		mapOverlays = mapView.getOverlays();
+		mapOverlays = mapView.getOverlays();//@TODO static mapping
 		OverlayItem item;
 		drawable = this.getResources().getDrawable(R.drawable.icon_map);
 		final MixOverlay mixOverlay = new MixOverlay(this, drawable);

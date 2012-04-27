@@ -68,26 +68,23 @@ public class MixViewData {
 		return myout;
 	}
 
-	public MixViewData(final float[] rTmp, final float[] rot, final float[] i,
-			final float[] grav, final float[] mag, final int rHistIdx,
-			final Matrix tempR, final Matrix finalR, final Matrix smoothR,
-			final Matrix[] histR, final Matrix m1, final Matrix m2,
-			final Matrix m3, final Matrix m4, final int compassErrorDisplayed) {
-		RTmp = rTmp;
-		Rot = rot;
-		I = i;
-		this.grav = grav;
-		this.mag = mag;
-		this.rHistIdx = rHistIdx;
-		this.tempR = tempR;
-		this.finalR = finalR;
-		this.smoothR = smoothR;
-		this.histR = histR;
-		this.m1 = m1;
-		this.m2 = m2;
-		this.m3 = m3;
-		this.m4 = m4;
-		this.compassErrorDisplayed = compassErrorDisplayed;
+	public MixViewData() {
+
+		RTmp = new float [9];
+		Rot = new float [9];
+		I = new float [9];
+		this.grav = new float [3];
+		this.mag = new float [3];
+		this.rHistIdx = 0;
+		this.tempR = new Matrix();
+		this.finalR = new Matrix();
+		this.smoothR = new Matrix();
+		this.histR = new Matrix[60];
+		this.m1 = new Matrix();
+		this.m2 = new Matrix();
+		this.m3 = new Matrix();
+		this.m4 = new Matrix();
+		this.compassErrorDisplayed = 0;
 	}
 
 	public CameraSurface getCamScreen() {
