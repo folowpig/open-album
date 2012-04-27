@@ -24,8 +24,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -54,7 +52,6 @@ import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
 import android.content.ContentResolver;
-import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
@@ -79,7 +76,7 @@ public class DownloadManager implements Runnable {
 	private int id = 0;
 	private HashMap<String, DownloadRequest> todoList = new HashMap<String, DownloadRequest>();
 	private HashMap<String, DownloadResult> doneList = new HashMap<String, DownloadResult>();
-	InputStream is;
+	private InputStream is;
 
 	private String currJobId = null;
 
@@ -221,21 +218,26 @@ public class DownloadManager implements Runnable {
 						Log.d("OpenAlbum - Mixare", e1.getMessage(), e1);
 					}
 				}
-				closeHttpInputStream(is);
-				is = null;
 			}
 		}
 		catch (Exception ex) {
 			result.errorMsg = ex.getMessage();
 			result.errorRequest = request;
-
-			try {
-				closeHttpInputStream(is);
-			} catch (Exception ignore) {
-				Log.e("OpenAlbum - Mixare", ignore.getMessage());
-			}
+//
+//			try {
+//				closeHttpInputStream(is);
+//			} catch (Exception ignore) {
+//				Log.e("OpenAlbum - Mixare", ignore.getMessage());
+//			}
 
 			Log.d("OpenAlbum - Mixare", ex.getMessage(), ex);
+		} finally {
+			try {
+				closeHttpInputStream(is);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			is = null;
 		}
 
 		currJobId = null;
@@ -316,59 +318,7 @@ public class DownloadManager implements Runnable {
 		return todoList.isEmpty();
 	}
 
-	// Moved from mixContext
-	public InputStream getHttpPOSTInputStream(String urlStr,
-			String params) throws Exception {
-		InputStream is = null;
-		OutputStream os = null;
-		HttpURLConnection conn = null;
 
-		if (urlStr.startsWith("content://")) {
-			return getContentInputStream(urlStr, params);
-		}
-
-		try {
-			final URL url = new URL(urlStr);
-			conn = (HttpURLConnection) url.openConnection();
-			conn.setReadTimeout(10000);
-			conn.setConnectTimeout(10000);
-
-			if (params != null) {
-				conn.setDoOutput(true);
-				os = conn.getOutputStream();
-				final OutputStreamWriter wr = new OutputStreamWriter(os);
-				wr.write(params);
-				wr.close();
-			}
-
-			is = conn.getInputStream();
-
-			return is;
-		} catch (Exception ex) {
-
-			try {
-				is.close();
-			} catch (Exception ignore) {			
-
-			}
-			try {
-				os.close();
-			} catch (Exception ignore) {			
-
-			}
-			try {
-				conn.disconnect();
-			} catch (Exception ignore) {
-			}
-
-			if (conn != null && conn.getResponseCode() == 405) {
-				return getHttpGETInputStream(urlStr);
-			} else {
-
-				throw ex;
-			}
-		}
-	}
 
 	public InputStream getHttpGETInputStream(final String urlStr)
 			throws Exception {
@@ -474,13 +424,14 @@ public class DownloadManager implements Runnable {
 			}
 		} catch (IOException e) {
 			Log.d("OpenAlbum - Mixare", e.getMessage(), e);
-		} finally {
-			try {
-				is.close();
-			} catch (IOException ex) {
-				Log.d("OpenAlbum - Mixare", ex.getMessage(), ex);
-			}
 		}
+//		 finally { // read, don't close.
+//			try {
+//				is.close();
+//			} catch (IOException ex) {
+//				Log.d("OpenAlbum - Mixare", ex.getMessage(), ex);
+//			}
+//		}
 		return sb.toString();
 	}
 
@@ -489,18 +440,71 @@ public class DownloadManager implements Runnable {
 			is.close();
 		}
 	}
+	// Moved from mixContext
+//	public InputStream getHttpPOSTInputStream(String urlStr,
+//			String params) throws Exception {
+//		InputStream is = null;
+//		OutputStream os = null;
+//		HttpURLConnection conn = null;
+//
+//		if (urlStr.startsWith("content://")) {
+//			return getContentInputStream(urlStr, params);
+//		}
+//
+//		try {
+//			final URL url = new URL(urlStr);
+//			conn = (HttpURLConnection) url.openConnection();
+//			conn.setReadTimeout(10000);
+//			conn.setConnectTimeout(10000);
+//
+//			if (params != null) {
+//				conn.setDoOutput(true);
+//				os = conn.getOutputStream();
+//				final OutputStreamWriter wr = new OutputStreamWriter(os);
+//				wr.write(params);
+//				wr.close();
+//			}
+//
+//			is = conn.getInputStream();
+//
+//			return is;
+//		} catch (Exception ex) {
+//
+//			try {
+//				is.close();
+//			} catch (Exception ignore) {			
+//
+//			}
+//			try {
+//				os.close();
+//			} catch (Exception ignore) {			
+//
+//			}
+//			try {
+//				conn.disconnect();
+//			} catch (Exception ignore) {
+//			}
+//
+//			if (conn != null && conn.getResponseCode() == 405) {
+//				return getHttpGETInputStream(urlStr);
+//			} else {
+//
+//				throw ex;
+//			}
+//		}
+//	}
 
-	public InputStream getResourceInputStream(String name)
-			throws Exception {
-		final AssetManager mgr = MixView.class.newInstance().getAssets();
-		return mgr.open(name);
-	}
+//	public InputStream getResourceInputStream(String name)
+//			throws Exception {
+//		final AssetManager mgr = MixView.class.newInstance().getAssets();
+//		return mgr.open(name);
+//	}
 
-	public void closeResourceInputStream(InputStream is) throws Exception {
-		if (is != null) {
-			is.close();
-		}
-	}
+//	public void closeResourceInputStream(InputStream is) throws Exception {
+//		if (is != null) {
+//			is.close();
+//		}
+//	}
 }
 
 class DownloadRequest {

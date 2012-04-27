@@ -18,20 +18,7 @@
  */
 package org.openalbum.mixare;
 
-//import java.io.BufferedReader;
-//import java.io.ByteArrayInputStream;
-//import java.io.FileInputStream;
-//import java.io.IOException;
-//import java.io.InputStream;
-//import java.io.InputStreamReader;
-//import java.io.OutputStream;
-//import java.io.OutputStreamWriter;
-//import java.net.HttpURLConnection;
-//import java.net.URL;
-//import java.net.URLConnection;
-//import java.security.SecureRandom;
-//import java.security.cert.CertificateException;
-//import java.security.cert.X509Certificate;
+
 import java.util.ArrayList;
 
 import org.openalbum.mixare.data.DataSource;
@@ -259,6 +246,7 @@ public class MixContext extends ContextWrapper {
 		data.getDownloadManager().stop();
 		data.setDownloadManager(null);
 		unregisterLocationManager();
+		data = null;
 	}
 
 	/**

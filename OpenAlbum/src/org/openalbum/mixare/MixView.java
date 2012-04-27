@@ -152,47 +152,6 @@ public class MixView extends Activity implements SensorEventListener,
 		setZoomLevel();
 	}
 
-	public void setErrorDialog() {
-		final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setMessage(getString(DataView.CONNECTION_ERROR_DIALOG_TEXT));
-		builder.setCancelable(false);
-
-		/* Retry */
-		builder.setPositiveButton(DataView.CONNECTION_ERROR_DIALOG_BUTTON1,
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						data.setfError(false); //?
-						// TODO improve
-						try {
-							repaint();
-						} catch (Exception ex) {
-							// Don't call doError, it will be a recursive call.
-							// doError(ex);
-							Log.d(TAG, ex.getMessage(), ex.fillInStackTrace());
-						}
-					}
-				});
-		/* Open settings */
-		builder.setNeutralButton(DataView.CONNECTION_ERROR_DIALOG_BUTTON2,
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						Intent intent1 = new Intent(
-								Settings.ACTION_WIRELESS_SETTINGS);
-						startActivityForResult(intent1, 42);
-					}
-				});
-		/* Close application */
-		builder.setNegativeButton(DataView.CONNECTION_ERROR_DIALOG_BUTTON3,
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						// System.exit(0);
-						finish();
-
-					}
-				});
-		AlertDialog alert = builder.create();
-		alert.show();
-	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -248,155 +207,6 @@ public class MixView extends Activity implements SensorEventListener,
 		} catch (Exception ex) {
 			doError(ex);
 		}
-	}
-
-	/**
-	 * Creates zoom Seek bar on FrameLayout.
-	 * Seek bar is set to invisble by default.
-	 * @param SharedPreferences settings
-	 * @return FrameLayout
-	 */
-	private FrameLayout createZoomBar(final SharedPreferences settings) {
-		data.setMyZoomBar(new SeekBar(this));
-		// myZoomBar.setVisibility(View.INVISIBLE);
-		data.getMyZoomBar().setMax(100);
-		data.getMyZoomBar().setProgress(settings.getInt("zoomLevel", 65));
-		data.getMyZoomBar().setOnSeekBarChangeListener(
-				getMyZoomBarOnSeekBarChangeListener());
-		data.getMyZoomBar().setVisibility(View.INVISIBLE);
-
-		final FrameLayout frameLayout = new FrameLayout(this);
-
-		frameLayout.setMinimumWidth(3000);
-		frameLayout.addView(data.getMyZoomBar());
-		frameLayout.setPadding(10, 0, 10, 10);
-		return frameLayout;
-	}
-
-	/**
-	 * First Access users. display the license agreement.
-	 * @param SharedPreferences settings
-	 */
-	private void firstAccess(final SharedPreferences settings) {
-		final SharedPreferences.Editor editor = settings.edit();
-		
-		final AlertDialog.Builder builder1 = new AlertDialog.Builder(
-				this);
-		
-		builder1.setMessage(getString(DataView.LICENSE_TEXT));
-		builder1.setNegativeButton(getString(DataView.CLOSE_BUTTON),
-				new DialogInterface.OnClickListener() {
-					public void onClick(final DialogInterface dialog,
-							final int id) {
-						dialog.dismiss();
-					}
-				});
-		final AlertDialog alert1 = builder1.create();
-		alert1.setTitle(getString(DataView.LICENSE_TITLE));
-		alert1.show();
-		editor.putBoolean("firstAccess", true);
-
-		// value for maximum POI for each selected OSM URL to be active
-		// by default is 5
-		editor.putInt("osmMaxObject", 5);
-		editor.commit();
-
-		storeDefaultSources();
-	}
-
-	/**
-	 * Stores default Data Source into "Shared_Prefs"
-	 */
-	public void storeDefaultSources() {
-		final SharedPreferences DataSourceSettings = getSharedPreferences(
-				DataSourceList.SHARED_PREFS, 0);
-		//setting the default values
-		final SharedPreferences.Editor dataSourceEditor = DataSourceSettings
-				.edit();
-		dataSourceEditor
-				.putString("DataSource0",
-						"Wikipedia|http://api.geonames.org/findNearbyWikipediaJSON|0|0|true");
-		dataSourceEditor
-				.putString("DataSource1",
-						"Twitter|http://search.twitter.com/search.json|2|0|false");
-		dataSourceEditor
-				.putString(
-						"DataSource2",
-						"OpenStreetmap|http://open.mapquestapi.com/xapi/api/0.6/node[railway=station]|3|1|false");
-		dataSourceEditor
-				.putString("DataSource3",
-						"Panoramio|http://www.panoramio.com/map/get_panoramas.php|4|0|true");
-		dataSourceEditor.commit();
-	}
-
-	private void handleIntent(Intent intent) {
-		if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-			String query = intent.getStringExtra(SearchManager.QUERY);
-			doMixSearch(query);
-		}
-	}
-
-	@Override
-	protected void onNewIntent(Intent intent) {
-		setIntent(intent);
-		handleIntent(intent);
-	}
-
-	private void doMixSearch(final String query) {
-		final DataHandler jLayer = getDataView().getDataHandler();
-		if (!getDataView().isFrozen()) {
-			MixListView.originalMarkerList = jLayer.getMarkerList();
-			MixMap.originalMarkerList = jLayer.getMarkerList();
-		}
-
-		final ArrayList<Marker> searchResults = new ArrayList<Marker>();
-		Log.d("SEARCH-------------------0", query);
-		if (jLayer.getMarkerCount() > 0) {
-			for (int i = 0; i < jLayer.getMarkerCount(); i++) {
-				final Marker ma = jLayer.getMarker(i);
-				if (ma.getTitle().toLowerCase().indexOf(query.toLowerCase()) != -1) {
-					searchResults.add(ma);
-					/* the website for the corresponding title */
-				}
-			}
-		}
-		if (searchResults.size() > 0) {
-			getDataView().setFrozen(true);
-			jLayer.setMarkerList(searchResults);
-		} else {
-			Toast.makeText(this,
-					getString(DataView.SEARCH_FAILED_NOTIFICATION),
-					Toast.LENGTH_LONG).show();
-		}
-	}
-
-	@Override
-	protected void onPause() {
-		try {
-			this.data.getmWakeLock().release();
-
-			try {
-				data.getSensorMgr().unregisterListener(this,
-						data.getSensorGrav());
-				data.getSensorMgr().unregisterListener(this,
-						data.getSensorMag());
-				// sensorMgr = null;
-
-				getMixContext().unregisterLocationManager();
-				getMixContext().data.getDownloadManager().stop();
-			} catch (Exception ignore) {
-				Log.w(TAG, ignore.getMessage());
-			}
-
-			if (data.isfError()) {
-				finish();
-			}
-		} catch (Exception ex) {
-			doError(ex);
-		} finally {
-			super.onPause();
-		}
-
 	}
 
 	// @TODO optimize onResume for faster transitions
@@ -542,6 +352,116 @@ public class MixView extends Activity implements SensorEventListener,
 		// data.getAugScreen().refreshDrawableState();
 		// setZoomLevel();
 	}
+
+	/**
+	 * Creates zoom Seek bar on FrameLayout.
+	 * Seek bar is set to invisble by default.
+	 * @param SharedPreferences settings
+	 * @return FrameLayout
+	 */
+	private FrameLayout createZoomBar(final SharedPreferences settings) {
+		data.setMyZoomBar(new SeekBar(this));
+		// myZoomBar.setVisibility(View.INVISIBLE);
+		data.getMyZoomBar().setMax(100);
+		data.getMyZoomBar().setProgress(settings.getInt("zoomLevel", 65));
+		data.getMyZoomBar().setOnSeekBarChangeListener(
+				getMyZoomBarOnSeekBarChangeListener());
+		data.getMyZoomBar().setVisibility(View.INVISIBLE);
+
+		final FrameLayout frameLayout = new FrameLayout(this);
+
+		frameLayout.setMinimumWidth(3000);
+		frameLayout.addView(data.getMyZoomBar());
+		frameLayout.setPadding(10, 0, 10, 10);
+		return frameLayout;
+	}
+
+	/**
+	 * First Access users. display the license agreement.
+	 * @param SharedPreferences settings
+	 */
+	private void firstAccess(final SharedPreferences settings) {
+		final SharedPreferences.Editor editor = settings.edit();
+		
+		final AlertDialog.Builder builder1 = new AlertDialog.Builder(
+				this);
+		
+		builder1.setMessage(getString(DataView.LICENSE_TEXT));
+		builder1.setNegativeButton(getString(DataView.CLOSE_BUTTON),
+				new DialogInterface.OnClickListener() {
+					public void onClick(final DialogInterface dialog,
+							final int id) {
+						dialog.dismiss();
+					}
+				});
+		final AlertDialog alert1 = builder1.create();
+		alert1.setTitle(getString(DataView.LICENSE_TITLE));
+		alert1.show();
+		editor.putBoolean("firstAccess", true);
+
+		// value for maximum POI for each selected OSM URL to be active
+		// by default is 5
+		editor.putInt("osmMaxObject", 5);
+		editor.commit();
+
+		storeDefaultSources();
+	}
+
+	/**
+	 * Stores default Data Source into "Shared_Prefs"
+	 */
+	public void storeDefaultSources() {
+		final SharedPreferences DataSourceSettings = getSharedPreferences(
+				DataSourceList.SHARED_PREFS, 0);
+		//setting the default values
+		final SharedPreferences.Editor dataSourceEditor = DataSourceSettings
+				.edit();
+		dataSourceEditor
+				.putString("DataSource0",
+						"Wikipedia|http://api.geonames.org/findNearbyWikipediaJSON|0|0|true");
+		dataSourceEditor
+				.putString("DataSource1",
+						"Twitter|http://search.twitter.com/search.json|2|0|false");
+		dataSourceEditor
+				.putString(
+						"DataSource2",
+						"OpenStreetmap|http://open.mapquestapi.com/xapi/api/0.6/node[railway=station]|3|1|false");
+		dataSourceEditor
+				.putString("DataSource3",
+						"Panoramio|http://www.panoramio.com/map/get_panoramas.php|4|0|true");
+		dataSourceEditor.commit();
+	}
+
+
+	@Override
+	protected void onPause() {
+		try {
+			this.data.getmWakeLock().release();
+
+			try {
+				data.getSensorMgr().unregisterListener(this,
+						data.getSensorGrav());
+				data.getSensorMgr().unregisterListener(this,
+						data.getSensorMag());
+				// sensorMgr = null;
+
+				getMixContext().unregisterLocationManager();
+				getMixContext().data.getDownloadManager().stop();
+			} catch (Exception ignore) {
+				Log.w(TAG, ignore.getMessage());
+			}
+
+			if (data.isfError()) {
+				finish();
+			}
+		} catch (Exception ex) {
+			doError(ex);
+		} finally {
+			super.onPause();
+		}
+
+	}
+
 
 	@Override
 	protected void onStop() {
@@ -725,6 +645,90 @@ public class MixView extends Activity implements SensorEventListener,
 	}
 	
 	/* ********* Handlers *************/
+	
+	private void handleIntent(Intent intent) {
+		if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+			String query = intent.getStringExtra(SearchManager.QUERY);
+			doMixSearch(query);
+		}
+	}
+
+	@Override
+	protected void onNewIntent(Intent intent) {
+		setIntent(intent);
+		handleIntent(intent);
+	}
+
+	private void doMixSearch(final String query) {
+		final DataHandler jLayer = getDataView().getDataHandler();
+		if (!getDataView().isFrozen()) {
+			MixListView.originalMarkerList = jLayer.getMarkerList();
+			MixMap.originalMarkerList = jLayer.getMarkerList();
+		}
+
+		final ArrayList<Marker> searchResults = new ArrayList<Marker>();
+		Log.d("SEARCH-------------------0", query);
+		if (jLayer.getMarkerCount() > 0) {
+			for (int i = 0; i < jLayer.getMarkerCount(); i++) {
+				final Marker ma = jLayer.getMarker(i);
+				if (ma.getTitle().toLowerCase().indexOf(query.toLowerCase()) != -1) {
+					searchResults.add(ma);
+					/* the website for the corresponding title */
+				}
+			}
+		}
+		if (searchResults.size() > 0) {
+			getDataView().setFrozen(true);
+			jLayer.setMarkerList(searchResults);
+		} else {
+			Toast.makeText(this,
+					getString(DataView.SEARCH_FAILED_NOTIFICATION),
+					Toast.LENGTH_LONG).show();
+		}
+	}
+
+	public void setErrorDialog() {
+		final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage(getString(DataView.CONNECTION_ERROR_DIALOG_TEXT));
+		builder.setCancelable(false);
+
+		/* Retry */
+		builder.setPositiveButton(DataView.CONNECTION_ERROR_DIALOG_BUTTON1,
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						data.setfError(false); //?
+						// TODO improve
+						try {
+							repaint();
+						} catch (Exception ex) {
+							// Don't call doError, it will be a recursive call.
+							// doError(ex);
+							Log.d(TAG, ex.getMessage(), ex.fillInStackTrace());
+						}
+					}
+				});
+		/* Open settings */
+		builder.setNeutralButton(DataView.CONNECTION_ERROR_DIALOG_BUTTON2,
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						Intent intent1 = new Intent(
+								Settings.ACTION_WIRELESS_SETTINGS);
+						startActivityForResult(intent1, 42);
+					}
+				});
+		/* Close application */
+		builder.setNegativeButton(DataView.CONNECTION_ERROR_DIALOG_BUTTON3,
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						// System.exit(0);
+						finish();
+
+					}
+				});
+		AlertDialog alert = builder.create();
+		alert.show();
+	}
+
 	public void doError(final Exception ex1) {
 		if (!data.isfError()) {
 			data.setfError(true); // ?
@@ -876,7 +880,7 @@ public class MixView extends Activity implements SensorEventListener,
 		return false;
 	}
 
-	/*********** Getters and Setters ************/
+	/* ********** Getters and Setters ************/
 	public boolean isZoombarVisible() {
 		return data.getMyZoomBar() != null
 				&& data.getMyZoomBar().getVisibility() == View.VISIBLE;

@@ -30,7 +30,7 @@ import android.location.Location;
 public class ImageMarker extends Marker {
 
 	public static final int MAX_OBJECTS = 20;
-	private final Bitmap image; // @TODO Should not be static
+	private final Bitmap image; 
 	public static final int OSM_URL_MAX_OBJECTS = 5;
 	private static final boolean FLAG_DECODE_PHOTO_STREAM_WITH_SKIA = false;
 	private static final int IO_BUFFER_SIZE = 4 * 1024;
