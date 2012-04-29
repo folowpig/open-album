@@ -29,12 +29,13 @@ import android.location.Location;
  */
 public class ImageMarker extends Marker {
 
-	public static final int MAX_OBJECTS = 20;
+	public static final int MAX_OBJECTS = 10;
 	private final Bitmap image; 
 	public static final int OSM_URL_MAX_OBJECTS = 5;
 	private static final boolean FLAG_DECODE_PHOTO_STREAM_WITH_SKIA = false;
 	private static final int IO_BUFFER_SIZE = 4 * 1024;
-	private final int rectangleBackgroundColor = Color.WHITE;
+	private final static int rectangleBackgroundColor = Color.WHITE;
+	private  String fullPhotoURL = "";
 
 	public ImageMarker(final String title, final double latitude,
 			final double longitude, final double altitude, final String URL,
@@ -49,6 +50,18 @@ public class ImageMarker extends Marker {
 		super(title, latitude, longitude, altitude, URL, datasource);
 
 		this.image = getBitmapFromURL(URL);
+	}
+	
+	public ImageMarker (final String title, 
+			final double latitude, 
+			final double longitude,
+			final double altitude,
+			final String URL,
+			final DataSource datasource,
+			final String fullPhotoURL){
+		super(title, latitude, longitude, altitude, fullPhotoURL, datasource);
+		this.image = getBitmapFromURL(URL);
+		this.setFullPhotoURL(fullPhotoURL);
 	}
 
 	public Bitmap getBitmapFromURL(final String src) {
@@ -189,5 +202,19 @@ public class ImageMarker extends Marker {
 	 */
 	public Bitmap getImage() {
 		return image;
+	}
+
+	/**
+	 * @return the fullPhotoURL
+	 */
+	public String getFullPhotoURL() {
+		return fullPhotoURL;
+	}
+
+	/**
+	 * @param fullPhotoURL the fullPhotoURL to set
+	 */
+	public void setFullPhotoURL(String fullPhotoURL) {
+		this.fullPhotoURL = fullPhotoURL;
 	}
 }

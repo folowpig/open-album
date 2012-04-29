@@ -213,7 +213,7 @@ public class MixContext extends ContextWrapper {
 	}
 
 	public void unregisterLocationManager() {
-		if (data.getLm() != null) {
+		if (!data.getLm().equals(null)) {
 			data.getLm().removeUpdates(data.getLnormal());
 			data.getLm().removeUpdates(data.getLcoarse());
 			data.getLm().removeUpdates(data.getLbounce());
@@ -304,7 +304,7 @@ public class MixContext extends ContextWrapper {
 	public void loadWebPage(final String url, final Context context)
 			throws Exception {
 		final WebView webview = new WebView(context);
-		webview.getSettings().setAppCacheEnabled(true);
+		//webview.getSettings().setAppCacheEnabled(true);
 		webview.setWebViewClient(new WebViewClient() {
 			@Override
 			public boolean shouldOverrideUrlLoading(final WebView view,

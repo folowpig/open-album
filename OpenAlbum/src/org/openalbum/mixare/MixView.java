@@ -471,16 +471,16 @@ public class MixView extends Activity implements SensorEventListener,
 		// @todo move destroy to onDestroy (user can relaunch app after it
 		// stops)
 		// downloadThread.destroy();
-		data.getMixContext().stopService(getIntent());
 		data.getMixContext().onStopContext();
+		data.getMixContext().stopService(getIntent());
 		super.onStop();
 	}
 
 	@Override
 	protected void onDestroy() {
 		// downloadThread.destroy();
-		data.getMixContext().stopService(getIntent());
 		data.getMixContext().onDestroyContext();
+		data.getMixContext().stopService(getIntent());
 		// Destroy data and this class data if any.
 		if (getMixContext() != null) {
 			getMixContext().unregisterLocationManager();

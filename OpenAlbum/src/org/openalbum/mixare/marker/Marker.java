@@ -274,7 +274,6 @@ public abstract class Marker implements Comparable<Marker> {
 		return (marker != null)? this.ID.equals(((Marker) marker).getID()) : false;
 	}
 
-	// ?!!
 	abstract public int getMaxObjects();
 
 	/************ Getters and Setters ****************/

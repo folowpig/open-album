@@ -108,8 +108,7 @@ public class Json extends DataHandler {
 				&& jo.has("photo_file_url")) {
 
 			Log.v(MixView.TAG, "processing Panoramio JSON object");
-			final String link = jo.getString("photo_file_url");
-
+			final String link = jo.getString("photo_url");
 			// For Panoramio elevation, generate a random number ranged [30 -
 			// 120]
 			// @TODO find better way
@@ -117,20 +116,12 @@ public class Json extends DataHandler {
 			// http://asterweb.jpl.nasa.gov/gdem.asp
 			final Random elevation = new Random();
 			ma = new ImageMarker(unescapeHTML(jo.getString("photo_title"), 0),
-					jo.getDouble("latitude"), jo.getDouble("longitude"),
-					(elevation.nextInt(90) + 30), // @TODO elevation level for
-													// Panoramio
-					link, datasource);
-			// ma = new POIMarker(
-			// unescapeHTML(jo.getString("photo_title"), 0),
-			// // jo.getDouble("latitude"),
-			// // jo.getDouble("longitude"),
-			// // jo.getDouble("elevation"),
-			// (double) 37.6588,
-			// (double) -122.4433,
-			// (double) 50, //@TODO elevation level for Panoramio
-			// link,
-			// datasource);
+					jo.getDouble("latitude"), 
+					jo.getDouble("longitude"),
+					(elevation.nextInt(90) + 30), // @TODO elevation level for Panoramio
+					jo.getString("photo_file_url"),
+					datasource,
+					link);
 		}
 		return ma;
 	}
