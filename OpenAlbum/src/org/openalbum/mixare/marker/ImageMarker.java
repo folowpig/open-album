@@ -59,7 +59,7 @@ public class ImageMarker extends Marker {
 			final String URL,
 			final DataSource datasource,
 			final String fullPhotoURL){
-		super(title, latitude, longitude, altitude, fullPhotoURL, datasource);
+		super(title, latitude, longitude, altitude, URL, datasource);
 		this.image = getBitmapFromURL(URL);
 		this.setFullPhotoURL(fullPhotoURL);
 	}

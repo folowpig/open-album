@@ -268,7 +268,7 @@ public class MixContext extends ContextWrapper {
 	public void loadMixViewWebPage(final String url) throws Exception {
 		final WebView webview = new WebView(data.getMixView());
 		webview.getSettings().setJavaScriptEnabled(true);
-		webview.getSettings().setAppCacheEnabled(true);
+		//webview.getSettings().setAppCacheEnabled(true);
 		webview.setWebViewClient(new WebViewClient() {
 			@Override
 			public boolean shouldOverrideUrlLoading(final WebView view,
@@ -284,7 +284,7 @@ public class MixContext extends ContextWrapper {
 			public boolean onKeyDown(final int keyCode, final KeyEvent event) {
 				if (keyCode == KeyEvent.KEYCODE_BACK) {
 					this.dismiss();
-					webview.destroy();
+					//webview.destroy();
 				}
 				return true;
 			}
@@ -320,7 +320,7 @@ public class MixContext extends ContextWrapper {
 			public boolean onKeyDown(final int keyCode, final KeyEvent event) {
 				if (keyCode == KeyEvent.KEYCODE_BACK) {
 					this.dismiss();
-					webview.destroy();
+					//webview.destroy();
 				}
 				return true;
 			}
