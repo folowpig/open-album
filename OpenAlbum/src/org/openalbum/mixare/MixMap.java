@@ -24,18 +24,16 @@ import java.util.List;
 
 import org.openalbum.mixare.data.DataHandler;
 import org.openalbum.mixare.data.DataSourceList;
-import org.openalbum.mixare.marker.ImageMarker;
 import org.openalbum.mixare.marker.Marker;
-
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -68,8 +66,9 @@ public class MixMap extends MapActivity implements OnTouchListener {
 
 	private MixContext mixContext;
 	private MapView mapView;
+	private static final String debugTag = "WorkFlow";
 
-	static MixMap map; // ???!! this !!
+	//static MixMap map; // ???!! this !!
 	private static Context thisContext;
 	private static TextView searchNotificationTxt;
 	public static List<Marker> originalMarkerList;
@@ -82,10 +81,11 @@ public class MixMap extends MapActivity implements OnTouchListener {
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		Log.d(debugTag, "on Create - MapView");
 		dataView = MixView.getDataView();
 		mixContext = dataView.getContext();
 		setMarkerList(dataView.getDataHandler().getMarkerList());
-		map = this;
+		//map = this;
 
 		setMapContext(this);
 		mapView = new MapView(this, this.getString(R.string.GoogleMapAPIKey)); // @devKey
@@ -100,13 +100,14 @@ public class MixMap extends MapActivity implements OnTouchListener {
 		setStartPoint();
 		createOverlay();
 
+		//Debug
 		if (dataView.isFrozen()) {
 			searchNotificationTxt = new TextView(this);
 			searchNotificationTxt.setWidth(MixView.getdWindow().getWidth());
 			searchNotificationTxt.setPadding(10, 2, 0, 0);
-			searchNotificationTxt.setText(getString(DataView.SEARCH_ACTIVE_1)
+			searchNotificationTxt.setText(getString(R.string.search_active_1)
 					+ " " + DataSourceList.getDataSourcesStringList()
-					+ getString(DataView.SEARCH_ACTIVE_2));
+					+ getString(R.string.search_active_2));
 			searchNotificationTxt.setBackgroundColor(Color.DKGRAY);
 			searchNotificationTxt.setTextColor(Color.WHITE);
 
@@ -161,19 +162,19 @@ public class MixMap extends MapActivity implements OnTouchListener {
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(final Menu menu) {
+	public boolean onCreateOptionsMenu( Menu menu) {
 		final int base = Menu.FIRST;
 		/* define the first */
 		final MenuItem item1 = menu.add(base, base, base,
-				getString(DataView.MAP_MENU_NORMAL_MODE));
+				getString(R.string.map_menu_normal_mode));
 		final MenuItem item2 = menu.add(base, base + 1, base + 1,
-				getString(DataView.MAP_MENU_SATELLITE_MODE));
+				getString(R.string.map_menu_satellite_mode));
 		final MenuItem item3 = menu.add(base, base + 2, base + 2,
-				getString(DataView.MAP_MY_LOCATION));
+				getString(R.string.map_my_location));
 		final MenuItem item4 = menu.add(base, base + 3, base + 3,
-				getString(DataView.MENU_ITEM_2));
+				getString(R.string.menu_item_2));
 		final MenuItem item5 = menu.add(base, base + 4, base + 4,
-				getString(DataView.MENU_CAM_MODE));
+				getString(R.string.map_menu_cam_mode));
 
 		/* assign icons to the menu items */
 		item1.setIcon(android.R.drawable.ic_menu_gallery);
@@ -203,25 +204,35 @@ public class MixMap extends MapActivity implements OnTouchListener {
 		/* List View */
 		case 4:
 			createListView();
-			finish();
+			//finish(); //doning close this activity -return to it instead
 			break;
 		/* back to Camera View */
 		case 5:
-			finish();
+			closeMapViewActivity();
 			break;
 		}
 		return true;
+	}
+
+	/**
+	 * 
+	 */
+	private void closeMapViewActivity() {
+		Intent closeAndRelauch = new Intent();
+		closeAndRelauch.putExtra("settingChanged", false);
+		setResult(RESULT_OK, closeAndRelauch);
+		finish();
 	}
 
 	public void createListView() {
 		MixListView.setList(2);
 		if (dataView.getDataHandler().getMarkerCount() > 0) {
 			final Intent intent1 = new Intent(MixMap.this, MixListView.class);
-			startActivityForResult(intent1, 42);
+			startActivity(intent1);
 		}
 		/* if the list is empty */
 		else {
-			Toast.makeText(this, DataView.EMPTY_LIST_STRING_ID,
+			Toast.makeText(this, R.string.empty_list,
 					Toast.LENGTH_LONG).show();
 		}
 	}
@@ -254,7 +265,7 @@ public class MixMap extends MapActivity implements OnTouchListener {
 		return mapOverlays;
 	}
 
-	public void setMapContext(final Context context) {
+	public void setMapContext(Context context) {
 		thisContext = context;
 	}
 
@@ -263,7 +274,7 @@ public class MixMap extends MapActivity implements OnTouchListener {
 	}
 
 	public void startPointMsg() {
-		Toast.makeText(getMapContext(), DataView.MAP_CURRENT_LOCATION_CLICK,
+		Toast.makeText(getMapContext(), R.string.map_current_location_click,
 				Toast.LENGTH_LONG).show();
 	}
 
@@ -297,7 +308,7 @@ public class MixMap extends MapActivity implements OnTouchListener {
 		}
 		if (markerList.size() == 0) {
 			Toast.makeText(this,
-					getString(DataView.SEARCH_FAILED_NOTIFICATION),
+					getString(R.string.search_failed_notification),
 					Toast.LENGTH_LONG).show();
 		} else {
 			jLayer.setMarkerList(markerList);
@@ -309,6 +320,26 @@ public class MixMap extends MapActivity implements OnTouchListener {
 		}
 	}
 
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		try {
+			
+			if (keyCode == KeyEvent.KEYCODE_BACK) {
+				Intent intent = new Intent();
+				setResult(RESULT_OK, intent);
+				finish();
+			}else if (keyCode == KeyEvent.KEYCODE_MENU){
+				openOptionsMenu();
+			} else {
+				return false;
+			}
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		
+		}
+		return true;
+	}
 	public boolean onTouch(final View v, final MotionEvent event) {
 		dataView.setFrozen(false);
 		dataView.getDataHandler().setMarkerList(originalMarkerList);

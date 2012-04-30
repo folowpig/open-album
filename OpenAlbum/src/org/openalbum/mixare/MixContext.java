@@ -173,7 +173,7 @@ public class MixContext extends ContextWrapper {
 			// ex2.printStackTrace();
 			data.setCurLoc(hardFix);
 			Toast.makeText(this,
-					getString(DataView.CONNECTION_GPS_DIALOG_TEXT),
+					getString(R.string.connection_GPS_dialog_text),
 					Toast.LENGTH_LONG).show();
 		}
 	}
@@ -213,12 +213,13 @@ public class MixContext extends ContextWrapper {
 	}
 
 	public void unregisterLocationManager() {
-		if (!data.getLm().equals(null)) {
+		if (data.getLnormal() != null)
 			data.getLm().removeUpdates(data.getLnormal());
+		if (data.getLcoarse() != null)
 			data.getLm().removeUpdates(data.getLcoarse());
+		if (data.getLbounce() != null)
 			data.getLm().removeUpdates(data.getLbounce());
 			data.setLm(null);
-		}
 	}
 
 	public DownloadManager getDownloader() {
@@ -237,6 +238,7 @@ public class MixContext extends ContextWrapper {
 
 	public void onStopContext() {
 		data.getDownloadManager().pause();
+//		unregisterLocationManager();
 		// @todo move destroy to onDestroy (user can relaunch app after it
 		// stops)
 		// downloadThread.destroy();
@@ -245,7 +247,9 @@ public class MixContext extends ContextWrapper {
 	public void onDestroyContext() {
 		data.getDownloadManager().stop();
 		data.setDownloadManager(null);
-		unregisterLocationManager();
+		if(data.getLm() != null){
+			unregisterLocationManager();
+		}
 		data = null;
 	}
 

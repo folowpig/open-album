@@ -28,7 +28,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.ContextMenu;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -53,13 +55,13 @@ public class DataSourceList extends ListActivity {
 	private static final int MENU_CREATE_ID = Menu.FIRST;
 	private static final int MENU_EDIT_ID = Menu.FIRST + 1;
 	private static final int MENU_DELETE_ID = Menu.FIRST + 2;
-
+	private static final String debugTag = "WorkFlow";
 
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
+		
 	}
 
 	@Override
@@ -70,6 +72,7 @@ public class DataSourceList extends ListActivity {
 
 		int size = settings.getAll().size(); //
 		if (size == 0){
+			Log.d(debugTag, "DataSourceList - onResume - Size ==0 !!!!");
 			SharedPreferences.Editor dataSourceEditor = settings.edit();
 			dataSourceEditor.putString("DataSource0", "Wikipedia|http://api.geonames.org/findNearbyWikipediaJSON|0|0|false");
 			dataSourceEditor.putString("DataSource1", "Twitter|http://search.twitter.com/search.json|2|0|false");
@@ -93,7 +96,6 @@ public class DataSourceList extends ListActivity {
 	
 	@Override
 	protected void onPause() {
-		super.onPause();
 		SharedPreferences settings = getSharedPreferences(DataSourceList.SHARED_PREFS, 0);
 		SharedPreferences.Editor editor = settings.edit();
 		editor.clear();
@@ -103,6 +105,33 @@ public class DataSourceList extends ListActivity {
 			editor.putString("DataSource" + k, dataSourceAdapter.serialize(k));
 		}
 		editor.commit();
+		super.onPause();
+	}
+	
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		try {
+			
+			if (keyCode == KeyEvent.KEYCODE_BACK) {
+				closeDataSLActivity();
+			} else {
+				return false;
+			}
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		
+		}
+		return true;
+	}
+	/**
+	 *  Sends Result message to main activity
+	 */
+	private void closeDataSLActivity() {
+		Intent closeAndRelauch = new Intent();
+		closeAndRelauch.putExtra("settingChanged", true);
+		setResult(RESULT_OK, closeAndRelauch);
+		finish();
 	}
 
 
@@ -145,6 +174,7 @@ public class DataSourceList extends ListActivity {
 		public String serialize(int k) {
 			return mDataSource.get(k).serialize();
 		}
+		
 		public void addItem(final DataSource item) {
 			mDataSource.add(item);
 			notifyDataSetChanged();

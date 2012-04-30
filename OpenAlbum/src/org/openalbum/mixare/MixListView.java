@@ -41,6 +41,7 @@ import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -89,7 +90,7 @@ public class MixListView extends ListActivity {
 	public static List<Marker> originalMarkerList;
 
 	@Override
-	public void onCreate(final Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		// mixCtx = MixView.ctx;
 		dataView = MixView.getDataView();
@@ -141,9 +142,9 @@ public class MixListView extends ListActivity {
 				final TextView searchNotificationTxt = new TextView(this);
 				searchNotificationTxt.setVisibility(View.VISIBLE);
 				searchNotificationTxt
-						.setText(getString(DataView.SEARCH_ACTIVE_1) + " "
+						.setText(getString(R.string.search_active_1) + " "
 								+ DataSourceList.getDataSourcesStringList()
-								+ getString(DataView.SEARCH_ACTIVE_2));
+								+ getString(R.string.search_active_2));
 				searchNotificationTxt.setWidth(MixView.getdWindow().getWidth());
 
 				searchNotificationTxt.setPadding(10, 2, 0, 0);
@@ -205,7 +206,7 @@ public class MixListView extends ListActivity {
 		}
 		if (listViewMenu.size() == 0) {
 			Toast.makeText(this,
-					getString(DataView.SEARCH_FAILED_NOTIFICATION),
+					getString(R.string.search_failed_notification),
 					Toast.LENGTH_LONG).show();
 		} else {
 			jLayer.setMarkerList(searchResultMarkers);
@@ -242,7 +243,7 @@ public class MixListView extends ListActivity {
 		final String selectedURL = position < selectedItemURL.size() ? selectedItemURL
 				.get(position) : null;
 		if (selectedURL == null || selectedURL.length() <= 0) {
-			Toast.makeText(this, getString(DataView.NO_WEBINFO_AVAILABLE),
+			Toast.makeText(this, getString(R.string.no_website_available),
 					Toast.LENGTH_LONG).show();
 		} else if ("search".equals(selectedURL)) {
 			dataView.setFrozen(false);
@@ -356,9 +357,9 @@ public class MixListView extends ListActivity {
 
 		/* define menu items */
 		final MenuItem item1 = menu.add(base, base, base,
-				getString(DataView.MENU_ITEM_3));
+				getString(R.string.menu_item_3));
 		final MenuItem item2 = menu.add(base, base + 1, base + 1,
-				getString(DataView.MENU_CAM_MODE));
+				getString(R.string.map_menu_cam_mode));
 		final MenuItem item3 = menu.add(base, base + 2, base + 2,
 				"Add data source");
 		/* assign icons to the menu items */
@@ -419,6 +420,22 @@ public class MixListView extends ListActivity {
 	 * public static String getDataSource(){ return selectedDataSource; }
 	 */
 
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		try {
+			
+			if (keyCode == KeyEvent.KEYCODE_BACK) {
+				Intent intent = new Intent();
+				setResult(RESULT_OK, intent);
+				finish();
+			}
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		
+		}
+		return true;
+	}
 	public static void setList(final int l) {
 		list = l;
 	}
