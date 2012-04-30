@@ -54,16 +54,18 @@ public class MixContext extends ContextWrapper {
 
 	// TAG for logging
 	public static final String TAG = "Open Album";
+	private static final String debugTag = "WorkFlow";
 	
 	public MixContextData data = new MixContextData(true, new Matrix(), 0f,
 			new ArrayList<DataSource>());
 	
 	public MixContext(final Context appCtx) {
 		super(appCtx);
+		Log.d(debugTag, "MixContex - created");
 		this.data.setMixView((MixView) appCtx);
 		this.data.setCtx(appCtx.getApplicationContext());
 
-		refreshDataSources();
+		//refreshDataSources();
 
 		boolean atLeastOneDatasourceSelected = false;
 
@@ -90,6 +92,7 @@ public class MixContext extends ContextWrapper {
 	
 	/**
 	 * Internal function that search's for the best GPS provider.
+	 * AND register the best of them.
 	 * 1- looks for more precise (fine)
 	 * 2- looks for approimation first (Coarse)
 	 * 3- Hard code location (reverse geo)
@@ -179,6 +182,7 @@ public class MixContext extends ContextWrapper {
 	}
 
 	public void refreshDataSources() {
+		Log.d(debugTag, "MixContex - DataSource is being refreshed");
 		this.data.getAllDataSources().clear();
 		 SharedPreferences settings = getSharedPreferences(
 				DataSourceList.SHARED_PREFS, 0);
@@ -213,13 +217,24 @@ public class MixContext extends ContextWrapper {
 	}
 
 	public void unregisterLocationManager() {
-		if (data.getLnormal() != null)
+		try{
+		if (data.getLnormal() != null){
+			Log.d(debugTag, "MixContex - getnormal will be unregister");
 			data.getLm().removeUpdates(data.getLnormal());
-		if (data.getLcoarse() != null)
+		}
+		if (data.getLcoarse() != null){
+			Log.d(debugTag, "MixContex - getcoarse will be unregister");
 			data.getLm().removeUpdates(data.getLcoarse());
-		if (data.getLbounce() != null)
+		}
+		if (data.getLbounce() != null){
+			Log.d(debugTag, "MixContex - bounce will be unregister");
 			data.getLm().removeUpdates(data.getLbounce());
-			data.setLm(null);
+		}
+			//data.setLm(null);
+		}catch (Exception ex){
+			Log.d(debugTag, "MixContex - unregister Error");
+			Log.w(TAG, ex.getMessage(), ex);
+		}
 	}
 
 	public DownloadManager getDownloader() {
