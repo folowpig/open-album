@@ -69,10 +69,12 @@ public class DownloadManager implements Runnable {
 
 	private boolean stop = false, pause = false, proceed = false;
 	//@FIXME Dangorus mutable static fields, Change ASAP
-	public static int NOT_STARTED = 0, CONNECTING = 1, CONNECTED = 2,
+	private final static int NOT_STARTED = 0, CONNECTING = 1, CONNECTED = 2,
 			PAUSED = 3, STOPPED = 4;
-	private int state = NOT_STARTED;
+	private static int state = NOT_STARTED;
+	private volatile Thread runner;
 
+	private static final String debugTag = "WorkFlow";
 	private int id = 0;
 	private HashMap<String, DownloadRequest> todoList = new HashMap<String, DownloadRequest>();
 	private HashMap<String, DownloadResult> doneList = new HashMap<String, DownloadResult>();
@@ -81,9 +83,15 @@ public class DownloadManager implements Runnable {
 	private String currJobId = null;
 
 	public DownloadManager(MixContext ctx) {
+		Log.d(debugTag, "DownloadManager - created");
+		 if(runner == null){
+			    runner = new Thread(this);
+			  }
 	}
 
+
 	public void run() {
+		Log.d(debugTag, "DownloadManager - running");
 		String jobId;
 		DownloadRequest request;
 		DownloadResult result;
@@ -93,14 +101,14 @@ public class DownloadManager implements Runnable {
 		proceed = false;
 		state = CONNECTING;
 
-		while (!stop) {
+		while ( Thread.currentThread() == runner) {
 			jobId = "";
 			request = null;
 			result = null;
 
 			// Wait for proceed
 			while (!stop && !pause) {
-				synchronized (this) { // @FIXME Important - Thread deadLock
+				synchronized (this) {
 					if (todoList.size() > 0) {
 						jobId = getNextReqId();
 						request = todoList.get(jobId);
@@ -127,15 +135,13 @@ public class DownloadManager implements Runnable {
 				}
 			}
 
-			// Do pause
-			while (!stop && pause) {
-				state = PAUSED;
-				sleep(100);
-			}
 			state = CONNECTING;
 		}
 		// Do stop
 		state = STOPPED;
+	
+		Log.d(debugTag, "DownloadManager - running Stopped");
+		return;
 	}
 
 	public int checkForConnection() {
@@ -151,6 +157,22 @@ public class DownloadManager implements Runnable {
 		}
 	}
 
+	//http://docs.oracle.com/javase/1.4.2/docs/guide/misc/threadPrimitiveDeprecation.html
+	public synchronized void startThread(){
+		Log.d(debugTag, "DownloadManager - startThread"); 
+		if(runner == null){
+		    runner = new Thread(this);
+		  }
+		  runner.start();
+		}
+	public synchronized void stopThread(){
+		Log.d(debugTag, "DownloadManager - stopThread");
+		  if(runner != null){
+		    Thread moribund = runner;
+		    runner = null;
+		    moribund.interrupt();
+		  }
+		}
 	private String getNextReqId() {
 		return todoList.keySet().iterator().next();
 	}
@@ -294,6 +316,7 @@ public class DownloadManager implements Runnable {
 
 	public void pause() {
 		pause = true;
+		Log.d(debugTag, "DownloadManager - Paused");
 	}
 
 	public void restart() {
@@ -302,6 +325,8 @@ public class DownloadManager implements Runnable {
 
 	public void stop() {
 		stop = true;
+		final Throwable stack = new Throwable().fillInStackTrace();//debugTag
+		Log.d(debugTag, "DownloadManager - stop request",stack);
 	}
 
 	public synchronized DownloadResult getNextResult() {
@@ -442,57 +467,14 @@ public class DownloadManager implements Runnable {
 	}
 	// Moved from mixContext
 //	public InputStream getHttpPOSTInputStream(String urlStr,
-//			String params) throws Exception {
-//		InputStream is = null;
-//		OutputStream os = null;
-//		HttpURLConnection conn = null;
-//
-//		if (urlStr.startsWith("content://")) {
-//			return getContentInputStream(urlStr, params);
-//		}
-//
-//		try {
-//			final URL url = new URL(urlStr);
-//			conn = (HttpURLConnection) url.openConnection();
-//			conn.setReadTimeout(10000);
-//			conn.setConnectTimeout(10000);
-//
-//			if (params != null) {
-//				conn.setDoOutput(true);
-//				os = conn.getOutputStream();
-//				final OutputStreamWriter wr = new OutputStreamWriter(os);
-//				wr.write(params);
-//				wr.close();
-//			}
-//
-//			is = conn.getInputStream();
-//
-//			return is;
-//		} catch (Exception ex) {
-//
-//			try {
-//				is.close();
-//			} catch (Exception ignore) {			
-//
-//			}
-//			try {
-//				os.close();
-//			} catch (Exception ignore) {			
-//
-//			}
-//			try {
-//				conn.disconnect();
-//			} catch (Exception ignore) {
-//			}
-//
-//			if (conn != null && conn.getResponseCode() == 405) {
-//				return getHttpGETInputStream(urlStr);
-//			} else {
-//
-//				throw ex;
-//			}
-//		}
-//	}
+//			String params) throws Exception {}
+
+	/**
+	 * @return the stopped
+	 */
+	public static boolean isStopped() {
+		return (state == STOPPED)? true : false;
+	}
 
 //	public InputStream getResourceInputStream(String name)
 //			throws Exception {

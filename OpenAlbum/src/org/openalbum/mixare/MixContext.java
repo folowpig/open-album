@@ -18,7 +18,6 @@
  */
 package org.openalbum.mixare;
 
-
 import java.util.ArrayList;
 
 import org.openalbum.mixare.data.DataSource;
@@ -55,17 +54,17 @@ public class MixContext extends ContextWrapper {
 	// TAG for logging
 	public static final String TAG = "Open Album";
 	private static final String debugTag = "WorkFlow";
-	
+
 	public MixContextData data = new MixContextData(true, new Matrix(), 0f,
 			new ArrayList<DataSource>());
-	
+
 	public MixContext(final Context appCtx) {
 		super(appCtx);
 		Log.d(debugTag, "MixContex - created");
 		this.data.setMixView((MixView) appCtx);
 		this.data.setCtx(appCtx.getApplicationContext());
 
-		//refreshDataSources();
+		// refreshDataSources();
 
 		boolean atLeastOneDatasourceSelected = false;
 
@@ -89,13 +88,11 @@ public class MixContext extends ContextWrapper {
 		setLocationAtLastDownload(data.getCurLoc());
 
 	}
-	
+
 	/**
-	 * Internal function that search's for the best GPS provider.
-	 * AND register the best of them.
-	 * 1- looks for more precise (fine)
-	 * 2- looks for approimation first (Coarse)
-	 * 3- Hard code location (reverse geo)
+	 * Internal function that search's for the best GPS provider. AND register
+	 * the best of them. 1- looks for more precise (fine) 2- looks for
+	 * approimation first (Coarse) 3- Hard code location (reverse geo)
 	 * 
 	 */
 	private void searchForGPSProvider() {
@@ -115,7 +112,7 @@ public class MixContext extends ContextWrapper {
 		} catch (final Exception e) {
 			Log.d(TAG, "Could not initialize the bounce provider");
 		}
-		
+
 		// try to use the coarse provider first to get a rough position
 		// Sidenote: rough estimate approach is not being used.
 		c.setAccuracy(Criteria.ACCURACY_COARSE);
@@ -184,14 +181,13 @@ public class MixContext extends ContextWrapper {
 	public void refreshDataSources() {
 		Log.d(debugTag, "MixContex - DataSource is being refreshed");
 		this.data.getAllDataSources().clear();
-		 SharedPreferences settings = getSharedPreferences(
+		SharedPreferences settings = getSharedPreferences(
 				DataSourceList.SHARED_PREFS, 0);
 		int size = settings.getAll().size();
 		if (size == 0) {
-			//@TODO make all access to setting through this class only
+			// @TODO make all access to setting through this class only
 			data.getMixView().storeDefaultSources();
-			settings = getSharedPreferences(
-					DataSourceList.SHARED_PREFS, 0);
+			settings = getSharedPreferences(DataSourceList.SHARED_PREFS, 0);
 			size = settings.getAll().size();
 		}
 		// copy the value from shared preference to adapter
@@ -204,8 +200,6 @@ public class MixContext extends ContextWrapper {
 		}
 	}
 
-
-
 	/***** Getters and Setters ********/
 	public ArrayList<DataSource> getAllDataSources() {
 		return this.data.getAllDataSources();
@@ -217,21 +211,23 @@ public class MixContext extends ContextWrapper {
 	}
 
 	public void unregisterLocationManager() {
-		try{
-		if (data.getLnormal() != null){
-			Log.d(debugTag, "MixContex - getnormal will be unregister");
-			data.getLm().removeUpdates(data.getLnormal());
-		}
-		if (data.getLcoarse() != null){
-			Log.d(debugTag, "MixContex - getcoarse will be unregister");
-			data.getLm().removeUpdates(data.getLcoarse());
-		}
-		if (data.getLbounce() != null){
-			Log.d(debugTag, "MixContex - bounce will be unregister");
-			data.getLm().removeUpdates(data.getLbounce());
-		}
-			//data.setLm(null);
-		}catch (Exception ex){
+		try {
+			// final Throwable stack = new
+			// Throwable().fillInStackTrace();//debugTag
+			if (data.getLnormal() != null) {
+				Log.d(debugTag, "MixContex - getnormal will be unregister");
+				data.getLm().removeUpdates(data.getLnormal());
+			}
+			if (data.getLcoarse() != null) {
+				Log.d(debugTag, "MixContex - getcoarse will be unregister");
+				data.getLm().removeUpdates(data.getLcoarse());
+			}
+			if (data.getLbounce() != null) {
+				Log.d(debugTag, "MixContex - bounce will be unregister");
+				data.getLm().removeUpdates(data.getLbounce());
+			}
+			// data.setLm(null);
+		} catch (Exception ex) {
 			Log.d(debugTag, "MixContex - unregister Error");
 			Log.w(TAG, ex.getMessage(), ex);
 		}
@@ -252,24 +248,38 @@ public class MixContext extends ContextWrapper {
 	}
 
 	public void onStopContext() {
-		data.getDownloadManager().pause();
-//		unregisterLocationManager();
-		// @todo move destroy to onDestroy (user can relaunch app after it
-		// stops)
-		// downloadThread.destroy();
+		if (null != data.getDownloadManager()) {
+			data.getDownloadManager().pause();
+		}
 	}
 
 	public void onDestroyContext() {
-		data.getDownloadManager().stop();
-		data.setDownloadManager(null);
-		if(data.getLm() != null){
-			unregisterLocationManager();
+		if (null != data) {
+			if (null != data.getDownloadManager()) {
+				data.getDownloadManager().stopThread();
+			}
+			if (null != data.getLm()) {
+				unregisterLocationManager();
+			}
+			// //attempt to destroy download thread.
+			// int attempts = 0;
+			// while (!DownloadManager.isStopped() && attempts < 2){
+			// try {
+			// wait(200);
+			// attempts++;
+			// } catch (InterruptedException e) {
+			// Log.w(TAG, e.getMessage());
+			// }
+			// }
+			//data.setDownloadManager(null);
 		}
 		data = null;
+		Log.d(debugTag, "MixContex - onDestroy Return");
+		return; //enforce return.
 	}
 
 	/**
-	 * sets rotation manager of dest
+	 * 
 	 * @param dest
 	 */
 	public void setRM(final Matrix dest) {
@@ -287,7 +297,7 @@ public class MixContext extends ContextWrapper {
 	public void loadMixViewWebPage(final String url) throws Exception {
 		final WebView webview = new WebView(data.getMixView());
 		webview.getSettings().setJavaScriptEnabled(true);
-		//webview.getSettings().setAppCacheEnabled(true);
+		// webview.getSettings().setAppCacheEnabled(true);
 		webview.setWebViewClient(new WebViewClient() {
 			@Override
 			public boolean shouldOverrideUrlLoading(final WebView view,
@@ -303,7 +313,7 @@ public class MixContext extends ContextWrapper {
 			public boolean onKeyDown(final int keyCode, final KeyEvent event) {
 				if (keyCode == KeyEvent.KEYCODE_BACK) {
 					this.dismiss();
-					//webview.destroy();
+					// webview.destroy();
 				}
 				return true;
 			}
@@ -323,7 +333,7 @@ public class MixContext extends ContextWrapper {
 	public void loadWebPage(final String url, final Context context)
 			throws Exception {
 		final WebView webview = new WebView(context);
-		//webview.getSettings().setAppCacheEnabled(true);
+		// webview.getSettings().setAppCacheEnabled(true);
 		webview.setWebViewClient(new WebViewClient() {
 			@Override
 			public boolean shouldOverrideUrlLoading(final WebView view,
@@ -339,7 +349,7 @@ public class MixContext extends ContextWrapper {
 			public boolean onKeyDown(final int keyCode, final KeyEvent event) {
 				if (keyCode == KeyEvent.KEYCODE_BACK) {
 					this.dismiss();
-					//webview.destroy();
+					// webview.destroy();
 				}
 				return true;
 			}
@@ -364,6 +374,5 @@ public class MixContext extends ContextWrapper {
 	public void setLocationAtLastDownload(final Location locationAtLastDownload) {
 		this.data.setLocationAtLastDownload(locationAtLastDownload);
 	}
-
 
 }

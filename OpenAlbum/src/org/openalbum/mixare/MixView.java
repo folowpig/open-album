@@ -82,11 +82,10 @@ public class MixView extends Activity implements SensorEventListener,
 	// TAG for logging
 	public static final String TAG = "Open Album";
 	private static final String debugTag = "WorkFlow";
-	
+
 	private static boolean isInited;
 	private static PaintScreen dWindow;
 	private static DataView dataView;
-
 
 	/* string to name & access the preference file in the internal storage */
 	// change to not be conflicted with Mixare AR
@@ -121,12 +120,13 @@ public class MixView extends Activity implements SensorEventListener,
 			data.getMyZoomBar().setVisibility(View.INVISIBLE);
 			// zoomChanging= false;
 			setZoomLevel();
-			//data.getMyZoomBar().getProgress();
+			// data.getMyZoomBar().getProgress();
 
 			t.cancel();
-			//repaint after changing the level
+			// repaint after changing the level
 			repaint();
-			
+			refreshDownload();
+
 		}
 
 		// private void //refreashZoomLevel() {
@@ -138,7 +138,6 @@ public class MixView extends Activity implements SensorEventListener,
 
 	/* Data holder class */
 	private MixViewData data = new MixViewData();
-
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -164,13 +163,10 @@ public class MixView extends Activity implements SensorEventListener,
 			if (settings.getBoolean("firstAccess", false) == false) {
 				firstAccess(settings);
 			}
-
+			maintainView();
+			
 			final FrameLayout frameLayout = createZoomBar(settings);
-
-			setCamScreen(new CameraSurface(this));
-			setAugScreen(new AugmentedView(this));
-			setContentView(getCamScreen());
-
+			
 			addContentView(getAugScreen(), new LayoutParams(
 					LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
 
@@ -179,7 +175,7 @@ public class MixView extends Activity implements SensorEventListener,
 					Gravity.BOTTOM));
 
 			if (!isInited) {
-				setMixContext(new MixContext(this)); 
+				setMixContext(new MixContext(this));
 				getMixContext().data.setDownloadManager(new DownloadManager(
 						getMixContext()));
 				setdWindow(new PaintScreen());
@@ -188,7 +184,7 @@ public class MixView extends Activity implements SensorEventListener,
 				/* set the radius in data view to the last selected by the user */
 				setZoomLevel();
 				isInited = true;
-				//refreshDownload();
+				refreshDownload();
 			}
 
 		} catch (Exception ex) {
@@ -197,20 +193,34 @@ public class MixView extends Activity implements SensorEventListener,
 	}
 
 	@Override
-	protected void onStart(){
+	protected void onStart() {
 		super.onStart();
-		Log.d(debugTag, "On Start - MixView ");
-		
+		Log.d(debugTag, "MixView - On Start started");
+
 		if (!isInited) {
-			Log.d(debugTag, "On Start - isInited is not true");
+			Log.d(debugTag, "MixView - On Start - isInited is not true");
 		}
-		if (getDataView() == null){
-			Log.d(debugTag, "on Start - DataView is null");
+		maintainView();
+	}
+
+	/**
+	 * checks if there is inctances of view
+	 */
+	private void maintainView() {
+		if (getAugScreen() == null || getCamScreen() == null){
+			setCamScreen(new CameraSurface(this));
+			setAugScreen(new AugmentedView(this));
+			setContentView(getCamScreen());
 		}
-		if (getMixContext() == null){
-			Log.d(debugTag, "on Start - MixContext is null");
+		if (getDataView() == null) {
+			Log.d(debugTag, "MixView - on Start - DataView is null");
+		}
+		if (getMixContext() == null) {
+			Log.d(debugTag, "MixView - on Start - MixContext is null");
+			setMixContext(new MixContext(this));
 		}
 	}
+
 	// @TODO optimize onResume for faster transitions
 	@Override
 	protected void onResume() {
@@ -218,15 +228,15 @@ public class MixView extends Activity implements SensorEventListener,
 		Log.d(debugTag, "MixView - On Resume - starting");
 		try {
 			this.data.getmWakeLock().acquire();
-			
-			//reinit context and dataview
+
+			// reinit context and dataview
 			getMixContext().data.setMixView(this);
 			getDataView().setMixContext(getMixContext());
-			//then update context
+			// then update context
 			data.setMixContext(getDataView().getContext());
-			//refreash data
+			// refreash data
 			getMixContext().refreshDataSources();
-			
+
 			getDataView().doStart();
 			getDataView().clearEvents();
 
@@ -308,10 +318,10 @@ public class MixView extends Activity implements SensorEventListener,
 			} catch (Exception ex) {
 				Log.d("Open Album", "GPS Initialize Error", ex);
 			}
-//			data.setDownloadThread(new Thread(getMixContext().data
-//					.getDownloadManager()));
-//			data.getDownloadThread().start();
-			refreshDownload();
+			// data.setDownloadThread(new Thread(getMixContext().data
+			// .getDownloadManager()));
+			// data.getDownloadThread().start();
+			// refreshDownload();
 		} catch (Exception ex) {
 			doError(ex);
 			try {
@@ -342,13 +352,13 @@ public class MixView extends Activity implements SensorEventListener,
 		// setZoomLevel();
 	}
 
-	
 	@Override
-	protected void onActivityResult (int requestCode, int resultCode, Intent data) {
-		//repaint screen if other activity requested it
-		if( data.getBooleanExtra("settingChanged", false)){
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		// repaint screen if other activity requested it
+		if (data.getBooleanExtra("settingChanged", false)) {
 			Log.d(debugTag, "MixView - Reseved Setting Change");
 			repaint();
+			refreshDownload();
 		}
 	}
 
@@ -365,12 +375,14 @@ public class MixView extends Activity implements SensorEventListener,
 		setDataView(new DataView(getMixContext()));
 		setdWindow(new PaintScreen());
 		setZoomLevel();
-		refreshDownload();
 	}
+
 	/**
-	 * Creates zoom Seek bar on FrameLayout.
-	 * Seek bar is set to invisble by default.
-	 * @param SharedPreferences settings
+	 * Creates zoom Seek bar on FrameLayout. Seek bar is set to invisble by
+	 * default.
+	 * 
+	 * @param SharedPreferences
+	 *            settings
 	 * @return FrameLayout
 	 */
 	private FrameLayout createZoomBar(final SharedPreferences settings) {
@@ -392,14 +404,15 @@ public class MixView extends Activity implements SensorEventListener,
 
 	/**
 	 * First Access users. display the license agreement.
-	 * @param SharedPreferences settings
+	 * 
+	 * @param SharedPreferences
+	 *            settings
 	 */
 	private void firstAccess(final SharedPreferences settings) {
 		final SharedPreferences.Editor editor = settings.edit();
-		
-		final AlertDialog.Builder builder1 = new AlertDialog.Builder(
-				this);
-		
+
+		final AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
+
 		builder1.setMessage(getString(R.string.license));
 		builder1.setNegativeButton(getString(R.string.close_button),
 				new DialogInterface.OnClickListener() {
@@ -427,15 +440,14 @@ public class MixView extends Activity implements SensorEventListener,
 	public void storeDefaultSources() {
 		final SharedPreferences DataSourceSettings = getSharedPreferences(
 				DataSourceList.SHARED_PREFS, 0);
-		//setting the default values
+		// setting the default values
 		final SharedPreferences.Editor dataSourceEditor = DataSourceSettings
 				.edit();
 		dataSourceEditor
 				.putString("DataSource0",
 						"Wikipedia|http://api.geonames.org/findNearbyWikipediaJSON|0|0|true");
-		dataSourceEditor
-				.putString("DataSource1",
-						"Twitter|http://search.twitter.com/search.json|2|0|false");
+		dataSourceEditor.putString("DataSource1",
+				"Twitter|http://search.twitter.com/search.json|2|0|false");
 		dataSourceEditor
 				.putString(
 						"DataSource2",
@@ -445,7 +457,6 @@ public class MixView extends Activity implements SensorEventListener,
 						"Panoramio|http://www.panoramio.com/map/get_panoramas.php|4|0|true");
 		dataSourceEditor.commit();
 	}
-
 
 	@Override
 	protected void onPause() {
@@ -460,10 +471,8 @@ public class MixView extends Activity implements SensorEventListener,
 			} catch (Exception ignore) {
 				Log.w(TAG, ignore.getMessage());
 			}
-
-			getMixContext().unregisterLocationManager();
 		} catch (Exception ex) {
-			Log.w("On pause", ex.getMessage(), ex);
+			Log.w("MixView - On pause", ex.getMessage(), ex);
 			doError(ex);
 		} finally {
 			super.onPause();
@@ -471,32 +480,26 @@ public class MixView extends Activity implements SensorEventListener,
 
 	}
 
-
 	@Override
 	protected void onStop() {
-		Log.d(debugTag, "On Stop - called");
-		data.getMixContext().stopService(getIntent());
+		Log.d(debugTag, "MixView - On Stop called");
 		data.getMixContext().onStopContext();
+		//data.getMixContext().stopService(getIntent());
 		super.onStop();
 	}
 
-//	@Override
-//	protected void onDestroy() {
-//		// downloadThread.destroy();
-//		data.getMixContext().stopService(getIntent());
-//		data.getMixContext().onDestroyContext();
-//		// Destroy data and this class data if any.
-//		if (getMixContext() != null) {
-//			getMixContext().unregisterLocationManager();
-//			if (getMixContext().data.getDownloadManager() != null) {
-//				getMixContext().data.getDownloadManager().stop();
-//			}
-//		}
-//		data.setDownloadThread(null);
-//		data.setMixContext(null);
-//		data = null;
-//		super.onDestroy();
-//	}
+	@Override
+	protected void onDestroy() {
+		// downloadThread.destroy();
+		Log.d(debugTag, "MixView - On Destroy called");
+		data.getMixContext().onDestroyContext();
+		//data.getMixContext().stopService(getIntent());
+		//data.setDownloadThread(null);
+		//data.setMixContext(null);
+		//data = null;
+		Log.d(debugTag, "MixView - onDestroy to super now");
+		super.onDestroy();
+	}
 
 	@Override
 	public boolean onCreateOptionsMenu(final Menu menu) {
@@ -539,8 +542,7 @@ public class MixView extends Activity implements SensorEventListener,
 				Intent intent = new Intent(MixView.this, DataSourceList.class);
 				startActivityForResult(intent, 40);
 			} else {
-				Toast.makeText(this,
-						getString(R.string.option_not_available),
+				Toast.makeText(this, getString(R.string.option_not_available),
 						Toast.LENGTH_LONG).show();
 			}
 			break;
@@ -558,8 +560,8 @@ public class MixView extends Activity implements SensorEventListener,
 			}
 			/* if the list is empty */
 			else {
-				Toast.makeText(this, R.string.empty_list,
-						Toast.LENGTH_LONG).show();
+				Toast.makeText(this, R.string.empty_list, Toast.LENGTH_LONG)
+						.show();
 			}
 			break;
 		/* Map View */
@@ -589,7 +591,7 @@ public class MixView extends Activity implements SensorEventListener,
 					+ getString(R.string.altitude)
 					+ currentGPSInfo.getAltitude() + "m\n"
 					+ getString(R.string.speed) + currentGPSInfo.getSpeed()
-					+ "km/h\n" + getString( R.string.accuracy)
+					+ "km/h\n" + getString(R.string.accuracy)
 					+ currentGPSInfo.getAccuracy() + "m\n"
 					+ getString(R.string.gps_last_fix)
 					+ new Date(currentGPSInfo.getTime()).toString() + "\n");
@@ -618,9 +620,9 @@ public class MixView extends Activity implements SensorEventListener,
 			alert1.setTitle(getString(R.string.license_title));
 			alert1.show();
 			break;
-			default:
-				//do nothing
-				break;
+		default:
+			// do nothing
+			break;
 
 		}
 		return true;
@@ -647,9 +649,9 @@ public class MixView extends Activity implements SensorEventListener,
 
 		return myout;
 	}
-	
-	/* ********* Handlers *************/
-	
+
+	/* ********* Handlers ************ */
+
 	private void handleIntent(Intent intent) {
 		if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
 			String query = intent.getStringExtra(SearchManager.QUERY);
@@ -700,10 +702,12 @@ public class MixView extends Activity implements SensorEventListener,
 		builder.setPositiveButton(R.string.connection_error_dialog_button1,
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
-						data.setfError(false); //?
+						data.setfError(false); // ?
 						// TODO improve
 						try {
+							maintainView();
 							repaint();
+							refreshDownload();
 						} catch (Exception ex) {
 							// Don't call doError, it will be a recursive call.
 							// doError(ex);
@@ -818,7 +822,7 @@ public class MixView extends Activity implements SensorEventListener,
 	}
 
 	/**
-	 *  For Debugging purposes
+	 * For Debugging purposes
 	 */
 	private void debugFrozen() {
 		data.setSearchNotificationTxt(new TextView(this));
@@ -835,7 +839,7 @@ public class MixView extends Activity implements SensorEventListener,
 		addContentView(data.getSearchNotificationTxt(), new LayoutParams(
 				LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
 	}
-	
+
 	@Override
 	public boolean onTouchEvent(MotionEvent me) {
 		try {
@@ -903,7 +907,7 @@ public class MixView extends Activity implements SensorEventListener,
 		return false;
 	}
 
-	/* ********** Getters and Setters ************/
+	/* ********** Getters and Setters *********** */
 	public boolean isZoombarVisible() {
 		return data.getMyZoomBar() != null
 				&& data.getMyZoomBar().getVisibility() == View.VISIBLE;
@@ -914,7 +918,7 @@ public class MixView extends Activity implements SensorEventListener,
 
 		getDataView().setRadius(myout);
 
-		//data.getMyZoomBar().setVisibility(View.INVISIBLE);
+		// data.getMyZoomBar().setVisibility(View.INVISIBLE);
 		data.setZoomLevel(String.valueOf(myout));
 
 	}
@@ -922,23 +926,28 @@ public class MixView extends Activity implements SensorEventListener,
 	/**
 	 * Refreshes Download
 	 */
-	public void refreshDownload() {
+	private void refreshDownload() {
 		Log.d(debugTag, "MixView - refreshing Download");
 		getDataView().doStart();
 		getDataView().clearEvents();
-		if (data.getDownloadThread() != null){
-			try {
-			if (! data.getDownloadThread().isInterrupted()){
-				data.getDownloadThread().interrupt();
+		try {
+			if (data.getDownloadThread() != null) {
+
+				if (!data.getDownloadThread().isInterrupted()) {
+					Log.d(debugTag, "MixView - refreshing Download - interrputing thread");
+					data.getDownloadThread().interrupt();
+					getMixContext().data.getDownloadManager().restart();
+				}
+
+			} else { //if no download thread found
+				Log.d(debugTag, "MixView - refreshing Download - creating new one");
+				data.setDownloadThread(new Thread(getMixContext().data
+						.getDownloadManager()));
+				getMixContext().data.getDownloadManager().startThread();
 			}
-			//data.getDownloadThread().stop();
-		}catch (Exception ex){
+		} catch (Exception ex) {
 			Log.w(TAG, ex.getMessage(), ex.fillInStackTrace());
 		}
-		}
-		data.setDownloadThread(new Thread(getMixContext().data
-				.getDownloadManager())); 
-		data.getDownloadThread().start();
 	}
 
 	public int getZoomProgress() {
@@ -1002,7 +1011,8 @@ public class MixView extends Activity implements SensorEventListener,
 	}
 
 	/**
-	 * @param dWindow the dWindow to set
+	 * @param dWindow
+	 *            the dWindow to set
 	 */
 	public static void setdWindow(PaintScreen dWindow) {
 		MixView.dWindow = dWindow;
@@ -1016,7 +1026,8 @@ public class MixView extends Activity implements SensorEventListener,
 	}
 
 	/**
-	 * @param dataView the dataView to set
+	 * @param dataView
+	 *            the dataView to set
 	 */
 	public static void setDataView(DataView dataView) {
 		MixView.dataView = dataView;
@@ -1030,7 +1041,8 @@ public class MixView extends Activity implements SensorEventListener,
 	}
 
 	/**
-	 * @param myZoomBarOnSeekBarChangeListener the myZoomBarOnSeekBarChangeListener to set
+	 * @param myZoomBarOnSeekBarChangeListener
+	 *            the myZoomBarOnSeekBarChangeListener to set
 	 */
 	public void setMyZoomBarOnSeekBarChangeListener(
 			OnSeekBarChangeListener myZoomBarOnSeekBarChangeListener) {
