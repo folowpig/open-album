@@ -66,4 +66,16 @@ public class MixUtils {
 
 		return angle;
 	}
+
+	public static double getAngle(final double center_x,final double center_y,
+			final double post_x,final double post_y) {
+		final double d = (double) Math.sqrt((post_x - center_x)*(post_x - center_x)+ 
+				(post_y - center_y) * (post_y - center_y));
+		final double cos = (post_x - center_x) / d;
+		double angle = (double) Math.toDegrees(Math.acos(cos));
+
+		angle = ((post_y - center_y) < 0.) ? angle * -1. : angle;
+
+		return angle;
+	}
 }

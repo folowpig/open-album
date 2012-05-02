@@ -27,6 +27,7 @@ import java.util.List;
 import org.openalbum.mixare.MixContext;
 import org.openalbum.mixare.MixView;
 import org.openalbum.mixare.marker.Marker;
+import org.openalbum.mixare.marker.MarkerInterface;
 
 import android.location.Location;
 import android.util.Log;
@@ -86,7 +87,7 @@ public class DataHandler {
 	public void onLocationChanged(final Location location) {
 		updateDistances(location);
 		sortMarkerList();
-		for (final Marker ma : markerList) {
+		for (final MarkerInterface ma : markerList) {
 			ma.update(location);
 		}
 	}

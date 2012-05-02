@@ -60,6 +60,7 @@ public class MixContext extends ContextWrapper {
 
 	public MixContext(final Context appCtx) {
 		super(appCtx);
+		//final Throwable stack = new Throwable();
 		Log.d(debugTag, "MixContex - created");
 		this.data.setMixView((MixView) appCtx);
 		this.data.setCtx(appCtx.getApplicationContext());

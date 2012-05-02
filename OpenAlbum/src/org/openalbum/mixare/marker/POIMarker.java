@@ -119,12 +119,12 @@ public class POIMarker extends Marker {
 			// dw.setColor(DataSource.getColor(type));
 
 			final float currentAngle = MixUtils.getAngle(cMarker.x, cMarker.y,
-					signMarker.x, signMarker.y);
+					getSignMarker().x, getSignMarker().y);
 			txtLab.prepare(textBlock);
 			dw.setStrokeWidth(1f);
 			dw.setFill(true);
-			dw.paintObj(txtLab, signMarker.x - txtLab.getWidth() / 2,
-					signMarker.y + maxHeight, currentAngle + 90, 1);
+			dw.paintObj(txtLab, getSignMarker().x - txtLab.getWidth() / 2,
+					getSignMarker().y + maxHeight, currentAngle + 90, 1);
 
 		}
 	}
@@ -132,7 +132,7 @@ public class POIMarker extends Marker {
 	public void otherShape(final PaintScreen dw) {
 		// This is to draw new shape, triangle
 		final float currentAngle = MixUtils.getAngle(cMarker.x, cMarker.y,
-				signMarker.x, signMarker.y);
+				getSignMarker().x, getSignMarker().y);
 		final float maxHeight = Math.round(dw.getHeight() / 10f) + 1;
 
 		dw.setColor(getColour());

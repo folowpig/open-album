@@ -34,6 +34,7 @@ import org.openalbum.mixare.render.Camera;
 import org.openalbum.mixare.render.MixVector;
 
 import android.location.Location;
+import android.util.Log;
 
 /**
  * The class represents a marker and contains its information. It draws the
@@ -41,7 +42,7 @@ import android.location.Location;
  * like SocialMarkers or NavigationMarkers, since this class is abstract
  */
 
-public abstract class Marker implements Comparable<Marker> {
+public abstract class Marker implements Comparable<Marker>, MarkerInterface {
 
 	private String ID;
 	protected String title;
@@ -60,14 +61,14 @@ public abstract class Marker implements Comparable<Marker> {
 	// private boolean isNear;
 	// private float deltaCenter;
 	public MixVector cMarker = new MixVector();
-	protected MixVector signMarker = new MixVector();
+	public MixVector signMarker = new MixVector(); //@FIXME private (change to public for debugging)
 	// private MixVector oMarker = new MixVector();
 
 	protected MixVector locationVector = new MixVector();
 	private final MixVector origin = new MixVector(0, 0, 0);
 	private final MixVector upV = new MixVector(0, 1, 0);
 	private final ScreenLine pPt = new ScreenLine();
-
+	private static final String debugTag = "WorkFlow";
 	protected Label txtLab = new Label();
 	protected TextObj textBlock;
 
@@ -106,7 +107,7 @@ public abstract class Marker implements Comparable<Marker> {
 		viewCam.projectPoint(tmpa, tmpb, addX, addY); // 6
 		cMarker.set(tmpb); // 7
 		viewCam.projectPoint(tmpc, tmpb, addX, addY); // 6
-		signMarker.set(tmpb); // 7
+		getSignMarker().set(tmpb); // 7
 	}
 
 	private void calcV(final Camera viewCam) {
@@ -116,10 +117,14 @@ public abstract class Marker implements Comparable<Marker> {
 
 		if (cMarker.z < -1f) {
 			isVisible = true;
-
+//			Log.d(debugTag, "Marker - calcV -  cMarker.y= "+ String.valueOf(cMarker.y)
+//					+ " cMarker.x= "+ String.valueOf(cMarker.x));
 			if (MixUtils.pointInside(cMarker.x, cMarker.y, 0, 0, viewCam.width,
 					viewCam.height)) {
-
+//				Log.d(debugTag, "Marker - calcV - pointsInside True - cMarker.y= "+ String.valueOf(cMarker.y)
+//						+ " cMarker.x= "+ String.valueOf(cMarker.x) + 
+//						" Marker= " + this.ID);
+				//isVisible = true;
 				// float xDist = cMarker.x - viewCam.width / 2;
 				// float yDist = cMarker.y - viewCam.height / 2;
 				// float dist = xDist * xDist + yDist * yDist;
@@ -133,6 +138,9 @@ public abstract class Marker implements Comparable<Marker> {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.openalbum.mixare.marker.MarkerInterface#update(android.location.Location)
+	 */
 	public void update(final Location curGPSFix) {
 		// An elevation of 0.0 probably means that the elevation of the
 		// POI is not known and should be set to the users GPS height
@@ -158,10 +166,10 @@ public abstract class Marker implements Comparable<Marker> {
 	// private void calcPaint(Camera viewCam) {
 	// cCMarker(origin, viewCam, 0, 0);
 	// }
-
+	//@TODO is click valid
 	private boolean isClickValid(final float x, final float y) {
 		final float currentAngle = MixUtils.getAngle(cMarker.x, cMarker.y,
-				signMarker.x, signMarker.y);
+				getSignMarker().x, getSignMarker().y);
 		// if the marker is not active (i.e. not shown in AR view) we don't have
 		// to check it for clicks
 		if (!isActive()) {
@@ -169,8 +177,8 @@ public abstract class Marker implements Comparable<Marker> {
 		}
 
 		// TODO adapt the following to the variable radius!
-		pPt.x = x - signMarker.x;
-		pPt.y = y - signMarker.y;
+		pPt.x = x - getSignMarker().x;
+		pPt.y = y - getSignMarker().y;
 		pPt.rotate(Math.toRadians(-(currentAngle + 90)));
 		pPt.x += txtLab.getX();
 		pPt.y += txtLab.getY();
@@ -188,6 +196,9 @@ public abstract class Marker implements Comparable<Marker> {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.openalbum.mixare.marker.MarkerInterface#draw(org.openalbum.mixare.gui.PaintScreen)
+	 */
 	public void draw(final PaintScreen dw) {
 		drawCircle(dw);
 		drawTextBlock(dw);
@@ -221,14 +232,17 @@ public abstract class Marker implements Comparable<Marker> {
 		// TODO: change textblock only when distance changes
 		String textStr = "";
 
-		double d = distance;
-		final DecimalFormat df = new DecimalFormat("@#");
-		if (d < 1000.0) {
-			textStr = title + " (" + df.format(d) + "m)";
-		} else {
-			d = d / 1000.0;
-			textStr = title + " (" + df.format(d) + "km)";
-		}
+		//Make use of already defined function (used for radar)
+		textStr = title + " (" + MixUtils.formatDist((float) distance) + ")";
+//		double d = distance;
+		
+//		final DecimalFormat df = new DecimalFormat("@#");
+//		if (d < 1000.0) {
+//			textStr = title + " (" + df.format(d) + "m)";
+//		} else {
+//			d = d / 1000.0;
+//			textStr = title + " (" + df.format(d) + "km)";
+//		}
 
 		textBlock = new TextObj(textStr, Math.round(maxHeight / 2f) + 1, 250,
 				dw, underline);
@@ -238,18 +252,21 @@ public abstract class Marker implements Comparable<Marker> {
 			// dw.setColor(DataSource.getColor(type));
 
 			final float currentAngle = MixUtils.getAngle(cMarker.x, cMarker.y,
-					signMarker.x, signMarker.y);
+					getSignMarker().x, getSignMarker().y);
 
 			txtLab.prepare(textBlock);
 
 			dw.setStrokeWidth(1f);
 			dw.setFill(true);
-			dw.paintObj(txtLab, signMarker.x - txtLab.getWidth() / 2,
-					signMarker.y + maxHeight, currentAngle + 90, 1);
+			dw.paintObj(txtLab, getSignMarker().x - txtLab.getWidth() / 2,
+					getSignMarker().y + maxHeight, currentAngle + 90, 1);
 		}
 
 	}
 
+	/* (non-Javadoc)
+	 * @see org.openalbum.mixare.marker.MarkerInterface#fClick(float, float, org.openalbum.mixare.MixContext, org.openalbum.mixare.MixState)
+	 */
 	public boolean fClick(final float x, final float y, final MixContext ctx,
 			final MixState state) {
 		boolean evtHandled = false;
@@ -269,11 +286,22 @@ public abstract class Marker implements Comparable<Marker> {
 
 	}
 
+	public static double doubleCompareTo(final Marker one, final Marker another) {
+
+		final double leftPm = one.getDistance();
+		final double rightPm = another.getDistance();
+
+		return Double.compare(leftPm, rightPm);
+
+	}
 	@Override
 	public boolean equals(final Object marker) {//@FIXME Marker casting Dangours
-		return (marker != null)? this.ID.equals(((Marker) marker).getID()) : false;
+		return (marker != null)? this.ID.equals(((MarkerInterface) marker).getID()) : false;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.openalbum.mixare.marker.MarkerInterface#getMaxObjects()
+	 */
 	abstract public int getMaxObjects();
 
 	/************ Getters and Setters ****************/
@@ -314,6 +342,9 @@ public abstract class Marker implements Comparable<Marker> {
 		this.distance = distance;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.openalbum.mixare.marker.MarkerInterface#getID()
+	 */
 	public String getID() {
 		return ID;
 	}
@@ -322,12 +353,29 @@ public abstract class Marker implements Comparable<Marker> {
 		ID = iD;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.openalbum.mixare.marker.MarkerInterface#isActive()
+	 */
 	public boolean isActive() {
 		return active;
 	}
 
 	public void setActive(final boolean active) {
 		this.active = active;
+	}
+
+	/**
+	 * @return the signMarker
+	 */
+	protected MixVector getSignMarker() {
+		return signMarker;
+	}
+
+	/**
+	 * @param signMarker the signMarker to set
+	 */
+	protected void setSignMarker(MixVector signMarker) {
+		this.signMarker = signMarker;
 	}
 
 }

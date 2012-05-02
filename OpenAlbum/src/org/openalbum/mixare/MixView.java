@@ -163,7 +163,9 @@ public class MixView extends Activity implements SensorEventListener,
 			if (settings.getBoolean("firstAccess", false) == false) {
 				firstAccess(settings);
 			}
-			maintainView();
+			setCamScreen(new CameraSurface(this));
+			setAugScreen(new AugmentedView(this));
+			setContentView(getCamScreen());
 			
 			final FrameLayout frameLayout = createZoomBar(settings);
 			

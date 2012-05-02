@@ -24,6 +24,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
+import android.util.Log;
 
 /**
  * This class has the ability to set up the main view and it paints objects on
@@ -34,13 +35,15 @@ public class PaintScreen {
 	Canvas canvas;
 	int width, height;
 	Paint paint = new Paint();
-	Paint bPaint = new Paint();
-
+	//Paint bPaint = new Paint();
+	private static final String debugTag = "WorkFlow";
+	
 	public PaintScreen() {
 		paint.setTextSize(16);
 		paint.setAntiAlias(true);
 		paint.setColor(Color.BLUE);
 		paint.setStyle(Paint.Style.STROKE);
+		Log.d(debugTag, "PaintScreen - created");
 	}
 
 	public void paintLine(final float x1, final float y1, final float x2,
@@ -62,6 +65,7 @@ public class PaintScreen {
 
 	public void paintBitmap(final Bitmap bitmap, final float left,
 			final float top) {
+//		Log.d(debugTag, "PaintScreen - paintBitmap");
 		canvas.save();
 		canvas.drawBitmap(bitmap, left, top, paint);
 		canvas.restore();

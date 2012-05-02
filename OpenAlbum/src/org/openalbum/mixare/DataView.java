@@ -42,7 +42,9 @@ import org.openalbum.mixare.data.DataSource;
 import org.openalbum.mixare.gui.PaintScreen;
 import org.openalbum.mixare.gui.RadarPoints;
 import org.openalbum.mixare.gui.ScreenLine;
+import org.openalbum.mixare.marker.ImageMarker;
 import org.openalbum.mixare.marker.Marker;
+import org.openalbum.mixare.marker.MarkerInterface;
 import org.openalbum.mixare.render.Camera;
 
 import android.graphics.Color;
@@ -63,10 +65,11 @@ public class DataView {
 	private  MixContext mixContext;
 	/** is the view Inited? */
 	private boolean isInit;
+	private static int  countertmp = 0;
 
 	/** width and height of the view */
 	private int width, height;
-
+	
 	/**
 	 * _NOT_ the android camera, the class that takes care of the transformation
 	 */
@@ -94,16 +97,20 @@ public class DataView {
 	private final ScreenLine rrl = new ScreenLine();
 	private final float rx = 10, ry = 20;
 	private float addX = 0, addY = 0;
-
+	private static final String debugTag = "WorkFlow";
 	/**
 	 * Constructor
 	 */
 	public DataView(MixContext ctx) {
+		//final Throwable stack = new Throwable();
+		Log.d(debugTag, "DataView - Created");
 		this.mixContext = (MixContext) ctx;
 	}
 
 	public void init(final int widthInit, final int heightInit) {
 		try {
+			//final Throwable stack = new Throwable();
+			Log.d(debugTag, "DataView - Created");
 			width = widthInit;
 			height = heightInit;
 
@@ -150,14 +157,14 @@ public class DataView {
 
 		state.calcPitchBearing(cam.transform);
 
+		
 		// Load Layer
 		if (state.nextLStatus == MixState.NOT_STARTED && !frozen) {
-
 			if (mixContext.getStartUrl().length() > 0) {
 				requestData(mixContext.getStartUrl());
 				isLauncherStarted = true;
+				
 			}
-
 			else {
 				final double lat = curFix.getLatitude(), lon = curFix
 						.getLongitude(), alt = curFix.getAltitude();
@@ -174,7 +181,6 @@ public class DataView {
 					}
 				}
 			}
-
 			// if no datasources are activated
 			if (state.nextLStatus == MixState.NOT_STARTED) {
 				state.nextLStatus = MixState.DONE;
@@ -208,6 +214,30 @@ public class DataView {
 									R.string.download_received)
 									+ " " + dRes.source.getName(),
 							Toast.LENGTH_SHORT).show();
+					//@TODO group markers
+					for (int i = dataHandler.getMarkerCount() - 1 ; i >= 0; i--) {
+						final int tm = (i > 0)? i-1 : i;
+						final int tm2 = (i >1)? i-2 : i;
+						final Marker ma = dataHandler.getMarker(i);
+						final Marker ma2 = dataHandler.getMarker(tm);
+						final Marker ma3 = dataHandler.getMarker(tm2);
+						if (ImageMarker.class.isInstance(ma) ){
+							final double comp = MixUtils.getAngle(ma.getLongitude(), ma.getLatitude(), 
+									ma2.getLongitude(), ma2.getLatitude());
+							Log.d(debugTag, "DataView - Draw - before cal"+
+									" i= " + String.valueOf(i) +
+						" compare " + String.valueOf(comp) +
+								//"dataHandler = " + String.valueOf(dataHandler.getMarkerCount()) +
+								" Latitude = " + String.valueOf(ma.getLatitude()) +
+								" long = " + String.valueOf(ma.getLongitude())+
+								" title " + ma.getTitle());
+							
+							
+							//if (MixUtils.getAngle(ma., center_y, post_x, post_y))
+						}
+					
+					}
+					
 
 				}
 			}
@@ -220,7 +250,9 @@ public class DataView {
 		// Update markers
 		dataHandler.updateActivationStatus(mixContext);
 		for (int i = dataHandler.getMarkerCount() - 1; i >= 0; i--) {
+			final int tmp = (i > 0)? i-1: i;
 			final Marker ma = dataHandler.getMarker(i);
+			final Marker ma2 = dataHandler.getMarker(tmp);
 			// if (ma.isActive() && (ma.getDistance() / 1000f < radius || ma
 			// instanceof NavigationMarker || ma instanceof SocialMarker)) {
 			if (ma.isActive() && (ma.getDistance() / 1000f < radius)) {
@@ -230,8 +262,30 @@ public class DataView {
 				// after onLocationChanged and after downloading new marker
 				// if (!frozen)
 				// ma.update(curFix);
+//				Log.d(debugTag, "DataView - Draw - calcPaint addx=" + String.valueOf(addX)
+//						+ " addy= " + String.valueOf(addY));
 				if (!frozen) {
 					ma.calcPaint(cam, addX, addY);
+					 if ( countertmp < 100){
+						Log.d(debugTag, "DataView - after Calpaint" +
+					" AsignMarkerX = "+ String.valueOf(ma.signMarker.x) +
+					" ASignMarkerY = "+ String.valueOf(ma.signMarker.y)+
+					" BsignMarkerX = "+ String.valueOf(ma2.signMarker.x) +
+					" BsignMarkerY = "+ String.valueOf(ma2.signMarker.x) +
+					" ACmarkerX = " + String.valueOf(ma.cMarker.x) +
+					" ACmarkerY = " + String.valueOf(ma.cMarker.y) +
+					" BCmarkerX = " + String.valueOf(ma2.cMarker.x) +
+					" BCmarkerY = " + String.valueOf(ma2.cMarker.y) +
+					" distance = " + String.valueOf(ma.getDistance()) +
+					" Compare = " + String.valueOf(Marker.doubleCompareTo(ma, ma2)) +
+					" title ma " + ma.getTitle() +
+						" title ma2 " + ma2.getTitle());
+						countertmp++;
+					}
+					 if (ImageMarker.class.isInstance(ma) && ImageMarker.class.isInstance(ma2)){
+						 
+					 }
+					
 				}
 				ma.draw(dw);
 			}
@@ -332,7 +386,7 @@ public class DataView {
 			// distance) the first marker that
 			// matches triggers the event.
 			for (int i = 0; i < dataHandler.getMarkerCount() && !evtHandled; i++) {
-				final Marker pm = dataHandler.getMarker(i);
+				final MarkerInterface pm = dataHandler.getMarker(i);
 
 				evtHandled = pm.fClick(evt.x, evt.y, mixContext, state);
 			}

@@ -29,13 +29,14 @@ import android.location.Location;
  */
 public class ImageMarker extends Marker {
 
-	public static final int MAX_OBJECTS = 10;
+	public static final int MAX_OBJECTS = 5;
 	private final Bitmap image; 
 	public static final int OSM_URL_MAX_OBJECTS = 5;
 	private static final boolean FLAG_DECODE_PHOTO_STREAM_WITH_SKIA = false;
 	private static final int IO_BUFFER_SIZE = 4 * 1024;
 	private final static int rectangleBackgroundColor = Color.WHITE;
 	private  String fullPhotoURL = "";
+	private int groupID = 0;
 
 	public ImageMarker(final String title, final double latitude,
 			final double longitude, final double altitude, final String URL,
@@ -114,8 +115,7 @@ public class ImageMarker extends Marker {
 	/**
 	 * Closes the specified stream.
 	 * 
-	 * @param stream
-	 *            The stream to close.
+	 * @param stream The stream to close.
 	 */
 	private static void closeStream(final Closeable stream) {
 		if (stream != null) {
@@ -177,22 +177,22 @@ public class ImageMarker extends Marker {
 		if (isVisible) {
 			// dw.setColor(DataSource.getColor(type));
 			final float currentAngle = MixUtils.getAngle(cMarker.x, cMarker.y,
-					signMarker.x, signMarker.y);
+					getSignMarker().x, getSignMarker().y);
 			txtLab.prepare(textBlock);
 			dw.setStrokeWidth(1f);
 			dw.setFill(true);
-			dw.paintObj(txtLab, signMarker.x - txtLab.getWidth() / 2,
-					signMarker.y + maxHeight, currentAngle + 90, 1);
+			dw.paintObj(txtLab, getSignMarker().x - txtLab.getWidth() / 2,
+					getSignMarker().y + maxHeight, currentAngle + 90, 1);
 		}
 	}
 
 	public void drawImage(final PaintScreen dw) {
 		if (isVisible) {
 			dw.setStrokeWidth(dw.getHeight() / 100f);
-			dw.setFill(false);
+			dw.setFill(true);
 			dw.setColor(rectangleBackgroundColor);
-			dw.paintBitmap(getImage(), (float) (signMarker.x - (getImage().getWidth() / 2f)),
-					(float) (signMarker.y - (getImage().getHeight() / 2f)));
+			dw.paintBitmap(getImage(), (float) (getSignMarker().x - (getImage().getWidth() / 2f)),
+					(float) (getSignMarker().y - (getImage().getHeight() / 2f)));
 
 		}
 	}
@@ -216,5 +216,19 @@ public class ImageMarker extends Marker {
 	 */
 	public void setFullPhotoURL(String fullPhotoURL) {
 		this.fullPhotoURL = fullPhotoURL;
+	}
+
+	/**
+	 * @return the groupID
+	 */
+	public int getGroupID() {
+		return groupID;
+	}
+
+	/**
+	 * @param groupID the groupID to set
+	 */
+	public void setGroupID(int groupID) {
+		this.groupID = groupID;
 	}
 }
