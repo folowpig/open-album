@@ -189,7 +189,7 @@ public class ImageMarker extends Marker {
 	public void drawImage(final PaintScreen dw) {
 		if (isVisible) {
 			dw.setStrokeWidth(dw.getHeight() / 100f);
-			dw.setFill(true);
+			dw.setFill(false);
 			dw.setColor(rectangleBackgroundColor);
 			dw.paintBitmap(getImage(), (float) (getSignMarker().x - (getImage().getWidth() / 2f)),
 					(float) (getSignMarker().y - (getImage().getHeight() / 2f)));

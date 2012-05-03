@@ -217,10 +217,10 @@ public class DataView {
 					//@TODO group markers
 					for (int i = dataHandler.getMarkerCount() - 1 ; i >= 0; i--) {
 						final int tm = (i > 0)? i-1 : i;
-						final int tm2 = (i >1)? i-2 : i;
+						//final int tm2 = (i >1)? i-2 : i;
 						final Marker ma = dataHandler.getMarker(i);
 						final Marker ma2 = dataHandler.getMarker(tm);
-						final Marker ma3 = dataHandler.getMarker(tm2);
+						//final Marker ma3 = dataHandler.getMarker(tm2);
 						if (ImageMarker.class.isInstance(ma) ){
 							final double comp = MixUtils.getAngle(ma.getLongitude(), ma.getLatitude(), 
 									ma2.getLongitude(), ma2.getLatitude());
@@ -268,18 +268,26 @@ public class DataView {
 					ma.calcPaint(cam, addX, addY);
 					 if ( countertmp < 100){
 						Log.d(debugTag, "DataView - after Calpaint" +
+								" title ma " + ma.getTitle() +
+								" title ma2 " + ma2.getTitle() +
 					" AsignMarkerX = "+ String.valueOf(ma.signMarker.x) +
 					" ASignMarkerY = "+ String.valueOf(ma.signMarker.y)+
+					" AsignMarkerZ = "+ String.valueOf(ma.signMarker.z)+
+					//" ACmarkerX = " + String.valueOf(ma.cMarker.x) +
+					//" ACmarkerY = " + String.valueOf(ma.cMarker.y) +
 					" BsignMarkerX = "+ String.valueOf(ma2.signMarker.x) +
-					" BsignMarkerY = "+ String.valueOf(ma2.signMarker.x) +
-					" ACmarkerX = " + String.valueOf(ma.cMarker.x) +
-					" ACmarkerY = " + String.valueOf(ma.cMarker.y) +
-					" BCmarkerX = " + String.valueOf(ma2.cMarker.x) +
-					" BCmarkerY = " + String.valueOf(ma2.cMarker.y) +
+					" BsignMarkerY = "+ String.valueOf(ma2.signMarker.y) +
+					" BsignMarkerZ = "+ String.valueOf(ma2.signMarker.z)+
+					//" BCmarkerX = " + String.valueOf(ma2.cMarker.x) +
+					//" BCmarkerY = " + String.valueOf(ma2.cMarker.y) +
 					" distance = " + String.valueOf(ma.getDistance()) +
-					" Compare = " + String.valueOf(Marker.doubleCompareTo(ma, ma2)) +
-					" title ma " + ma.getTitle() +
-						" title ma2 " + ma2.getTitle());
+					" Angle = " + String.valueOf(MixUtils.getAngle(ma.signMarker.x, ma.signMarker.y, 
+							ma2.signMarker.x, ma2.signMarker.y)) +
+							"Addx = " + String.valueOf(this.addX) +
+							"AddY = " + String.valueOf(this.addY)+
+							"k = " + String.valueOf(this.lrl.x) +
+							"k2 = " + String.valueOf(this.lrl.y)
+					);
 						countertmp++;
 					}
 					 if (ImageMarker.class.isInstance(ma) && ImageMarker.class.isInstance(ma2)){
