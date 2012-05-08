@@ -172,7 +172,7 @@ public abstract class Marker implements Comparable<Marker>, MarkerInterface {
 				getSignMarker().x, getSignMarker().y);
 		// if the marker is not active (i.e. not shown in AR view) we don't have
 		// to check it for clicks
-		if (!isActive()) {
+		if (!isActive() || !this.isVisible) {
 			return false;
 		}
 
