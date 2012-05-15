@@ -1,0 +1,109 @@
+/**
+*  		Open Album Project
+* 
+*	An Augmented Reality Android Application that display photos of near by land marks
+*	and places of interest in Augmented reality Fashion.
+*	
+*	@URL http://code.google.com/p/open-album/
+*	@Email devBinnooh at gmail
+*	@Author A B
+*   @date 5/14/2012
+*/
+
+
+
+- based
+Open Album is fork of open source augmented reality android app, Mixare.
+https://github.com/mixare/mixare
+License is included with this project, GNU v3. See file COPYING For more information.
+
+
+
+-- Project Status
+Currently Open Album is being merged with Mixare. You can follow Open Album contributions at
+https://github.com/DevBinnooh/mixare
+http://code.google.com/p/open-album/wiki/ChangeLog
+
+
+
+--- MetaData
+http://code.google.com/p/open-album/wiki/MetaData
+
+
+
+---- How to build
+1- clone project "git clone https://DevBinnooh@code.google.com/p/open-album/"
+2- Install Android API 10 and GoogleAPI 10. http://developer.android.com/sdk/index.html
+3- Build using Android SDK tools. 
+4- Install and run application on USB connected Android device.
+5- enjoy.
+
+
+
+----- How OA is structured
+Under Src folder, there are JAVA source code distributed in packages as follow:
+
+## org.openalbum.mixare
+	Which is the default package, contains the major activities and controllers.
+	
+	It contains: 
+	MixView == Main Application Activity.
+	MixMap == Map View Activity.
+	MixContext == Holds Application's custom contexts.
+	DataView == View Helper class, which maintain data flow among activities and sources.
+	MixListView == List View Activity that display data in list fashion.
+	DownloadMaganger == Handler Class that handles Internet connection and data request/results.
+	MixUtilty, MixState and Compatibility == Helper classes. 
+	
+## org.openalbum.mixare.data 
+	Holds data and sources
+	
+	It contains:
+	DataSource == an Activity that Manages/control data's activation and manages search functionality. 
+	DataHandler == Handler class that handles Adding/editing/deleting dataSources.
+	DataSourceList == User Interface/menu of On/off/edit/add sources.
+	JSON and XMLHandler == Received Data Handler
+	MixViewData and MixContext == Data Holders for MixView and MixContext.
+	
+## 	org.openalbum.mixare.gui
+	View Objects, Paints, and drawables
+	
+## org.openalbum.mixare.markers
+	Package that holds Data's markers. For each piece of data, a matching marker is created and stored that specifies 
+	how would that data be treated and viewed.
+	
+## org.openalbum.mixare.reality
+	The Main View classes for each activity. 
+	
+## org.openalbum.mixare.render
+	A bride container and helper classes for view.
+	
+	
+------ Developer, Where to start?
+The main Activity is MixView, and it's the starting point for you. :)
+Have in mind the other activities such as
+*MixMap
+*DataSourceList
+*MixListView
+
+Main Views
+*AugmentedReality
+
+*View Markers
+Marker
+NavigationMarker
+POIMarker
+ImageMarker
+SocialMarker
+
+*View Objects
+PaintScreen
+RadarPoints
+ScreenLines
+ScreenObjects
+TxtObj
+
+
+--------------------------------
+Up-to date links and resources
+http://code.google.com/p/open-album/wiki/MetaData
